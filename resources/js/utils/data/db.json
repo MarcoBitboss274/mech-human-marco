@@ -1,0 +1,4023 @@
+{
+  "users": [
+    {
+      "id": "11",
+      "name": "Valsss",
+      "surname": "Berends",
+      "email": "vberendsa@hao123.com",
+      "phone": "936-376-4799",
+      "role": "customer",
+      "address": "5217 Shopko Point",
+      "created_at": "2023-11-13T13:58:06Z",
+      "updated_at": "2024-09-07T08:37:36Z",
+      "email_verified_at": "2024-08-04T13:46:30Z"
+    },
+    {
+      "id": "12",
+      "name": "Dredi",
+      "surname": "Croan",
+      "email": "dcroanb@walmart.com",
+      "phone": "503-346-4435",
+      "role": "customer",
+      "address": "8 Forest Run Plaza",
+      "created_at": "2024-03-07T13:06:14Z",
+      "updated_at": "2024-08-01T03:27:57Z",
+      "email_verified_at": "2024-08-10T20:09:28Z"
+    },
+    {
+      "id": "13",
+      "name": "Isa",
+      "surname": "Tithecote",
+      "email": "itithecotec@deliciousdays.com",
+      "phone": "175-254-3462",
+      "role": "customer",
+      "address": "9 Summer Ridge Street",
+      "created_at": "2024-06-16T13:04:20Z",
+      "updated_at": "2024-02-26T03:19:51Z",
+      "email_verified_at": "2024-01-20T04:52:36Z"
+    },
+    {
+      "id": "14",
+      "name": "Bess",
+      "surname": "Henker",
+      "email": "bhenkerd@fema.gov",
+      "phone": "563-301-8082",
+      "role": "admin",
+      "address": "83 Susan Court",
+      "created_at": "2024-06-12T10:37:15Z",
+      "updated_at": "2024-07-16T16:38:58Z",
+      "email_verified_at": "2024-02-04T01:27:06Z"
+    },
+    {
+      "id": "15",
+      "name": "Delia",
+      "surname": "Brunetti",
+      "email": "dbrunettie@ftc.gov",
+      "phone": "509-768-2810",
+      "role": "admin",
+      "address": "4434 Ridgeview Crossing",
+      "created_at": "2023-11-18T08:16:01Z",
+      "updated_at": "2024-03-18T10:24:44Z",
+      "email_verified_at": "2023-12-25T23:16:56Z"
+    },
+    {
+      "id": "16",
+      "name": "Teodoor",
+      "surname": "Keaton",
+      "email": "tkeatonf@uol.com.br",
+      "phone": "736-250-5562",
+      "role": "customer",
+      "address": "0 Dexter Hill",
+      "created_at": "2023-10-11T22:21:06Z",
+      "updated_at": "2024-09-09T07:59:50Z",
+      "email_verified_at": "2024-02-06T08:47:43Z"
+    },
+    {
+      "id": "17",
+      "name": "Cart",
+      "surname": "Harvie",
+      "email": "charvieg@nymag.com",
+      "phone": "526-761-8648",
+      "role": "customer",
+      "address": "34608 Knutson Drive",
+      "created_at": "2024-06-08T17:14:45Z",
+      "updated_at": "2024-03-24T05:23:31Z",
+      "email_verified_at": "2024-03-11T13:20:06Z"
+    },
+    {
+      "id": "18",
+      "name": "Vita",
+      "surname": "Ibbetson",
+      "email": "vibbetsonh@privacy.gov.au",
+      "phone": "597-503-3543",
+      "role": "admin",
+      "address": "95801 American Ash Park",
+      "created_at": "2024-08-31T23:19:08Z",
+      "updated_at": "2024-03-08T07:41:41Z",
+      "email_verified_at": "2023-09-27T19:41:53Z"
+    },
+    {
+      "id": "19",
+      "name": "Vallie",
+      "surname": "Janikowski",
+      "email": "vjanikowskii@stumbleupon.com",
+      "phone": "314-456-4967",
+      "role": "admin",
+      "address": "3 Russell Avenue",
+      "created_at": "2024-08-17T08:08:44Z",
+      "updated_at": "2024-02-13T03:45:12Z",
+      "email_verified_at": "2024-04-15T10:25:41Z"
+    },
+    {
+      "id": "20",
+      "name": "Porty",
+      "surname": "Mechi",
+      "email": "pmechij@etsy.com",
+      "phone": "937-509-0523",
+      "role": "customer",
+      "address": "65 Delladonna Junction",
+      "created_at": "2024-07-20T13:48:44Z",
+      "updated_at": "2023-09-13T07:01:41Z",
+      "email_verified_at": "2024-06-05T20:11:41Z"
+    },
+    {
+      "id": "21",
+      "name": "Livvie",
+      "surname": "Corns",
+      "email": "lcornsk@cdc.gov",
+      "phone": "224-597-0829",
+      "role": "customer",
+      "address": "5691 Forest Dale Junction",
+      "created_at": "2024-06-30T09:55:06Z",
+      "updated_at": "2024-02-04T15:10:53Z",
+      "email_verified_at": "2024-08-05T03:04:17Z"
+    },
+    {
+      "id": "22",
+      "name": "Sara",
+      "surname": "Bruckent",
+      "email": "sbruckentl@digg.com",
+      "phone": "971-498-9523",
+      "role": "customer",
+      "address": "23194 Mosinee Trail",
+      "created_at": "2023-10-08T14:20:28Z",
+      "updated_at": "2023-09-25T03:02:40Z",
+      "email_verified_at": "2024-04-19T07:34:49Z"
+    },
+    {
+      "id": "23",
+      "name": "Hally",
+      "surname": "Chessor",
+      "email": "hchessorm@npr.org",
+      "phone": "216-213-2515",
+      "role": "customer",
+      "address": "56 Toban Junction",
+      "created_at": "2024-09-01T17:19:51Z",
+      "updated_at": "2024-01-09T21:37:35Z",
+      "email_verified_at": "2023-10-12T18:18:06Z"
+    },
+    {
+      "id": "24",
+      "name": "Celestia",
+      "surname": "Newlands",
+      "email": "cnewlandsn@example.com",
+      "phone": "644-756-7422",
+      "role": "admin",
+      "address": "2 Melby Drive",
+      "created_at": "2024-07-05T01:03:57Z",
+      "updated_at": "2023-10-29T12:28:57Z",
+      "email_verified_at": "2023-12-24T12:34:03Z"
+    },
+    {
+      "id": "25",
+      "name": "Jewell",
+      "surname": "Pursglove",
+      "email": "jpursgloveo@adobe.com",
+      "phone": "564-653-7414",
+      "role": "customer",
+      "address": "4406 Prentice Court",
+      "created_at": "2024-03-11T21:45:27Z",
+      "updated_at": "2024-05-03T06:39:42Z",
+      "email_verified_at": "2024-03-17T09:09:34Z"
+    },
+    {
+      "id": "26",
+      "name": "Bourke",
+      "surname": "Flockhart",
+      "email": "bflockhartp@sohu.com",
+      "phone": "257-750-6186",
+      "role": "admin",
+      "address": "254 6th Circle",
+      "created_at": "2024-05-07T13:01:24Z",
+      "updated_at": "2024-09-02T22:52:47Z",
+      "email_verified_at": "2023-12-31T05:36:09Z"
+    },
+    {
+      "id": "27",
+      "name": "Anallise",
+      "surname": "Snaith",
+      "email": "asnaithq@telegraph.co.uk",
+      "phone": "834-473-4902",
+      "role": "admin",
+      "address": "6 Stoughton Junction",
+      "created_at": "2024-01-29T02:20:22Z",
+      "updated_at": "2023-11-20T13:12:21Z",
+      "email_verified_at": "2024-03-14T13:44:08Z"
+    },
+    {
+      "id": "28",
+      "name": "Archibald",
+      "surname": "Shapter",
+      "email": "ashapterr@typepad.com",
+      "phone": "708-466-7867",
+      "role": "customer",
+      "address": "48 Grayhawk Place",
+      "created_at": "2024-07-04T17:12:38Z",
+      "updated_at": "2024-05-22T18:35:13Z",
+      "email_verified_at": "2023-10-29T13:25:15Z"
+    },
+    {
+      "id": "29",
+      "name": "Oran",
+      "surname": "Efford",
+      "email": "oeffords@bloglines.com",
+      "phone": "697-343-5303",
+      "role": "customer",
+      "address": "853 New Castle Park",
+      "created_at": "2023-11-13T20:04:07Z",
+      "updated_at": "2023-10-17T07:05:42Z",
+      "email_verified_at": "2024-08-10T15:58:48Z"
+    },
+    {
+      "id": "30",
+      "name": "Viva",
+      "surname": "Merrgen",
+      "email": "vmerrgent@phoca.cz",
+      "phone": "158-542-6227",
+      "role": "customer",
+      "address": "7 Butternut Place",
+      "created_at": "2024-03-22T01:07:08Z",
+      "updated_at": "2024-09-18T06:29:30Z",
+      "email_verified_at": "2024-02-10T05:26:00Z"
+    },
+    {
+      "id": "31",
+      "name": "Kirsteni",
+      "surname": "Airton",
+      "email": "kairtonu@umn.edu",
+      "phone": "151-646-2037",
+      "role": "customer",
+      "address": "5 Village Green Park",
+      "created_at": "2023-10-16T16:44:50Z",
+      "updated_at": "2023-11-17T15:15:48Z",
+      "email_verified_at": "2024-01-19T06:51:18Z"
+    },
+    {
+      "id": "32",
+      "name": "Koenraad",
+      "surname": "Bridgland",
+      "email": "kbridglandv@statcounter.com",
+      "phone": "821-808-3039",
+      "role": "admin",
+      "address": "456 Forest Dale Trail",
+      "created_at": "2024-07-20T23:36:00Z",
+      "updated_at": "2023-11-07T05:15:15Z",
+      "email_verified_at": "2024-07-17T07:51:58Z"
+    },
+    {
+      "id": "33",
+      "name": "Shana",
+      "surname": "Revance",
+      "email": "srevancew@npr.org",
+      "phone": "583-453-1279",
+      "role": "admin",
+      "address": "7631 Sullivan Alley",
+      "created_at": "2024-05-02T05:28:43Z",
+      "updated_at": "2023-09-24T11:43:18Z",
+      "email_verified_at": "2024-07-09T18:01:11Z"
+    },
+    {
+      "id": "34",
+      "name": "Rafaelia",
+      "surname": "Perulli",
+      "email": "rperullix@youtu.be",
+      "phone": "984-139-3211",
+      "role": "admin",
+      "address": "1 Hazelcrest Parkway",
+      "created_at": "2024-03-22T08:08:32Z",
+      "updated_at": "2024-04-18T03:01:46Z",
+      "email_verified_at": "2024-09-13T07:28:00Z"
+    },
+    {
+      "id": "35",
+      "name": "Cyndy",
+      "surname": "Allsebrook",
+      "email": "callsebrooky@ed.gov",
+      "phone": "938-387-5139",
+      "role": "admin",
+      "address": "655 Corscot Drive",
+      "created_at": "2024-03-23T18:33:07Z",
+      "updated_at": "2023-09-09T22:11:38Z",
+      "email_verified_at": "2023-10-14T23:08:02Z"
+    },
+    {
+      "id": "36",
+      "name": "Marilyn",
+      "surname": "Pruvost",
+      "email": "mpruvostz@dedecms.com",
+      "phone": "196-375-4667",
+      "role": "customer",
+      "address": "179 Sunfield Way",
+      "created_at": "2024-02-27T17:46:28Z",
+      "updated_at": "2024-08-05T18:16:41Z",
+      "email_verified_at": "2024-09-18T08:08:44Z"
+    },
+    {
+      "id": "37",
+      "name": "Carol-jean",
+      "surname": "Fitzpayn",
+      "email": "cfitzpayn10@cloudflare.com",
+      "phone": "603-494-9008",
+      "role": "admin",
+      "address": "64552 Manley Park",
+      "created_at": "2024-08-15T18:20:26Z",
+      "updated_at": "2024-04-02T11:13:14Z",
+      "email_verified_at": "2024-08-03T13:21:03Z"
+    },
+    {
+      "id": "38",
+      "name": "Agna",
+      "surname": "Komorowski",
+      "email": "akomorowski11@themeforest.net",
+      "phone": "484-239-6433",
+      "role": "customer",
+      "address": "8725 Anzinger Point",
+      "created_at": "2024-04-28T21:44:36Z",
+      "updated_at": "2024-03-22T08:42:43Z",
+      "email_verified_at": "2024-06-12T12:37:40Z"
+    },
+    {
+      "id": "39",
+      "name": "Elsinore",
+      "surname": "Faldoe",
+      "email": "efaldoe12@geocities.jp",
+      "phone": "614-331-8978",
+      "role": "admin",
+      "address": "9 Huxley Point",
+      "created_at": "2024-09-14T02:55:32Z",
+      "updated_at": "2024-08-11T04:01:58Z",
+      "email_verified_at": "2023-12-15T15:00:08Z"
+    },
+    {
+      "id": "40",
+      "name": "Carole",
+      "surname": "De Bellis",
+      "email": "cdebellis13@ameblo.jp",
+      "phone": "714-363-4526",
+      "role": "admin",
+      "address": "1603 Farmco Parkway",
+      "created_at": "2023-12-30T16:16:22Z",
+      "updated_at": "2024-01-13T14:35:41Z",
+      "email_verified_at": "2024-03-22T22:03:29Z"
+    },
+    {
+      "id": "41",
+      "name": "Stirling",
+      "surname": "Pheazey",
+      "email": "spheazey14@geocities.com",
+      "phone": "941-931-5237",
+      "role": "admin",
+      "address": "90 Southridge Lane",
+      "created_at": "2024-01-28T18:53:17Z",
+      "updated_at": "2024-07-10T19:49:31Z",
+      "email_verified_at": "2024-02-05T02:28:37Z"
+    },
+    {
+      "id": "42",
+      "name": "Bunny",
+      "surname": "Tidy",
+      "email": "btidy15@tmall.com",
+      "phone": "459-315-5193",
+      "role": "admin",
+      "address": "39545 Fremont Circle",
+      "created_at": "2024-05-20T23:31:53Z",
+      "updated_at": "2024-05-14T00:28:17Z",
+      "email_verified_at": "2024-03-26T11:14:08Z"
+    },
+    {
+      "id": "43",
+      "name": "Brendan",
+      "surname": "Duckwith",
+      "email": "bduckwith16@blogger.com",
+      "phone": "899-395-5387",
+      "role": "customer",
+      "address": "220 Mifflin Way",
+      "created_at": "2023-10-11T21:52:50Z",
+      "updated_at": "2024-05-24T09:52:56Z",
+      "email_verified_at": "2023-11-10T08:35:15Z"
+    },
+    {
+      "id": "44",
+      "name": "Jackie",
+      "surname": "McMenamy",
+      "email": "jmcmenamy17@ask.com",
+      "phone": "604-446-2126",
+      "role": "customer",
+      "address": "7470 Johnson Court",
+      "created_at": "2024-03-03T08:42:58Z",
+      "updated_at": "2024-06-01T07:18:02Z",
+      "email_verified_at": "2023-12-18T13:15:48Z"
+    },
+    {
+      "id": "45",
+      "name": "Kaiser",
+      "surname": "Handrik",
+      "email": "khandrik18@marketwatch.com",
+      "phone": "834-177-8526",
+      "role": "admin",
+      "address": "33339 Gulseth Pass",
+      "created_at": "2024-04-26T19:20:20Z",
+      "updated_at": "2023-09-14T04:52:43Z",
+      "email_verified_at": "2023-11-08T22:37:00Z"
+    },
+    {
+      "id": "46",
+      "name": "Sayre",
+      "surname": "Stanett",
+      "email": "sstanett19@cdbaby.com",
+      "phone": "606-821-6377",
+      "role": "customer",
+      "address": "91456 Oak Hill",
+      "created_at": "2023-12-25T03:16:05Z",
+      "updated_at": "2024-08-09T23:44:45Z",
+      "email_verified_at": "2024-07-26T03:38:12Z"
+    },
+    {
+      "id": "47",
+      "name": "Madelena",
+      "surname": "Jollie",
+      "email": "mjollie1a@qq.com",
+      "phone": "310-569-4653",
+      "role": "admin",
+      "address": "13 Ramsey Way",
+      "created_at": "2024-06-02T19:58:47Z",
+      "updated_at": "2024-08-22T15:38:14Z",
+      "email_verified_at": "2024-04-27T08:48:57Z"
+    },
+    {
+      "id": "48",
+      "name": "Felicity",
+      "surname": "Varah",
+      "email": "fvarah1b@techcrunch.com",
+      "phone": "385-665-3575",
+      "role": "customer",
+      "address": "375 Gulseth Parkway",
+      "created_at": "2024-05-08T16:47:23Z",
+      "updated_at": "2024-09-29T21:05:44Z",
+      "email_verified_at": "2024-03-09T01:22:08Z"
+    },
+    {
+      "id": "49",
+      "name": "Rhianna",
+      "surname": "Ewols",
+      "email": "rewols1c@jigsy.com",
+      "phone": "952-989-8639",
+      "role": "admin",
+      "address": "7 Cottonwood Lane",
+      "created_at": "2023-09-05T16:52:47Z",
+      "updated_at": "2023-10-16T00:06:15Z",
+      "email_verified_at": "2023-10-26T04:34:48Z"
+    },
+    {
+      "id": "50",
+      "name": "Gard",
+      "surname": "Sarton",
+      "email": "gsarton1d@wordpress.org",
+      "phone": "436-369-7315",
+      "role": "admin",
+      "address": "893 Randy Lane",
+      "created_at": "2024-06-13T03:52:07Z",
+      "updated_at": "2024-09-28T14:20:44Z",
+      "email_verified_at": "2024-01-05T15:25:14Z"
+    },
+    {
+      "id": "51",
+      "name": "Auberon",
+      "surname": "Dawidowitz",
+      "email": "adawidowitz1e@constantcontact.com",
+      "phone": "810-706-7813",
+      "role": "customer",
+      "address": "5 Lien Center",
+      "created_at": "2024-09-24T18:54:25Z",
+      "updated_at": "2024-06-29T04:18:51Z",
+      "email_verified_at": "2024-04-20T21:59:56Z"
+    },
+    {
+      "id": "52",
+      "name": "Stewart",
+      "surname": "Hitchens",
+      "email": "shitchens1f@alexa.com",
+      "phone": "858-401-0105",
+      "role": "customer",
+      "address": "8615 North Trail",
+      "created_at": "2024-06-07T09:05:12Z",
+      "updated_at": "2024-06-17T02:50:55Z",
+      "email_verified_at": "2023-11-07T02:23:44Z"
+    },
+    {
+      "id": "53",
+      "name": "Audrey",
+      "surname": "Glenny",
+      "email": "aglenny1g@trellian.com",
+      "phone": "908-637-8154",
+      "role": "admin",
+      "address": "130 Merry Parkway",
+      "created_at": "2024-09-17T21:24:24Z",
+      "updated_at": "2023-12-30T00:54:40Z",
+      "email_verified_at": "2024-01-24T02:32:49Z"
+    },
+    {
+      "id": "54",
+      "name": "Kellyann",
+      "surname": "Custard",
+      "email": "kcustard1h@dmoz.org",
+      "phone": "981-444-7139",
+      "role": "customer",
+      "address": "335 Becker Place",
+      "created_at": "2024-06-17T14:49:08Z",
+      "updated_at": "2024-06-15T00:35:38Z",
+      "email_verified_at": "2023-12-24T02:42:10Z"
+    },
+    {
+      "id": "55",
+      "name": "Coriss",
+      "surname": "Meaden",
+      "email": "cmeaden1i@cmu.edu",
+      "phone": "171-222-4183",
+      "role": "customer",
+      "address": "823 Dennis Trail",
+      "created_at": "2023-09-29T16:21:30Z",
+      "updated_at": "2024-02-22T00:52:18Z",
+      "email_verified_at": "2024-05-12T07:42:05Z"
+    },
+    {
+      "id": "56",
+      "name": "Justus",
+      "surname": "Skerman",
+      "email": "jskerman1j@indiatimes.com",
+      "phone": "296-965-0473",
+      "role": "customer",
+      "address": "179 Judy Parkway",
+      "created_at": "2024-04-07T04:50:23Z",
+      "updated_at": "2023-11-06T20:58:42Z",
+      "email_verified_at": "2024-06-22T19:51:08Z"
+    },
+    {
+      "id": "57",
+      "name": "Nicolais",
+      "surname": "Whiff",
+      "email": "nwhiff1k@devhub.com",
+      "phone": "631-228-7503",
+      "role": "customer",
+      "address": "38168 Sage Court",
+      "created_at": "2024-04-29T08:15:03Z",
+      "updated_at": "2024-05-24T21:20:56Z",
+      "email_verified_at": "2024-09-26T20:40:45Z"
+    },
+    {
+      "id": "58",
+      "name": "Vivienne",
+      "surname": "Kluge",
+      "email": "vkluge1l@imageshack.us",
+      "phone": "133-514-7271",
+      "role": "admin",
+      "address": "36 Stone Corner Plaza",
+      "created_at": "2024-08-30T18:32:07Z",
+      "updated_at": "2024-09-29T12:18:51Z",
+      "email_verified_at": "2024-08-09T06:22:20Z"
+    },
+    {
+      "id": "59",
+      "name": "Patrizio",
+      "surname": "Annakin",
+      "email": "pannakin1m@princeton.edu",
+      "phone": "181-693-9919",
+      "role": "customer",
+      "address": "12020 Summerview Drive",
+      "created_at": "2023-10-23T16:27:44Z",
+      "updated_at": "2023-11-27T08:25:07Z",
+      "email_verified_at": "2024-07-24T11:04:33Z"
+    },
+    {
+      "id": "60",
+      "name": "Randi",
+      "surname": "Sobtka",
+      "email": "rsobtka1n@sbwire.com",
+      "phone": "813-766-7501",
+      "role": "admin",
+      "address": "305 Maryland Park",
+      "created_at": "2024-02-04T00:24:58Z",
+      "updated_at": "2023-12-27T16:32:48Z",
+      "email_verified_at": "2024-01-13T12:05:02Z"
+    },
+    {
+      "id": "61",
+      "name": "Leia",
+      "surname": "Povey",
+      "email": "lpovey1o@rediff.com",
+      "phone": "995-340-2535",
+      "role": "customer",
+      "address": "481 Waywood Way",
+      "created_at": "2023-12-03T12:51:44Z",
+      "updated_at": "2024-01-13T04:20:08Z",
+      "email_verified_at": "2024-03-12T11:15:35Z"
+    },
+    {
+      "id": "62",
+      "name": "Marrilee",
+      "surname": "Otter",
+      "email": "motter1p@reverbnation.com",
+      "phone": "418-889-0663",
+      "role": "customer",
+      "address": "0323 Cottonwood Circle",
+      "created_at": "2024-04-22T22:41:02Z",
+      "updated_at": "2023-11-06T21:11:44Z",
+      "email_verified_at": "2023-11-28T15:22:53Z"
+    },
+    {
+      "id": "63",
+      "name": "Tybalt",
+      "surname": "Jacke",
+      "email": "tjacke1q@constantcontact.com",
+      "phone": "345-660-4347",
+      "role": "admin",
+      "address": "0204 Paget Park",
+      "created_at": "2024-09-02T15:35:38Z",
+      "updated_at": "2024-04-19T20:19:38Z",
+      "email_verified_at": "2024-07-23T11:31:22Z"
+    },
+    {
+      "id": "64",
+      "name": "Gerda",
+      "surname": "Pendlebury",
+      "email": "gpendlebury1r@dagondesign.com",
+      "phone": "760-132-8071",
+      "role": "admin",
+      "address": "093 Talmadge Way",
+      "created_at": "2024-04-11T01:11:10Z",
+      "updated_at": "2024-02-29T06:35:32Z",
+      "email_verified_at": "2023-09-28T17:19:00Z"
+    },
+    {
+      "id": "65",
+      "name": "Melody",
+      "surname": "Futcher",
+      "email": "mfutcher1s@craigslist.org",
+      "phone": "692-444-5461",
+      "role": "customer",
+      "address": "50 Nelson Hill",
+      "created_at": "2024-03-07T18:49:24Z",
+      "updated_at": "2024-07-11T00:09:54Z",
+      "email_verified_at": "2024-03-09T21:34:42Z"
+    },
+    {
+      "id": "66",
+      "name": "Mirella",
+      "surname": "Cavaney",
+      "email": "mcavaney1t@purevolume.com",
+      "phone": "129-129-4860",
+      "role": "admin",
+      "address": "39 Sutherland Road",
+      "created_at": "2024-04-08T00:42:17Z",
+      "updated_at": "2023-11-14T01:45:39Z",
+      "email_verified_at": "2024-08-15T22:49:18Z"
+    },
+    {
+      "id": "67",
+      "name": "Walker",
+      "surname": "Grishanov",
+      "email": "wgrishanov1u@telegraph.co.uk",
+      "phone": "924-834-7451",
+      "role": "customer",
+      "address": "2 Division Plaza",
+      "created_at": "2023-11-09T22:08:30Z",
+      "updated_at": "2023-10-04T04:18:27Z",
+      "email_verified_at": "2023-12-03T05:17:04Z"
+    },
+    {
+      "id": "68",
+      "name": "Yuri",
+      "surname": "Batman",
+      "email": "ybatman1v@eventbrite.com",
+      "phone": "898-817-7185",
+      "role": "admin",
+      "address": "77 Oriole Road",
+      "created_at": "2024-07-25T01:46:58Z",
+      "updated_at": "2024-02-23T07:48:22Z",
+      "email_verified_at": "2023-09-07T23:58:06Z"
+    },
+    {
+      "id": "69",
+      "name": "Bart",
+      "surname": "Mulchrone",
+      "email": "bmulchrone1w@chicagotribune.com",
+      "phone": "670-538-3728",
+      "role": "customer",
+      "address": "700 3rd Crossing",
+      "created_at": "2023-11-30T04:11:43Z",
+      "updated_at": "2024-01-01T04:46:06Z",
+      "email_verified_at": "2023-12-06T16:50:16Z"
+    },
+    {
+      "id": "70",
+      "name": "Elsworth",
+      "surname": "Thomasson",
+      "email": "ethomasson1x@gov.uk",
+      "phone": "113-542-8061",
+      "role": "admin",
+      "address": "2414 Ridgeview Avenue",
+      "created_at": "2023-10-18T05:20:47Z",
+      "updated_at": "2024-07-17T05:51:25Z",
+      "email_verified_at": "2024-07-25T01:12:01Z"
+    },
+    {
+      "id": "71",
+      "name": "Sayres",
+      "surname": "Winfred",
+      "email": "swinfred1y@dyndns.org",
+      "phone": "895-314-2559",
+      "role": "customer",
+      "address": "79 Arapahoe Hill",
+      "created_at": "2024-09-20T12:52:52Z",
+      "updated_at": "2023-09-06T19:30:39Z",
+      "email_verified_at": "2023-12-31T10:54:08Z"
+    },
+    {
+      "id": "72",
+      "name": "Claudie",
+      "surname": "Gong",
+      "email": "cgong1z@about.com",
+      "phone": "538-951-2241",
+      "role": "customer",
+      "address": "61 Haas Center",
+      "created_at": "2024-07-24T10:23:44Z",
+      "updated_at": "2023-11-10T13:35:53Z",
+      "email_verified_at": "2024-04-03T17:18:25Z"
+    },
+    {
+      "id": "73",
+      "name": "Lorry",
+      "surname": "Dumpleton",
+      "email": "ldumpleton20@illinois.edu",
+      "phone": "128-921-4732",
+      "role": "customer",
+      "address": "816 Fulton Avenue",
+      "created_at": "2024-01-07T08:12:57Z",
+      "updated_at": "2024-01-29T00:18:53Z",
+      "email_verified_at": "2024-05-25T13:36:11Z"
+    },
+    {
+      "id": "74",
+      "name": "Pavlov",
+      "surname": "Rolston",
+      "email": "prolston21@accuweather.com",
+      "phone": "775-178-8488",
+      "role": "customer",
+      "address": "491 Lake View Park",
+      "created_at": "2024-04-08T13:10:08Z",
+      "updated_at": "2024-06-07T09:51:11Z",
+      "email_verified_at": "2024-02-13T22:05:37Z"
+    },
+    {
+      "id": "75",
+      "name": "Alis",
+      "surname": "Rayburn",
+      "email": "arayburn22@mashable.com",
+      "phone": "978-448-7651",
+      "role": "admin",
+      "address": "74 Holmberg Circle",
+      "created_at": "2024-02-26T18:17:06Z",
+      "updated_at": "2023-10-03T22:58:04Z",
+      "email_verified_at": "2023-10-21T18:00:10Z"
+    },
+    {
+      "id": "76",
+      "name": "Harwilll",
+      "surname": "Tayler",
+      "email": "htayler23@marketwatch.com",
+      "phone": "703-940-2163",
+      "role": "customer",
+      "address": "86317 Katie Pass",
+      "created_at": "2024-05-24T12:25:49Z",
+      "updated_at": "2023-12-07T12:24:05Z",
+      "email_verified_at": "2024-08-31T06:41:19Z"
+    },
+    {
+      "id": "77",
+      "name": "Carlos",
+      "surname": "Mathias",
+      "email": "cmathias24@ibm.com",
+      "phone": "354-384-4110",
+      "role": "admin",
+      "address": "3 Fairview Center",
+      "created_at": "2023-09-27T04:29:13Z",
+      "updated_at": "2024-07-26T09:49:14Z",
+      "email_verified_at": "2024-04-13T05:11:46Z"
+    },
+    {
+      "id": "78",
+      "name": "Allyn",
+      "surname": "Middas",
+      "email": "amiddas25@geocities.com",
+      "phone": "419-626-1854",
+      "role": "customer",
+      "address": "9613 Bonner Alley",
+      "created_at": "2023-12-31T10:32:21Z",
+      "updated_at": "2024-04-29T00:47:31Z",
+      "email_verified_at": "2024-05-22T04:52:25Z"
+    },
+    {
+      "id": "79",
+      "name": "Tracie",
+      "surname": "Kimmel",
+      "email": "tkimmel26@wsj.com",
+      "phone": "780-589-1079",
+      "role": "customer",
+      "address": "6 Westport Plaza",
+      "created_at": "2023-10-19T21:05:46Z",
+      "updated_at": "2023-12-01T05:07:32Z",
+      "email_verified_at": "2024-06-16T17:38:35Z"
+    },
+    {
+      "id": "80",
+      "name": "Kara-lynn",
+      "surname": "Manford",
+      "email": "kmanford27@discuz.net",
+      "phone": "980-380-8522",
+      "role": "admin",
+      "address": "44 Golf Court",
+      "created_at": "2024-06-15T19:41:56Z",
+      "updated_at": "2023-10-17T05:33:25Z",
+      "email_verified_at": "2024-06-09T06:57:14Z"
+    },
+    {
+      "id": "81",
+      "name": "Sibbie",
+      "surname": "Cristofaro",
+      "email": "scristofaro28@people.com.cn",
+      "phone": "920-705-7925",
+      "role": "customer",
+      "address": "5621 Hoepker Circle",
+      "created_at": "2023-11-03T00:54:03Z",
+      "updated_at": "2024-01-14T01:12:22Z",
+      "email_verified_at": "2024-01-27T17:23:05Z"
+    },
+    {
+      "id": "82",
+      "name": "Sallee",
+      "surname": "Dowglass",
+      "email": "sdowglass29@spotify.com",
+      "phone": "112-288-7214",
+      "role": "customer",
+      "address": "98 Beilfuss Circle",
+      "created_at": "2024-03-25T20:42:48Z",
+      "updated_at": "2024-09-28T12:31:19Z",
+      "email_verified_at": "2024-07-17T22:53:36Z"
+    },
+    {
+      "id": "83",
+      "name": "Christen",
+      "surname": "Coote",
+      "email": "ccoote2a@intel.com",
+      "phone": "756-507-2667",
+      "role": "admin",
+      "address": "9656 Sutteridge Circle",
+      "created_at": "2024-09-26T16:33:16Z",
+      "updated_at": "2024-04-03T20:22:35Z",
+      "email_verified_at": "2023-12-24T20:49:18Z"
+    },
+    {
+      "id": "84",
+      "name": "Raimundo",
+      "surname": "Delacourt",
+      "email": "rdelacourt2b@ning.com",
+      "phone": "330-649-5017",
+      "role": "admin",
+      "address": "29 Ramsey Court",
+      "created_at": "2024-06-18T17:18:47Z",
+      "updated_at": "2023-10-17T07:21:24Z",
+      "email_verified_at": "2024-03-13T01:02:25Z"
+    },
+    {
+      "id": "85",
+      "name": "Emlen",
+      "surname": "Petchell",
+      "email": "epetchell2c@wp.com",
+      "phone": "732-186-2027",
+      "role": "customer",
+      "address": "3 Raven Parkway",
+      "created_at": "2024-05-18T00:26:23Z",
+      "updated_at": "2024-03-20T13:31:33Z",
+      "email_verified_at": "2023-11-15T22:01:50Z"
+    },
+    {
+      "id": "86",
+      "name": "Kynthia",
+      "surname": "Orpen",
+      "email": "korpen2d@cnbc.com",
+      "phone": "300-217-7529",
+      "role": "customer",
+      "address": "1 7th Park",
+      "created_at": "2024-07-26T01:41:57Z",
+      "updated_at": "2024-03-14T06:21:30Z",
+      "email_verified_at": "2023-12-27T17:33:18Z"
+    },
+    {
+      "id": "87",
+      "name": "Lurline",
+      "surname": "Ketteringham",
+      "email": "lketteringham2e@prlog.org",
+      "phone": "800-791-5967",
+      "role": "admin",
+      "address": "538 Carioca Court",
+      "created_at": "2024-06-06T13:34:33Z",
+      "updated_at": "2024-06-29T04:33:37Z",
+      "email_verified_at": "2024-04-12T10:13:58Z"
+    },
+    {
+      "id": "88",
+      "name": "Porter",
+      "surname": "Durtnel",
+      "email": "pdurtnel2f@cafepress.com",
+      "phone": "647-642-0027",
+      "role": "customer",
+      "address": "28 Chive Center",
+      "created_at": "2024-08-22T17:17:30Z",
+      "updated_at": "2024-04-06T15:51:49Z",
+      "email_verified_at": "2024-03-11T06:50:13Z"
+    },
+    {
+      "id": "89",
+      "name": "Carilyn",
+      "surname": "Layman",
+      "email": "clayman2g@drupal.org",
+      "phone": "144-934-0707",
+      "role": "admin",
+      "address": "95 Milwaukee Circle",
+      "created_at": "2023-09-11T07:17:07Z",
+      "updated_at": "2024-05-14T12:09:51Z",
+      "email_verified_at": "2023-09-12T04:12:36Z"
+    },
+    {
+      "id": "90",
+      "name": "Teddi",
+      "surname": "Pavier",
+      "email": "tpavier2h@webs.com",
+      "phone": "570-514-9608",
+      "role": "customer",
+      "address": "97675 Artisan Place",
+      "created_at": "2023-10-31T10:56:28Z",
+      "updated_at": "2024-04-06T09:30:51Z",
+      "email_verified_at": "2024-01-08T14:50:27Z"
+    },
+    {
+      "id": "91",
+      "name": "Grace",
+      "surname": "Beggio",
+      "email": "gbeggio2i@github.com",
+      "phone": "494-121-5631",
+      "role": "admin",
+      "address": "4676 Marcy Trail",
+      "created_at": "2023-12-28T10:38:53Z",
+      "updated_at": "2024-01-05T20:42:55Z",
+      "email_verified_at": "2024-05-21T12:23:09Z"
+    },
+    {
+      "id": "92",
+      "name": "Darius",
+      "surname": "Northedge",
+      "email": "dnorthedge2j@cnbc.com",
+      "phone": "310-946-9380",
+      "role": "customer",
+      "address": "97 Stuart Road",
+      "created_at": "2023-11-08T22:44:05Z",
+      "updated_at": "2024-09-20T19:43:04Z",
+      "email_verified_at": "2024-07-28T07:23:29Z"
+    },
+    {
+      "id": "93",
+      "name": "Jayne",
+      "surname": "O'Cahey",
+      "email": "jocahey2k@mapy.cz",
+      "phone": "701-598-3970",
+      "role": "customer",
+      "address": "8 Jenifer Road",
+      "created_at": "2023-11-07T22:11:35Z",
+      "updated_at": "2024-04-05T09:27:43Z",
+      "email_verified_at": "2024-02-20T01:27:53Z"
+    },
+    {
+      "id": "94",
+      "name": "Heather",
+      "surname": "Kaser",
+      "email": "hkaser2l@shareasale.com",
+      "phone": "360-120-5371",
+      "role": "customer",
+      "address": "446 Anthes Terrace",
+      "created_at": "2024-05-10T21:21:37Z",
+      "updated_at": "2023-11-28T14:15:14Z",
+      "email_verified_at": "2024-01-08T06:46:11Z"
+    },
+    {
+      "id": "95",
+      "name": "Mellie",
+      "surname": "Spurdens",
+      "email": "mspurdens2m@ocn.ne.jp",
+      "phone": "865-394-5914",
+      "role": "admin",
+      "address": "3 Glacier Hill Lane",
+      "created_at": "2024-03-05T14:58:47Z",
+      "updated_at": "2024-06-13T02:00:30Z",
+      "email_verified_at": "2024-08-17T22:22:31Z"
+    },
+    {
+      "id": "96",
+      "name": "Garry",
+      "surname": "Parkeson",
+      "email": "gparkeson2n@moonfruit.com",
+      "phone": "545-318-0272",
+      "role": "customer",
+      "address": "616 Golf Course Junction",
+      "created_at": "2024-06-09T11:07:53Z",
+      "updated_at": "2024-09-03T04:11:37Z",
+      "email_verified_at": "2024-05-25T22:00:49Z"
+    },
+    {
+      "id": "97",
+      "name": "Kayley",
+      "surname": "Petranek",
+      "email": "kpetranek2o@earthlink.net",
+      "phone": "883-895-9244",
+      "role": "admin",
+      "address": "891 Fairfield Parkway",
+      "created_at": "2024-05-04T08:14:59Z",
+      "updated_at": "2024-05-28T23:47:34Z",
+      "email_verified_at": "2023-10-04T14:29:04Z"
+    },
+    {
+      "id": "98",
+      "name": "Carena",
+      "surname": "Kildahl",
+      "email": "ckildahl2p@hugedomains.com",
+      "phone": "702-245-5296",
+      "role": "admin",
+      "address": "7339 Rockefeller Road",
+      "created_at": "2024-07-04T16:34:02Z",
+      "updated_at": "2023-12-26T19:39:33Z",
+      "email_verified_at": "2024-07-05T13:02:34Z"
+    },
+    {
+      "id": "99",
+      "name": "Kylynn",
+      "surname": "Rolstone",
+      "email": "krolstone2q@cloudflare.com",
+      "phone": "710-394-6221",
+      "role": "customer",
+      "address": "52 Ruskin Drive",
+      "created_at": "2024-05-01T03:38:49Z",
+      "updated_at": "2024-01-16T15:59:44Z",
+      "email_verified_at": "2024-05-23T10:14:52Z"
+    },
+    {
+      "id": "100",
+      "name": "Frederigo",
+      "surname": "Pollicote",
+      "email": "fpollicote2r@wired.com",
+      "phone": "869-382-5494",
+      "role": "admin",
+      "address": "56 Declaration Crossing",
+      "created_at": "2023-09-10T21:36:27Z",
+      "updated_at": "2024-01-07T23:49:52Z",
+      "email_verified_at": "2023-10-08T18:31:48Z"
+    },
+    {
+      "id": "101",
+      "name": "Kalila",
+      "surname": "Sebrook",
+      "email": "ksebrook2s@businesswire.com",
+      "phone": "617-514-8417",
+      "role": "admin",
+      "address": "80 Columbus Drive",
+      "created_at": "2024-01-03T14:32:48Z",
+      "updated_at": "2024-04-17T11:42:13Z",
+      "email_verified_at": "2023-11-24T03:19:14Z"
+    },
+    {
+      "id": "102",
+      "name": "Aland",
+      "surname": "Matieu",
+      "email": "amatieu2t@xrea.com",
+      "phone": "219-665-2314",
+      "role": "admin",
+      "address": "3 Birchwood Road",
+      "created_at": "2024-06-27T18:10:22Z",
+      "updated_at": "2023-11-08T04:06:14Z",
+      "email_verified_at": "2024-01-10T14:33:42Z"
+    },
+    {
+      "id": "103",
+      "name": "Alaric",
+      "surname": "Teaz",
+      "email": "ateaz2u@fastcompany.com",
+      "phone": "115-646-4492",
+      "role": "admin",
+      "address": "7838 Banding Parkway",
+      "created_at": "2023-09-21T06:44:42Z",
+      "updated_at": "2024-01-10T23:16:15Z",
+      "email_verified_at": "2024-03-09T20:32:33Z"
+    },
+    {
+      "id": "104",
+      "name": "Donelle",
+      "surname": "Dubock",
+      "email": "ddubock2v@clickbank.net",
+      "phone": "749-907-8895",
+      "role": "admin",
+      "address": "42 Mcguire Center",
+      "created_at": "2023-12-20T05:13:25Z",
+      "updated_at": "2024-02-24T08:41:52Z",
+      "email_verified_at": "2024-07-18T05:30:04Z"
+    },
+    {
+      "id": "105",
+      "name": "Base",
+      "surname": "Banner",
+      "email": "bbanner2w@phpbb.com",
+      "phone": "819-400-1029",
+      "role": "admin",
+      "address": "922 Morrow Crossing",
+      "created_at": "2024-08-13T22:05:19Z",
+      "updated_at": "2024-07-09T01:55:57Z",
+      "email_verified_at": "2023-10-08T23:20:29Z"
+    },
+    {
+      "id": "106",
+      "name": "Eolande",
+      "surname": "Noorwood",
+      "email": "enoorwood2x@smh.com.au",
+      "phone": "825-862-9766",
+      "role": "customer",
+      "address": "574 Anderson Trail",
+      "created_at": "2023-11-22T15:03:40Z",
+      "updated_at": "2023-09-11T18:48:32Z",
+      "email_verified_at": "2023-10-18T16:26:21Z"
+    },
+    {
+      "id": "107",
+      "name": "Darlleen",
+      "surname": "Horsewood",
+      "email": "dhorsewood2y@weibo.com",
+      "phone": "922-909-0713",
+      "role": "customer",
+      "address": "1 South Parkway",
+      "created_at": "2023-11-01T07:15:41Z",
+      "updated_at": "2024-08-26T18:15:23Z",
+      "email_verified_at": "2024-01-27T18:20:52Z"
+    },
+    {
+      "id": "108",
+      "name": "Rosabella",
+      "surname": "Jakel",
+      "email": "rjakel2z@bandcamp.com",
+      "phone": "225-137-8216",
+      "role": "customer",
+      "address": "4 Colorado Junction",
+      "created_at": "2023-10-20T20:54:03Z",
+      "updated_at": "2024-05-05T13:58:22Z",
+      "email_verified_at": "2024-05-03T20:46:07Z"
+    },
+    {
+      "id": "109",
+      "name": "Oswell",
+      "surname": "Josovich",
+      "email": "ojosovich30@1und1.de",
+      "phone": "775-383-1794",
+      "role": "customer",
+      "address": "39 Elgar Trail",
+      "created_at": "2023-12-10T12:38:20Z",
+      "updated_at": "2024-06-10T10:16:33Z",
+      "email_verified_at": "2023-09-21T23:39:10Z"
+    },
+    {
+      "id": "110",
+      "name": "Christie",
+      "surname": "Follit",
+      "email": "cfollit31@list-manage.com",
+      "phone": "922-276-7562",
+      "role": "admin",
+      "address": "493 Meadow Vale Street",
+      "created_at": "2024-04-02T23:01:43Z",
+      "updated_at": "2024-04-15T11:40:37Z",
+      "email_verified_at": "2024-06-25T00:02:26Z"
+    },
+    {
+      "id": "111",
+      "name": "Burt",
+      "surname": "Liptrot",
+      "email": "bliptrot32@wp.com",
+      "phone": "977-716-1484",
+      "role": "customer",
+      "address": "9885 Mcguire Parkway",
+      "created_at": "2023-12-14T04:58:49Z",
+      "updated_at": "2024-04-05T16:14:48Z",
+      "email_verified_at": "2023-11-04T03:56:33Z"
+    },
+    {
+      "id": "112",
+      "name": "Adam",
+      "surname": "Juden",
+      "email": "ajuden33@drupal.org",
+      "phone": "109-912-0925",
+      "role": "customer",
+      "address": "24530 Cordelia Street",
+      "created_at": "2024-05-16T15:33:11Z",
+      "updated_at": "2023-12-31T14:36:48Z",
+      "email_verified_at": "2023-12-14T07:25:30Z"
+    },
+    {
+      "id": "113",
+      "name": "Findlay",
+      "surname": "Buscombe",
+      "email": "fbuscombe34@mlb.com",
+      "phone": "694-656-6107",
+      "role": "customer",
+      "address": "11885 Upham Terrace",
+      "created_at": "2023-09-21T22:30:09Z",
+      "updated_at": "2023-11-30T18:25:57Z",
+      "email_verified_at": "2024-08-23T22:58:16Z"
+    },
+    {
+      "id": "114",
+      "name": "Berthe",
+      "surname": "Oganian",
+      "email": "boganian35@blogger.com",
+      "phone": "116-847-3146",
+      "role": "admin",
+      "address": "15184 South Center",
+      "created_at": "2023-09-27T15:15:12Z",
+      "updated_at": "2024-08-12T19:53:05Z",
+      "email_verified_at": "2024-01-28T05:55:33Z"
+    },
+    {
+      "id": "115",
+      "name": "Rolfe",
+      "surname": "Brauninger",
+      "email": "rbrauninger36@nymag.com",
+      "phone": "476-703-3311",
+      "role": "customer",
+      "address": "50590 Birchwood Plaza",
+      "created_at": "2024-01-17T18:53:36Z",
+      "updated_at": "2024-09-06T10:50:26Z",
+      "email_verified_at": "2024-04-18T19:27:17Z"
+    },
+    {
+      "id": "116",
+      "name": "Kerwin",
+      "surname": "Baxill",
+      "email": "kbaxill37@who.int",
+      "phone": "686-812-2256",
+      "role": "admin",
+      "address": "721 Columbus Avenue",
+      "created_at": "2023-11-16T04:19:57Z",
+      "updated_at": "2024-05-24T06:21:12Z",
+      "email_verified_at": "2023-12-07T20:05:50Z"
+    },
+    {
+      "id": "117",
+      "name": "Christoffer",
+      "surname": "Krol",
+      "email": "ckrol38@networkadvertising.org",
+      "phone": "219-578-0076",
+      "role": "admin",
+      "address": "4 Kipling Junction",
+      "created_at": "2024-08-04T03:40:42Z",
+      "updated_at": "2023-11-29T06:59:06Z",
+      "email_verified_at": "2024-09-01T03:26:11Z"
+    },
+    {
+      "id": "118",
+      "name": "Mellisa",
+      "surname": "Dyers",
+      "email": "mdyers39@vimeo.com",
+      "phone": "675-574-1741",
+      "role": "customer",
+      "address": "0 Charing Cross Center",
+      "created_at": "2024-05-29T07:43:07Z",
+      "updated_at": "2024-01-31T23:05:27Z",
+      "email_verified_at": "2024-09-26T08:43:33Z"
+    },
+    {
+      "id": "119",
+      "name": "Shanda",
+      "surname": "Wilshire",
+      "email": "swilshire3a@oracle.com",
+      "phone": "771-884-5588",
+      "role": "admin",
+      "address": "1 Oriole Place",
+      "created_at": "2024-02-14T08:13:23Z",
+      "updated_at": "2024-06-20T04:47:28Z",
+      "email_verified_at": "2023-11-06T08:10:18Z"
+    },
+    {
+      "id": "120",
+      "name": "Addia",
+      "surname": "Bessant",
+      "email": "abessant3b@bloglines.com",
+      "phone": "621-220-5301",
+      "role": "admin",
+      "address": "5926 Amoth Plaza",
+      "created_at": "2023-10-11T04:38:22Z",
+      "updated_at": "2023-09-22T18:05:09Z",
+      "email_verified_at": "2024-08-14T16:56:58Z"
+    },
+    {
+      "id": "121",
+      "name": "Kristos",
+      "surname": "Sivyer",
+      "email": "ksivyer3c@wikispaces.com",
+      "phone": "343-253-6963",
+      "role": "admin",
+      "address": "73531 Derek Trail",
+      "created_at": "2024-08-15T06:07:40Z",
+      "updated_at": "2024-09-10T19:34:33Z",
+      "email_verified_at": "2024-01-25T07:01:24Z"
+    },
+    {
+      "id": "122",
+      "name": "Maia",
+      "surname": "Sambells",
+      "email": "msambells3d@dmoz.org",
+      "phone": "982-544-9999",
+      "role": "admin",
+      "address": "18970 Commercial Circle",
+      "created_at": "2024-03-21T05:34:56Z",
+      "updated_at": "2024-04-22T09:20:02Z",
+      "email_verified_at": "2024-03-22T09:26:53Z"
+    },
+    {
+      "id": "123",
+      "name": "Georgeta",
+      "surname": "Charon",
+      "email": "gcharon3e@amazonaws.com",
+      "phone": "576-161-6383",
+      "role": "customer",
+      "address": "27 Thompson Junction",
+      "created_at": "2024-04-20T16:27:50Z",
+      "updated_at": "2023-09-17T00:07:54Z",
+      "email_verified_at": "2023-12-23T01:42:16Z"
+    },
+    {
+      "id": "124",
+      "name": "Pamelina",
+      "surname": "Geelan",
+      "email": "pgeelan3f@dmoz.org",
+      "phone": "279-761-1469",
+      "role": "customer",
+      "address": "7431 Lake View Terrace",
+      "created_at": "2024-03-08T18:07:30Z",
+      "updated_at": "2024-02-04T22:02:24Z",
+      "email_verified_at": "2024-09-04T11:15:51Z"
+    },
+    {
+      "id": "125",
+      "name": "Danie",
+      "surname": "Santon",
+      "email": "dsanton3g@php.net",
+      "phone": "140-903-2520",
+      "role": "customer",
+      "address": "318 Twin Pines Pass",
+      "created_at": "2024-01-04T20:14:02Z",
+      "updated_at": "2024-03-12T13:07:32Z",
+      "email_verified_at": "2023-09-08T00:07:18Z"
+    },
+    {
+      "id": "126",
+      "name": "Anstice",
+      "surname": "Vigurs",
+      "email": "avigurs3h@virginia.edu",
+      "phone": "632-400-6349",
+      "role": "admin",
+      "address": "54984 Burrows Way",
+      "created_at": "2024-02-15T16:35:27Z",
+      "updated_at": "2023-11-30T07:41:23Z",
+      "email_verified_at": "2024-03-15T10:50:13Z"
+    },
+    {
+      "id": "127",
+      "name": "Blinny",
+      "surname": "Leary",
+      "email": "bleary3i@livejournal.com",
+      "phone": "356-781-0333",
+      "role": "customer",
+      "address": "44 Mandrake Way",
+      "created_at": "2023-11-02T07:55:06Z",
+      "updated_at": "2024-04-26T23:53:11Z",
+      "email_verified_at": "2023-10-22T03:39:32Z"
+    },
+    {
+      "id": "128",
+      "name": "Kent",
+      "surname": "Cardo",
+      "email": "kcardo3j@miibeian.gov.cn",
+      "phone": "757-141-0665",
+      "role": "admin",
+      "address": "72905 Susan Circle",
+      "created_at": "2024-06-18T01:17:36Z",
+      "updated_at": "2024-04-27T16:46:06Z",
+      "email_verified_at": "2024-03-05T13:31:24Z"
+    },
+    {
+      "id": "129",
+      "name": "Nikos",
+      "surname": "Yesinin",
+      "email": "nyesinin3k@yellowpages.com",
+      "phone": "403-289-7727",
+      "role": "admin",
+      "address": "85 Burning Wood Crossing",
+      "created_at": "2023-12-16T14:48:39Z",
+      "updated_at": "2024-03-10T07:42:51Z",
+      "email_verified_at": "2023-12-25T16:47:48Z"
+    },
+    {
+      "id": "130",
+      "name": "Donavon",
+      "surname": "Edwin",
+      "email": "dedwin3l@nasa.gov",
+      "phone": "551-881-2312",
+      "role": "customer",
+      "address": "39845 Scott Circle",
+      "created_at": "2024-08-02T07:46:48Z",
+      "updated_at": "2024-04-19T09:34:55Z",
+      "email_verified_at": "2024-05-06T21:32:01Z"
+    },
+    {
+      "id": "131",
+      "name": "Sheila-kathryn",
+      "surname": "De Ruggero",
+      "email": "sderuggero3m@un.org",
+      "phone": "873-745-5615",
+      "role": "admin",
+      "address": "2925 Red Cloud Pass",
+      "created_at": "2024-06-10T02:09:30Z",
+      "updated_at": "2024-05-01T22:49:33Z",
+      "email_verified_at": "2024-05-16T02:00:05Z"
+    },
+    {
+      "id": "132",
+      "name": "Bea",
+      "surname": "Semaine",
+      "email": "bsemaine3n@ted.com",
+      "phone": "163-628-3687",
+      "role": "admin",
+      "address": "3 Northwestern Pass",
+      "created_at": "2024-02-12T08:00:54Z",
+      "updated_at": "2024-08-14T23:29:28Z",
+      "email_verified_at": "2023-09-06T00:50:39Z"
+    },
+    {
+      "id": "133",
+      "name": "Herschel",
+      "surname": "Tuckwell",
+      "email": "htuckwell3o@angelfire.com",
+      "phone": "806-502-2894",
+      "role": "customer",
+      "address": "65 Onsgard Road",
+      "created_at": "2024-03-14T04:54:13Z",
+      "updated_at": "2024-09-04T15:44:22Z",
+      "email_verified_at": "2024-09-16T07:16:23Z"
+    },
+    {
+      "id": "134",
+      "name": "Sutton",
+      "surname": "Click",
+      "email": "sclick3p@usa.gov",
+      "phone": "380-302-9301",
+      "role": "customer",
+      "address": "1688 Schmedeman Place",
+      "created_at": "2024-07-31T05:49:29Z",
+      "updated_at": "2024-06-18T00:46:17Z",
+      "email_verified_at": "2024-09-26T04:00:30Z"
+    },
+    {
+      "id": "135",
+      "name": "Edin",
+      "surname": "Fausch",
+      "email": "efausch3q@oaic.gov.au",
+      "phone": "698-267-5736",
+      "role": "customer",
+      "address": "386 Kipling Drive",
+      "created_at": "2024-08-18T03:45:05Z",
+      "updated_at": "2024-02-25T05:02:43Z",
+      "email_verified_at": "2024-05-17T11:03:40Z"
+    },
+    {
+      "id": "136",
+      "name": "Jack",
+      "surname": "Petrescu",
+      "email": "jpetrescu3r@meetup.com",
+      "phone": "463-305-8428",
+      "role": "admin",
+      "address": "34 Susan Point",
+      "created_at": "2024-05-28T08:29:57Z",
+      "updated_at": "2024-06-28T13:56:29Z",
+      "email_verified_at": "2024-05-06T12:47:35Z"
+    },
+    {
+      "id": "137",
+      "name": "Frans",
+      "surname": "London",
+      "email": "flondon3s@1und1.de",
+      "phone": "812-906-7787",
+      "role": "admin",
+      "address": "93298 Dryden Point",
+      "created_at": "2023-11-03T19:05:36Z",
+      "updated_at": "2024-07-21T15:49:27Z",
+      "email_verified_at": "2024-04-16T03:58:10Z"
+    },
+    {
+      "id": "138",
+      "name": "Any",
+      "surname": "Ondrich",
+      "email": "aondrich3t@chronoengine.com",
+      "phone": "189-545-0934",
+      "role": "customer",
+      "address": "82 Bartelt Hill",
+      "created_at": "2023-09-29T03:40:38Z",
+      "updated_at": "2024-06-29T02:50:40Z",
+      "email_verified_at": "2024-08-07T13:19:47Z"
+    },
+    {
+      "id": "139",
+      "name": "Davide",
+      "surname": "Harbard",
+      "email": "dharbard3u@amazon.de",
+      "phone": "408-727-8075",
+      "role": "admin",
+      "address": "21 David Court",
+      "created_at": "2024-05-30T01:35:08Z",
+      "updated_at": "2024-03-13T20:52:54Z",
+      "email_verified_at": "2024-06-08T05:41:44Z"
+    },
+    {
+      "id": "140",
+      "name": "Marven",
+      "surname": "Boissier",
+      "email": "mboissier3v@creativecommons.org",
+      "phone": "569-668-9964",
+      "role": "customer",
+      "address": "9 Laurel Alley",
+      "created_at": "2024-09-28T07:31:11Z",
+      "updated_at": "2024-09-21T18:32:04Z",
+      "email_verified_at": "2024-01-06T11:43:25Z"
+    },
+    {
+      "id": "141",
+      "name": "Pierce",
+      "surname": "Cardew",
+      "email": "pcardew3w@quantcast.com",
+      "phone": "630-610-7136",
+      "role": "admin",
+      "address": "41 Muir Avenue",
+      "created_at": "2024-01-07T07:52:07Z",
+      "updated_at": "2024-08-20T22:31:53Z",
+      "email_verified_at": "2024-09-13T10:45:51Z"
+    },
+    {
+      "id": "142",
+      "name": "Nicholle",
+      "surname": "Ableson",
+      "email": "nableson3x@stanford.edu",
+      "phone": "163-264-2145",
+      "role": "customer",
+      "address": "5 John Wall Circle",
+      "created_at": "2023-09-15T20:26:34Z",
+      "updated_at": "2024-02-15T10:36:27Z",
+      "email_verified_at": "2024-09-08T22:52:44Z"
+    },
+    {
+      "id": "143",
+      "name": "Codi",
+      "surname": "Landells",
+      "email": "clandells3y@columbia.edu",
+      "phone": "764-516-4284",
+      "role": "admin",
+      "address": "9 Kensington Trail",
+      "created_at": "2024-04-08T07:05:53Z",
+      "updated_at": "2023-10-25T21:31:12Z",
+      "email_verified_at": "2024-01-15T20:37:57Z"
+    },
+    {
+      "id": "144",
+      "name": "Matthew",
+      "surname": "Wilne",
+      "email": "mwilne3z@howstuffworks.com",
+      "phone": "949-503-2529",
+      "role": "admin",
+      "address": "102 Kings Terrace",
+      "created_at": "2023-09-12T00:01:17Z",
+      "updated_at": "2024-06-26T23:39:41Z",
+      "email_verified_at": "2023-10-20T13:44:33Z"
+    },
+    {
+      "id": "145",
+      "name": "Xerxes",
+      "surname": "Eadington",
+      "email": "xeadington40@nbcnews.com",
+      "phone": "900-346-9157",
+      "role": "admin",
+      "address": "64174 Union Avenue",
+      "created_at": "2023-09-29T15:32:19Z",
+      "updated_at": "2024-09-22T10:59:59Z",
+      "email_verified_at": "2024-07-23T06:04:49Z"
+    },
+    {
+      "id": "146",
+      "name": "Corby",
+      "surname": "Moan",
+      "email": "cmoan41@youtu.be",
+      "phone": "364-358-3597",
+      "role": "admin",
+      "address": "06102 Schiller Junction",
+      "created_at": "2024-06-20T21:35:30Z",
+      "updated_at": "2024-01-17T21:25:19Z",
+      "email_verified_at": "2024-06-22T15:10:31Z"
+    },
+    {
+      "id": "147",
+      "name": "Guenna",
+      "surname": "McCandie",
+      "email": "gmccandie42@newsvine.com",
+      "phone": "686-451-3965",
+      "role": "customer",
+      "address": "203 Scofield Street",
+      "created_at": "2024-08-14T00:11:03Z",
+      "updated_at": "2024-03-05T18:37:26Z",
+      "email_verified_at": "2024-07-07T11:06:29Z"
+    },
+    {
+      "id": "148",
+      "name": "Marleah",
+      "surname": "Ducroe",
+      "email": "mducroe43@nytimes.com",
+      "phone": "380-451-4581",
+      "role": "admin",
+      "address": "0 Blaine Pass",
+      "created_at": "2024-09-16T05:18:01Z",
+      "updated_at": "2024-05-02T06:50:48Z",
+      "email_verified_at": "2023-11-09T15:38:41Z"
+    },
+    {
+      "id": "149",
+      "name": "Wendye",
+      "surname": "Stickler",
+      "email": "wstickler44@arizona.edu",
+      "phone": "431-702-7839",
+      "role": "customer",
+      "address": "10 Bultman Way",
+      "created_at": "2024-03-18T04:18:02Z",
+      "updated_at": "2024-04-23T01:56:19Z",
+      "email_verified_at": "2024-08-26T05:08:50Z"
+    },
+    {
+      "id": "150",
+      "name": "Cull",
+      "surname": "Ventura",
+      "email": "cventura45@macromedia.com",
+      "phone": "918-515-6010",
+      "role": "admin",
+      "address": "53 Ilene Pass",
+      "created_at": "2023-11-05T22:33:22Z",
+      "updated_at": "2023-10-08T18:38:23Z",
+      "email_verified_at": "2024-08-15T03:29:59Z"
+    },
+    {
+      "id": "151",
+      "name": "Valma",
+      "surname": "Mash",
+      "email": "vmash46@cnbc.com",
+      "phone": "769-213-6783",
+      "role": "customer",
+      "address": "2517 Florence Court",
+      "created_at": "2024-05-31T17:53:09Z",
+      "updated_at": "2024-05-29T07:31:49Z",
+      "email_verified_at": "2024-08-29T22:56:22Z"
+    },
+    {
+      "id": "152",
+      "name": "Marcus",
+      "surname": "Watman",
+      "email": "mwatman47@dmoz.org",
+      "phone": "161-912-9080",
+      "role": "customer",
+      "address": "81 Bultman Hill",
+      "created_at": "2024-06-04T21:45:33Z",
+      "updated_at": "2023-10-16T12:41:02Z",
+      "email_verified_at": "2024-06-11T07:17:31Z"
+    },
+    {
+      "id": "153",
+      "name": "Maryann",
+      "surname": "Jorge",
+      "email": "mjorge48@t-online.de",
+      "phone": "397-338-6164",
+      "role": "admin",
+      "address": "19 High Crossing Junction",
+      "created_at": "2023-10-19T00:00:46Z",
+      "updated_at": "2024-08-30T21:21:27Z",
+      "email_verified_at": "2024-07-04T20:34:56Z"
+    },
+    {
+      "id": "154",
+      "name": "Robbyn",
+      "surname": "Cardall",
+      "email": "rcardall49@gov.uk",
+      "phone": "307-641-9080",
+      "role": "customer",
+      "address": "85634 Sunfield Trail",
+      "created_at": "2024-02-10T07:44:14Z",
+      "updated_at": "2024-07-09T02:49:42Z",
+      "email_verified_at": "2023-12-18T05:12:23Z"
+    },
+    {
+      "id": "155",
+      "name": "Nate",
+      "surname": "Rosgen",
+      "email": "nrosgen4a@umn.edu",
+      "phone": "171-315-6919",
+      "role": "admin",
+      "address": "86 Fisk Parkway",
+      "created_at": "2024-07-28T06:23:38Z",
+      "updated_at": "2023-11-19T02:32:12Z",
+      "email_verified_at": "2023-09-20T05:19:05Z"
+    },
+    {
+      "id": "156",
+      "name": "Creight",
+      "surname": "Cudby",
+      "email": "ccudby4b@ustream.tv",
+      "phone": "282-184-5794",
+      "role": "admin",
+      "address": "10906 Bultman Hill",
+      "created_at": "2024-09-17T12:44:04Z",
+      "updated_at": "2024-06-18T04:09:08Z",
+      "email_verified_at": "2024-01-23T07:29:28Z"
+    },
+    {
+      "id": "157",
+      "name": "Giff",
+      "surname": "Welsby",
+      "email": "gwelsby4c@phoca.cz",
+      "phone": "558-797-7397",
+      "role": "admin",
+      "address": "4 Cottonwood Avenue",
+      "created_at": "2023-09-07T07:53:15Z",
+      "updated_at": "2023-10-09T18:20:36Z",
+      "email_verified_at": "2024-08-02T06:56:30Z"
+    },
+    {
+      "id": "158",
+      "name": "Dalila",
+      "surname": "Senner",
+      "email": "dsenner4d@taobao.com",
+      "phone": "809-595-9135",
+      "role": "admin",
+      "address": "8421 Crescent Oaks Drive",
+      "created_at": "2023-10-31T04:48:44Z",
+      "updated_at": "2024-05-20T01:07:56Z",
+      "email_verified_at": "2023-09-29T08:28:01Z"
+    },
+    {
+      "id": "159",
+      "name": "Collen",
+      "surname": "Derkes",
+      "email": "cderkes4e@webmd.com",
+      "phone": "771-557-4617",
+      "role": "customer",
+      "address": "16 Corscot Plaza",
+      "created_at": "2024-06-28T19:21:36Z",
+      "updated_at": "2024-03-06T17:47:33Z",
+      "email_verified_at": "2024-07-23T13:57:32Z"
+    },
+    {
+      "id": "160",
+      "name": "Kaycee",
+      "surname": "Scothern",
+      "email": "kscothern4f@deliciousdays.com",
+      "phone": "818-982-0305",
+      "role": "customer",
+      "address": "81704 Village Road",
+      "created_at": "2024-04-12T06:02:38Z",
+      "updated_at": "2024-01-26T00:45:40Z",
+      "email_verified_at": "2024-09-28T16:17:53Z"
+    },
+    {
+      "id": "161",
+      "name": "Ibrahim",
+      "surname": "Rodenburgh",
+      "email": "irodenburgh4g@netscape.com",
+      "phone": "377-238-2443",
+      "role": "customer",
+      "address": "533 Pierstorff Drive",
+      "created_at": "2023-09-29T05:11:26Z",
+      "updated_at": "2023-11-26T11:23:40Z",
+      "email_verified_at": "2024-07-10T12:24:12Z"
+    },
+    {
+      "id": "162",
+      "name": "Hillel",
+      "surname": "Fawke",
+      "email": "hfawke4h@amazon.com",
+      "phone": "982-163-1798",
+      "role": "admin",
+      "address": "87647 Parkside Hill",
+      "created_at": "2024-07-21T19:53:51Z",
+      "updated_at": "2023-11-17T07:34:14Z",
+      "email_verified_at": "2024-05-03T01:41:08Z"
+    },
+    {
+      "id": "163",
+      "name": "Godiva",
+      "surname": "Donner",
+      "email": "gdonner4i@hexun.com",
+      "phone": "631-111-5633",
+      "role": "customer",
+      "address": "755 Charing Cross Street",
+      "created_at": "2024-05-16T14:01:34Z",
+      "updated_at": "2023-12-08T01:19:41Z",
+      "email_verified_at": "2024-01-31T13:31:14Z"
+    },
+    {
+      "id": "164",
+      "name": "Sean",
+      "surname": "Woolf",
+      "email": "swoolf4j@cocolog-nifty.com",
+      "phone": "649-716-3046",
+      "role": "admin",
+      "address": "623 Heffernan Crossing",
+      "created_at": "2024-06-29T13:06:42Z",
+      "updated_at": "2023-10-10T22:36:46Z",
+      "email_verified_at": "2024-02-12T12:35:46Z"
+    },
+    {
+      "id": "165",
+      "name": "Logan",
+      "surname": "Panner",
+      "email": "lpanner4k@patch.com",
+      "phone": "127-981-0823",
+      "role": "customer",
+      "address": "04 Parkside Trail",
+      "created_at": "2024-08-05T08:11:24Z",
+      "updated_at": "2024-09-11T23:10:25Z",
+      "email_verified_at": "2024-09-29T05:18:43Z"
+    },
+    {
+      "id": "166",
+      "name": "Ebonee",
+      "surname": "O'Docherty",
+      "email": "eodocherty4l@zdnet.com",
+      "phone": "282-551-9334",
+      "role": "customer",
+      "address": "28400 2nd Park",
+      "created_at": "2023-11-30T20:57:17Z",
+      "updated_at": "2024-09-03T03:11:30Z",
+      "email_verified_at": "2024-07-21T08:34:50Z"
+    },
+    {
+      "id": "167",
+      "name": "Christiane",
+      "surname": "Arboin",
+      "email": "carboin4m@51.la",
+      "phone": "978-597-8249",
+      "role": "customer",
+      "address": "2 Bowman Pass",
+      "created_at": "2023-11-02T17:57:16Z",
+      "updated_at": "2024-08-14T16:47:07Z",
+      "email_verified_at": "2024-03-20T17:00:38Z"
+    },
+    {
+      "id": "168",
+      "name": "Lonny",
+      "surname": "Smillie",
+      "email": "lsmillie4n@nsw.gov.au",
+      "phone": "527-864-4756",
+      "role": "admin",
+      "address": "989 Monica Terrace",
+      "created_at": "2023-12-21T13:10:54Z",
+      "updated_at": "2023-09-06T10:48:18Z",
+      "email_verified_at": "2023-11-18T23:10:09Z"
+    },
+    {
+      "id": "169",
+      "name": "Nollie",
+      "surname": "Ajean",
+      "email": "najean4o@businesswire.com",
+      "phone": "593-149-5604",
+      "role": "customer",
+      "address": "2284 Orin Hill",
+      "created_at": "2024-02-10T05:56:08Z",
+      "updated_at": "2023-09-14T09:09:35Z",
+      "email_verified_at": "2023-12-22T13:21:07Z"
+    },
+    {
+      "id": "170",
+      "name": "Chas",
+      "surname": "Ricket",
+      "email": "cricket4p@slideshare.net",
+      "phone": "550-343-1377",
+      "role": "customer",
+      "address": "1480 Jenna Court",
+      "created_at": "2024-03-17T13:02:19Z",
+      "updated_at": "2024-03-21T21:52:21Z",
+      "email_verified_at": "2023-10-11T23:41:16Z"
+    },
+    {
+      "id": "171",
+      "name": "Miquela",
+      "surname": "Coast",
+      "email": "mcoast4q@sakura.ne.jp",
+      "phone": "723-589-2142",
+      "role": "admin",
+      "address": "21 Moland Hill",
+      "created_at": "2023-10-02T22:36:29Z",
+      "updated_at": "2024-07-18T12:34:04Z",
+      "email_verified_at": "2023-11-26T14:05:42Z"
+    },
+    {
+      "id": "172",
+      "name": "Sella",
+      "surname": "Ridwood",
+      "email": "sridwood4r@answers.com",
+      "phone": "642-348-2387",
+      "role": "customer",
+      "address": "404 Thompson Way",
+      "created_at": "2024-01-16T15:49:09Z",
+      "updated_at": "2024-01-21T04:38:22Z",
+      "email_verified_at": "2024-01-12T04:51:26Z"
+    },
+    {
+      "id": "173",
+      "name": "Austin",
+      "surname": "McAloren",
+      "email": "amcaloren4s@amazon.de",
+      "phone": "944-335-4599",
+      "role": "customer",
+      "address": "176 Homewood Park",
+      "created_at": "2024-08-06T16:48:02Z",
+      "updated_at": "2023-10-26T04:25:39Z",
+      "email_verified_at": "2023-12-13T13:08:50Z"
+    },
+    {
+      "id": "174",
+      "name": "Patrizius",
+      "surname": "Huskinson",
+      "email": "phuskinson4t@is.gd",
+      "phone": "850-931-2548",
+      "role": "admin",
+      "address": "18 Glacier Hill Trail",
+      "created_at": "2023-11-24T08:32:32Z",
+      "updated_at": "2024-06-21T17:35:07Z",
+      "email_verified_at": "2023-09-21T07:33:37Z"
+    },
+    {
+      "id": "175",
+      "name": "Felicity",
+      "surname": "Brunicke",
+      "email": "fbrunicke4u@google.nl",
+      "phone": "461-435-8933",
+      "role": "customer",
+      "address": "47712 Canary Center",
+      "created_at": "2024-02-06T18:56:41Z",
+      "updated_at": "2024-09-24T03:24:45Z",
+      "email_verified_at": "2024-09-02T05:31:32Z"
+    },
+    {
+      "id": "176",
+      "name": "Grazia",
+      "surname": "Scandrick",
+      "email": "gscandrick4v@devhub.com",
+      "phone": "901-258-6250",
+      "role": "customer",
+      "address": "13507 La Follette Park",
+      "created_at": "2024-01-18T21:07:18Z",
+      "updated_at": "2023-11-24T09:45:24Z",
+      "email_verified_at": "2024-06-03T02:17:35Z"
+    },
+    {
+      "id": "177",
+      "name": "Bertine",
+      "surname": "Schwier",
+      "email": "bschwier4w@a8.net",
+      "phone": "561-927-9174",
+      "role": "admin",
+      "address": "40640 David Junction",
+      "created_at": "2023-11-28T17:34:01Z",
+      "updated_at": "2024-09-16T01:37:58Z",
+      "email_verified_at": "2023-10-24T18:27:29Z"
+    },
+    {
+      "id": "178",
+      "name": "Leeland",
+      "surname": "Laugherane",
+      "email": "llaugherane4x@infoseek.co.jp",
+      "phone": "156-906-8311",
+      "role": "customer",
+      "address": "64295 Holy Cross Hill",
+      "created_at": "2023-09-17T06:41:37Z",
+      "updated_at": "2023-11-05T07:24:25Z",
+      "email_verified_at": "2023-09-24T08:58:08Z"
+    },
+    {
+      "id": "179",
+      "name": "Paquito",
+      "surname": "Threadgould",
+      "email": "pthreadgould4y@booking.com",
+      "phone": "772-196-8097",
+      "role": "admin",
+      "address": "09443 Bartelt Pass",
+      "created_at": "2023-10-19T11:29:45Z",
+      "updated_at": "2024-01-05T00:47:55Z",
+      "email_verified_at": "2024-02-06T05:31:01Z"
+    },
+    {
+      "id": "180",
+      "name": "Milissent",
+      "surname": "Coopland",
+      "email": "mcoopland4z@last.fm",
+      "phone": "352-814-4066",
+      "role": "admin",
+      "address": "7 Florence Parkway",
+      "created_at": "2024-02-18T04:04:32Z",
+      "updated_at": "2023-11-12T07:50:01Z",
+      "email_verified_at": "2024-01-03T16:36:49Z"
+    },
+    {
+      "id": "181",
+      "name": "Alexis",
+      "surname": "MacSkeaghan",
+      "email": "amacskeaghan50@state.gov",
+      "phone": "470-198-7858",
+      "role": "admin",
+      "address": "0666 Burning Wood Parkway",
+      "created_at": "2024-06-08T03:25:37Z",
+      "updated_at": "2024-02-17T18:50:45Z",
+      "email_verified_at": "2024-03-06T21:48:53Z"
+    },
+    {
+      "id": "182",
+      "name": "Zelda",
+      "surname": "Bruno",
+      "email": "zbruno51@posterous.com",
+      "phone": "934-321-2421",
+      "role": "admin",
+      "address": "120 Park Meadow Junction",
+      "created_at": "2024-04-20T08:50:50Z",
+      "updated_at": "2024-02-02T23:07:36Z",
+      "email_verified_at": "2024-01-27T09:56:54Z"
+    },
+    {
+      "id": "183",
+      "name": "Rex",
+      "surname": "Glide",
+      "email": "rglide52@deliciousdays.com",
+      "phone": "715-431-6983",
+      "role": "customer",
+      "address": "09530 Esker Junction",
+      "created_at": "2024-05-14T09:18:36Z",
+      "updated_at": "2024-09-17T13:57:09Z",
+      "email_verified_at": "2024-02-28T13:39:01Z"
+    },
+    {
+      "id": "184",
+      "name": "Lyssa",
+      "surname": "Benediktovich",
+      "email": "lbenediktovich53@csmonitor.com",
+      "phone": "283-468-5827",
+      "role": "customer",
+      "address": "12953 Montana Parkway",
+      "created_at": "2024-07-23T22:57:00Z",
+      "updated_at": "2024-03-17T18:14:52Z",
+      "email_verified_at": "2023-09-11T16:16:09Z"
+    },
+    {
+      "id": "185",
+      "name": "Maureen",
+      "surname": "Krug",
+      "email": "mkrug54@home.pl",
+      "phone": "600-623-2909",
+      "role": "admin",
+      "address": "647 Loomis Point",
+      "created_at": "2024-01-17T14:42:21Z",
+      "updated_at": "2023-11-21T09:58:40Z",
+      "email_verified_at": "2023-12-16T21:45:08Z"
+    },
+    {
+      "id": "186",
+      "name": "Lea",
+      "surname": "Sherrott",
+      "email": "lsherrott55@utexas.edu",
+      "phone": "999-488-0525",
+      "role": "admin",
+      "address": "9 Marcy Terrace",
+      "created_at": "2024-04-10T23:08:39Z",
+      "updated_at": "2024-09-04T20:27:49Z",
+      "email_verified_at": "2024-09-15T21:34:14Z"
+    },
+    {
+      "id": "187",
+      "name": "Clemmy",
+      "surname": "Hoyes",
+      "email": "choyes56@imgur.com",
+      "phone": "392-269-3139",
+      "role": "admin",
+      "address": "873 Novick Road",
+      "created_at": "2024-09-23T23:30:54Z",
+      "updated_at": "2023-12-02T13:00:12Z",
+      "email_verified_at": "2024-06-23T02:39:02Z"
+    },
+    {
+      "id": "188",
+      "name": "Saraann",
+      "surname": "Wingar",
+      "email": "swingar57@deliciousdays.com",
+      "phone": "881-691-2850",
+      "role": "admin",
+      "address": "42 Pepper Wood Street",
+      "created_at": "2023-10-30T20:33:49Z",
+      "updated_at": "2023-09-29T07:43:42Z",
+      "email_verified_at": "2024-03-08T12:58:08Z"
+    },
+    {
+      "id": "4f63",
+      "name": "csacascs",
+      "surname": "csacsacas",
+      "email": "scacsacsaacs",
+      "phone": "csacsacsa",
+      "address": "Via Tunisi, 54, 10134 Torino TO, Italia",
+      "role": "customer",
+      "avatar": "https://picsum.photos/200/300",
+      "email_verified_at": "2024-10-02T09:44:24.749Z",
+      "created_at": "2024-10-02T09:44:24.750Z",
+      "updated_at": "2024-10-02T09:44:24.750Z"
+    },
+    {
+      "id": "583e",
+      "name": "vvdsdvs",
+      "surname": "vsdvdsvd",
+      "email": "dvsvsdvsd",
+      "phone": "vdsvsdsdv",
+      "address": "Via Tunisi, 54, 10134 Torino TO, Italia",
+      "role": "customer",
+      "avatar": "https://picsum.photos/200/300",
+      "email_verified_at": "2024-10-02T10:05:17.376Z",
+      "created_at": "2024-10-02T10:05:17.376Z",
+      "updated_at": "2024-10-02T10:05:17.376Z"
+    },
+    {
+      "id": "cdef",
+      "name": "efwfew",
+      "surname": "efwewf",
+      "email": "fewefw",
+      "phone": "fewfewefw",
+      "address": "Via Tunisi, 54, 10134 Torino TO, Italia",
+      "role": "customer",
+      "avatar": "https://picsum.photos/200/300",
+      "email_verified_at": "2024-10-02T10:06:26.687Z",
+      "created_at": "2024-10-02T10:06:26.687Z",
+      "updated_at": "2024-10-02T10:06:26.687Z"
+    },
+    {
+      "id": "9eb5",
+      "name": "dsvdsvsd",
+      "surname": "vdsdvsvsd",
+      "email": "vdsvsd",
+      "phone": "vdsvsdvsd",
+      "address": "Via Teramo, 50, 10152 Torino TO, Italia",
+      "role": "customer",
+      "avatar": "https://picsum.photos/200/300",
+      "email_verified_at": "2024-10-02T10:07:18.851Z",
+      "created_at": "2024-10-02T10:07:18.851Z",
+      "updated_at": "2024-10-02T10:07:18.851Z"
+    },
+    {
+      "id": "7ccc",
+      "name": "",
+      "surname": "",
+      "email": "",
+      "phone": "",
+      "address": "",
+      "role": "customer",
+      "avatar": "https://picsum.photos/200/300",
+      "email_verified_at": "2024-10-03T13:26:26.476Z",
+      "created_at": "2024-10-03T13:26:26.476Z",
+      "updated_at": "2024-10-03T13:26:26.476Z"
+    },
+    {
+      "id": "6dac",
+      "name": "",
+      "surname": "",
+      "email": "",
+      "phone": "",
+      "address": "",
+      "role": "customer",
+      "avatar": "https://picsum.photos/200/300",
+      "email_verified_at": "2024-10-03T13:26:40.263Z",
+      "created_at": "2024-10-03T13:26:40.263Z",
+      "updated_at": "2024-10-03T13:26:40.263Z"
+    },
+    {
+      "id": "8500",
+      "name": "qwddqw",
+      "surname": "dwqdqw",
+      "email": "dwqwdqqwd",
+      "phone": "",
+      "address": "Via Tunisi, 54, 10134 Torino TO, Italia",
+      "role": "customer",
+      "avatar": "https://picsum.photos/200/300",
+      "email_verified_at": "2024-10-03T13:53:04.590Z",
+      "created_at": "2024-10-03T13:53:04.590Z",
+      "updated_at": "2024-10-03T13:53:04.590Z"
+    },
+    {
+      "id": "7581",
+      "name": "asccas",
+      "surname": "cascas",
+      "email": "csacascas@yahoo.com",
+      "phone": "",
+      "address": "Via Tunisi, 54, 10134 Torino TO, Italia",
+      "role": "customer",
+      "avatar": "https://picsum.photos/200/300",
+      "email_verified_at": "2024-10-03T14:08:48.447Z",
+      "created_at": "2024-10-03T14:08:48.447Z",
+      "updated_at": "2024-10-03T14:08:48.447Z"
+    },
+    {
+      "id": "48f4",
+      "name": "Val",
+      "surname": "Berends",
+      "email": "vberendsa@hao123.com",
+      "phone": "936-376-4799",
+      "address": "5217 Shopko Point",
+      "role": "customer",
+      "avatar": "https://picsum.photos/200/300",
+      "email_verified_at": "2024-10-03T14:43:07.345Z",
+      "created_at": "2024-10-03T14:43:07.345Z",
+      "updated_at": "2024-10-03T14:43:07.345Z"
+    },
+    {
+      "id": "c0c5",
+      "name": "Porty",
+      "surname": "Mechi",
+      "email": "pmechij@etsy.com",
+      "phone": "937-509-0523",
+      "address": "65 Delladonna Junction",
+      "role": "customer",
+      "avatar": "https://picsum.photos/200/300",
+      "email_verified_at": "2024-10-03T14:44:40.525Z",
+      "created_at": "2024-10-03T14:44:40.525Z",
+      "updated_at": "2024-10-03T14:44:40.525Z"
+    }
+  ],
+  "products": [
+    {
+      "id": "4",
+      "title": "Red Lipstick",
+      "description": "The Red Lipstick is a classic and bold choice for adding a pop of color to your lips. With a creamy and pigmented formula, it provides a vibrant and long-lasting finish.",
+      "category": "beauty",
+      "price": 12.99,
+      "discountPercentage": 19.03,
+      "rating": 2.51,
+      "stock": 68,
+      "tags": [
+        "beauty",
+        "lipstick"
+      ],
+      "brand": "Chic Cosmetics",
+      "sku": "O5IF1NTA",
+      "weight": 5,
+      "dimensions": {
+        "width": 14.37,
+        "height": 13.94,
+        "depth": 14.6
+      },
+      "warrantyInformation": "Lifetime warranty",
+      "shippingInformation": "Ships in 2 weeks",
+      "availabilityStatus": "In Stock",
+      "reviews": [
+        {
+          "rating": 5,
+          "comment": "Great product!",
+          "date": "2024-05-23T08:56:21.619Z",
+          "reviewerName": "Leo Rivera",
+          "reviewerEmail": "leo.rivera@x.dummyjson.com"
+        },
+        {
+          "rating": 4,
+          "comment": "Very pleased!",
+          "date": "2024-05-23T08:56:21.619Z",
+          "reviewerName": "Oscar Powers",
+          "reviewerEmail": "oscar.powers@x.dummyjson.com"
+        },
+        {
+          "rating": 5,
+          "comment": "Very pleased!",
+          "date": "2024-05-23T08:56:21.619Z",
+          "reviewerName": "Carter Rivera",
+          "reviewerEmail": "carter.rivera@x.dummyjson.com"
+        }
+      ],
+      "returnPolicy": "90 days return policy",
+      "minimumOrderQuantity": 6,
+      "meta": {
+        "createdAt": "2024-05-23T08:56:21.619Z",
+        "updatedAt": "2024-05-23T08:56:21.619Z",
+        "barcode": "9444582199406",
+        "qrCode": "https://assets.dummyjson.com/public/qr-code.png"
+      },
+      "images": [
+        "https://cdn.dummyjson.com/products/images/beauty/Red%20Lipstick/1.png"
+      ],
+      "thumbnail": "https://cdn.dummyjson.com/products/images/beauty/Red%20Lipstick/thumbnail.png"
+    },
+    {
+      "id": "5",
+      "title": "Red Nail Polish",
+      "description": "The Red Nail Polish offers a rich and glossy red hue for vibrant and polished nails. With a quick-drying formula, it provides a salon-quality finish at home.",
+      "category": "beauty",
+      "price": 8.99,
+      "discountPercentage": 2.46,
+      "rating": 3.91,
+      "stock": 71,
+      "tags": [
+        "beauty",
+        "nail polish"
+      ],
+      "brand": "Nail Couture",
+      "sku": "YUIIIP4W",
+      "weight": 9,
+      "dimensions": {
+        "width": 8.11,
+        "height": 10.89,
+        "depth": 29.06
+      },
+      "warrantyInformation": "1 year warranty",
+      "shippingInformation": "Ships in 1 week",
+      "availabilityStatus": "In Stock",
+      "reviews": [
+        {
+          "rating": 5,
+          "comment": "Very pleased!",
+          "date": "2024-05-23T08:56:21.619Z",
+          "reviewerName": "Leo Rivera",
+          "reviewerEmail": "leo.rivera@x.dummyjson.com"
+        },
+        {
+          "rating": 5,
+          "comment": "Great product!",
+          "date": "2024-05-23T08:56:21.619Z",
+          "reviewerName": "Evan Reed",
+          "reviewerEmail": "evan.reed@x.dummyjson.com"
+        },
+        {
+          "rating": 4,
+          "comment": "Highly recommended!",
+          "date": "2024-05-23T08:56:21.619Z",
+          "reviewerName": "Evelyn Sanchez",
+          "reviewerEmail": "evelyn.sanchez@x.dummyjson.com"
+        }
+      ],
+      "returnPolicy": "No return policy",
+      "minimumOrderQuantity": 46,
+      "meta": {
+        "createdAt": "2024-05-23T08:56:21.619Z",
+        "updatedAt": "2024-05-23T08:56:21.619Z",
+        "barcode": "3212847902461",
+        "qrCode": "https://assets.dummyjson.com/public/qr-code.png"
+      },
+      "images": [
+        "https://cdn.dummyjson.com/products/images/beauty/Red%20Nail%20Polish/1.png"
+      ],
+      "thumbnail": "https://cdn.dummyjson.com/products/images/beauty/Red%20Nail%20Polish/thumbnail.png"
+    },
+    {
+      "id": "6",
+      "title": "Calvin Klein CK One",
+      "description": "CK One by Calvin Klein is a classic unisex fragrance, known for its fresh and clean scent. It's a versatile fragrance suitable for everyday wear.",
+      "category": "fragrances",
+      "price": 49.99,
+      "discountPercentage": 0.32,
+      "rating": 4.85,
+      "stock": 17,
+      "tags": [
+        "fragrances",
+        "perfumes"
+      ],
+      "brand": "Calvin Klein",
+      "sku": "DZM2JQZE",
+      "weight": 5,
+      "dimensions": {
+        "width": 11.53,
+        "height": 14.44,
+        "depth": 6.81
+      },
+      "warrantyInformation": "5 year warranty",
+      "shippingInformation": "Ships overnight",
+      "availabilityStatus": "In Stock",
+      "reviews": [
+        {
+          "rating": 5,
+          "comment": "Great value for money!",
+          "date": "2024-05-23T08:56:21.619Z",
+          "reviewerName": "Sophia Brown",
+          "reviewerEmail": "sophia.brown@x.dummyjson.com"
+        },
+        {
+          "rating": 3,
+          "comment": "Very disappointed!",
+          "date": "2024-05-23T08:56:21.619Z",
+          "reviewerName": "Madison Collins",
+          "reviewerEmail": "madison.collins@x.dummyjson.com"
+        },
+        {
+          "rating": 1,
+          "comment": "Poor quality!",
+          "date": "2024-05-23T08:56:21.619Z",
+          "reviewerName": "Maya Reed",
+          "reviewerEmail": "maya.reed@x.dummyjson.com"
+        }
+      ],
+      "returnPolicy": "No return policy",
+      "minimumOrderQuantity": 20,
+      "meta": {
+        "createdAt": "2024-05-23T08:56:21.619Z",
+        "updatedAt": "2024-05-23T08:56:21.619Z",
+        "barcode": "2210136215089",
+        "qrCode": "https://assets.dummyjson.com/public/qr-code.png"
+      },
+      "images": [
+        "https://cdn.dummyjson.com/products/images/fragrances/Calvin%20Klein%20CK%20One/1.png",
+        "https://cdn.dummyjson.com/products/images/fragrances/Calvin%20Klein%20CK%20One/2.png",
+        "https://cdn.dummyjson.com/products/images/fragrances/Calvin%20Klein%20CK%20One/3.png"
+      ],
+      "thumbnail": "https://cdn.dummyjson.com/products/images/fragrances/Calvin%20Klein%20CK%20One/thumbnail.png"
+    },
+    {
+      "id": "7",
+      "title": "Chanel Coco Noir Eau De",
+      "description": "Coco Noir by Chanel is an elegant and mysterious fragrance, featuring notes of grapefruit, rose, and sandalwood. Perfect for evening occasions.",
+      "category": "fragrances",
+      "price": 129.99,
+      "discountPercentage": 18.64,
+      "rating": 2.76,
+      "stock": 41,
+      "tags": [
+        "fragrances",
+        "perfumes"
+      ],
+      "brand": "Chanel",
+      "sku": "K71HBCGS",
+      "weight": 4,
+      "dimensions": {
+        "width": 21.27,
+        "height": 28,
+        "depth": 11.89
+      },
+      "warrantyInformation": "1 week warranty",
+      "shippingInformation": "Ships in 1 month",
+      "availabilityStatus": "In Stock",
+      "reviews": [
+        {
+          "rating": 1,
+          "comment": "Disappointing product!",
+          "date": "2024-05-23T08:56:21.619Z",
+          "reviewerName": "Lincoln Kelly",
+          "reviewerEmail": "lincoln.kelly@x.dummyjson.com"
+        },
+        {
+          "rating": 4,
+          "comment": "Great product!",
+          "date": "2024-05-23T08:56:21.619Z",
+          "reviewerName": "Lincoln Kelly",
+          "reviewerEmail": "lincoln.kelly@x.dummyjson.com"
+        },
+        {
+          "rating": 4,
+          "comment": "Excellent quality!",
+          "date": "2024-05-23T08:56:21.619Z",
+          "reviewerName": "Lucas Allen",
+          "reviewerEmail": "lucas.allen@x.dummyjson.com"
+        }
+      ],
+      "returnPolicy": "60 days return policy",
+      "minimumOrderQuantity": 5,
+      "meta": {
+        "createdAt": "2024-05-23T08:56:21.619Z",
+        "updatedAt": "2024-05-23T08:56:21.619Z",
+        "barcode": "1435582999795",
+        "qrCode": "https://assets.dummyjson.com/public/qr-code.png"
+      },
+      "images": [
+        "https://cdn.dummyjson.com/products/images/fragrances/Chanel%20Coco%20Noir%20Eau%20De/1.png",
+        "https://cdn.dummyjson.com/products/images/fragrances/Chanel%20Coco%20Noir%20Eau%20De/2.png",
+        "https://cdn.dummyjson.com/products/images/fragrances/Chanel%20Coco%20Noir%20Eau%20De/3.png"
+      ],
+      "thumbnail": "https://cdn.dummyjson.com/products/images/fragrances/Chanel%20Coco%20Noir%20Eau%20De/thumbnail.png"
+    },
+    {
+      "id": "8",
+      "title": "Dior J'adore",
+      "description": "J'adore by Dior is a luxurious and floral fragrance, known for its blend of ylang-ylang, rose, and jasmine. It embodies femininity and sophistication.",
+      "category": "fragrances",
+      "price": 89.99,
+      "discountPercentage": 17.44,
+      "rating": 3.31,
+      "stock": 91,
+      "tags": [
+        "fragrances",
+        "perfumes"
+      ],
+      "brand": "Dior",
+      "sku": "E70NB03B",
+      "weight": 10,
+      "dimensions": {
+        "width": 21.51,
+        "height": 7,
+        "depth": 26.51
+      },
+      "warrantyInformation": "Lifetime warranty",
+      "shippingInformation": "Ships in 2 weeks",
+      "availabilityStatus": "In Stock",
+      "reviews": [
+        {
+          "rating": 5,
+          "comment": "Fast shipping!",
+          "date": "2024-05-23T08:56:21.619Z",
+          "reviewerName": "Zoe Nicholson",
+          "reviewerEmail": "zoe.nicholson@x.dummyjson.com"
+        },
+        {
+          "rating": 4,
+          "comment": "Excellent quality!",
+          "date": "2024-05-23T08:56:21.619Z",
+          "reviewerName": "Addison Wright",
+          "reviewerEmail": "addison.wright@x.dummyjson.com"
+        },
+        {
+          "rating": 4,
+          "comment": "Would buy again!",
+          "date": "2024-05-23T08:56:21.619Z",
+          "reviewerName": "Clara Berry",
+          "reviewerEmail": "clara.berry@x.dummyjson.com"
+        }
+      ],
+      "returnPolicy": "7 days return policy",
+      "minimumOrderQuantity": 8,
+      "meta": {
+        "createdAt": "2024-05-23T08:56:21.619Z",
+        "updatedAt": "2024-05-23T08:56:21.619Z",
+        "barcode": "0887083199279",
+        "qrCode": "https://assets.dummyjson.com/public/qr-code.png"
+      },
+      "images": [
+        "https://cdn.dummyjson.com/products/images/fragrances/Dior%20J'adore/1.png",
+        "https://cdn.dummyjson.com/products/images/fragrances/Dior%20J'adore/2.png",
+        "https://cdn.dummyjson.com/products/images/fragrances/Dior%20J'adore/3.png"
+      ],
+      "thumbnail": "https://cdn.dummyjson.com/products/images/fragrances/Dior%20J'adore/thumbnail.png"
+    },
+    {
+      "id": "9",
+      "title": "Dolce Shine Eau de",
+      "description": "Dolce Shine by Dolce & Gabbana is a vibrant and fruity fragrance, featuring notes of mango, jasmine, and blonde woods. It's a joyful and youthful scent.",
+      "category": "fragrances",
+      "price": 69.99,
+      "discountPercentage": 11.47,
+      "rating": 2.68,
+      "stock": 3,
+      "tags": [
+        "fragrances",
+        "perfumes"
+      ],
+      "brand": "Dolce & Gabbana",
+      "sku": "1NBFK980",
+      "weight": 5,
+      "dimensions": {
+        "width": 17,
+        "height": 24.57,
+        "depth": 13.3
+      },
+      "warrantyInformation": "5 year warranty",
+      "shippingInformation": "Ships in 1-2 business days",
+      "availabilityStatus": "Low Stock",
+      "reviews": [
+        {
+          "rating": 4,
+          "comment": "Very satisfied!",
+          "date": "2024-05-23T08:56:21.619Z",
+          "reviewerName": "Xavier Wright",
+          "reviewerEmail": "xavier.wright@x.dummyjson.com"
+        },
+        {
+          "rating": 1,
+          "comment": "Poor quality!",
+          "date": "2024-05-23T08:56:21.619Z",
+          "reviewerName": "Mila Hernandez",
+          "reviewerEmail": "mila.hernandez@x.dummyjson.com"
+        },
+        {
+          "rating": 5,
+          "comment": "Very happy with my purchase!",
+          "date": "2024-05-23T08:56:21.619Z",
+          "reviewerName": "Sophia Brown",
+          "reviewerEmail": "sophia.brown@x.dummyjson.com"
+        }
+      ],
+      "returnPolicy": "30 days return policy",
+      "minimumOrderQuantity": 9,
+      "meta": {
+        "createdAt": "2024-05-23T08:56:21.619Z",
+        "updatedAt": "2024-05-23T08:56:21.619Z",
+        "barcode": "1939383392674",
+        "qrCode": "https://assets.dummyjson.com/public/qr-code.png"
+      },
+      "images": [
+        "https://cdn.dummyjson.com/products/images/fragrances/Dolce%20Shine%20Eau%20de/1.png",
+        "https://cdn.dummyjson.com/products/images/fragrances/Dolce%20Shine%20Eau%20de/2.png",
+        "https://cdn.dummyjson.com/products/images/fragrances/Dolce%20Shine%20Eau%20de/3.png"
+      ],
+      "thumbnail": "https://cdn.dummyjson.com/products/images/fragrances/Dolce%20Shine%20Eau%20de/thumbnail.png"
+    },
+    {
+      "id": "10",
+      "title": "Gucci Bloom Eau de",
+      "description": "Gucci Bloom by Gucci is a floral and captivating fragrance, with notes of tuberose, jasmine, and Rangoon creeper. It's a modern and romantic scent.",
+      "category": "fragrances",
+      "price": 79.99,
+      "discountPercentage": 8.9,
+      "rating": 2.69,
+      "stock": 93,
+      "tags": [
+        "fragrances",
+        "perfumes"
+      ],
+      "brand": "Gucci",
+      "sku": "FFKZ6HOF",
+      "weight": 10,
+      "dimensions": {
+        "width": 22.28,
+        "height": 17.81,
+        "depth": 27.18
+      },
+      "warrantyInformation": "No warranty",
+      "shippingInformation": "Ships in 2 weeks",
+      "availabilityStatus": "In Stock",
+      "reviews": [
+        {
+          "rating": 5,
+          "comment": "Great value for money!",
+          "date": "2024-05-23T08:56:21.620Z",
+          "reviewerName": "Aria Parker",
+          "reviewerEmail": "aria.parker@x.dummyjson.com"
+        },
+        {
+          "rating": 4,
+          "comment": "Excellent quality!",
+          "date": "2024-05-23T08:56:21.620Z",
+          "reviewerName": "Natalie Harris",
+          "reviewerEmail": "natalie.harris@x.dummyjson.com"
+        },
+        {
+          "rating": 4,
+          "comment": "Fast shipping!",
+          "date": "2024-05-23T08:56:21.620Z",
+          "reviewerName": "Ava Harris",
+          "reviewerEmail": "ava.harris@x.dummyjson.com"
+        }
+      ],
+      "returnPolicy": "No return policy",
+      "minimumOrderQuantity": 10,
+      "meta": {
+        "createdAt": "2024-05-23T08:56:21.620Z",
+        "updatedAt": "2024-05-23T08:56:21.620Z",
+        "barcode": "8232190382069",
+        "qrCode": "https://assets.dummyjson.com/public/qr-code.png"
+      },
+      "images": [
+        "https://cdn.dummyjson.com/products/images/fragrances/Gucci%20Bloom%20Eau%20de/1.png",
+        "https://cdn.dummyjson.com/products/images/fragrances/Gucci%20Bloom%20Eau%20de/2.png",
+        "https://cdn.dummyjson.com/products/images/fragrances/Gucci%20Bloom%20Eau%20de/3.png"
+      ],
+      "thumbnail": "https://cdn.dummyjson.com/products/images/fragrances/Gucci%20Bloom%20Eau%20de/thumbnail.png"
+    },
+    {
+      "id": "11",
+      "title": "Annibale Colombo Bed",
+      "description": "The Annibale Colombo Bed is a luxurious and elegant bed frame, crafted with high-quality materials for a comfortable and stylish bedroom.",
+      "category": "furniture",
+      "price": 1899.99,
+      "discountPercentage": 0.29,
+      "rating": 4.14,
+      "stock": 47,
+      "tags": [
+        "furniture",
+        "beds"
+      ],
+      "brand": "Annibale Colombo",
+      "sku": "4KMDTZWF",
+      "weight": 3,
+      "dimensions": {
+        "width": 28.75,
+        "height": 26.88,
+        "depth": 24.47
+      },
+      "warrantyInformation": "2 year warranty",
+      "shippingInformation": "Ships overnight",
+      "availabilityStatus": "In Stock",
+      "reviews": [
+        {
+          "rating": 4,
+          "comment": "Great value for money!",
+          "date": "2024-05-23T08:56:21.620Z",
+          "reviewerName": "Julian Newton",
+          "reviewerEmail": "julian.newton@x.dummyjson.com"
+        },
+        {
+          "rating": 5,
+          "comment": "Would buy again!",
+          "date": "2024-05-23T08:56:21.620Z",
+          "reviewerName": "Madison Collins",
+          "reviewerEmail": "madison.collins@x.dummyjson.com"
+        },
+        {
+          "rating": 4,
+          "comment": "Would buy again!",
+          "date": "2024-05-23T08:56:21.620Z",
+          "reviewerName": "Clara Berry",
+          "reviewerEmail": "clara.berry@x.dummyjson.com"
+        }
+      ],
+      "returnPolicy": "7 days return policy",
+      "minimumOrderQuantity": 1,
+      "meta": {
+        "createdAt": "2024-05-23T08:56:21.620Z",
+        "updatedAt": "2024-05-23T08:56:21.620Z",
+        "barcode": "7113807059215",
+        "qrCode": "https://assets.dummyjson.com/public/qr-code.png"
+      },
+      "images": [
+        "https://cdn.dummyjson.com/products/images/furniture/Annibale%20Colombo%20Bed/1.png",
+        "https://cdn.dummyjson.com/products/images/furniture/Annibale%20Colombo%20Bed/2.png",
+        "https://cdn.dummyjson.com/products/images/furniture/Annibale%20Colombo%20Bed/3.png"
+      ],
+      "thumbnail": "https://cdn.dummyjson.com/products/images/furniture/Annibale%20Colombo%20Bed/thumbnail.png"
+    },
+    {
+      "id": "12",
+      "title": "Annibale Colombo Sofa",
+      "description": "The Annibale Colombo Sofa is a sophisticated and comfortable seating option, featuring exquisite design and premium upholstery for your living room.",
+      "category": "furniture",
+      "price": 2499.99,
+      "discountPercentage": 18.54,
+      "rating": 3.08,
+      "stock": 16,
+      "tags": [
+        "furniture",
+        "sofas"
+      ],
+      "brand": "Annibale Colombo",
+      "sku": "LUU95CQP",
+      "weight": 3,
+      "dimensions": {
+        "width": 20.97,
+        "height": 19.11,
+        "depth": 25.81
+      },
+      "warrantyInformation": "1 month warranty",
+      "shippingInformation": "Ships overnight",
+      "availabilityStatus": "In Stock",
+      "reviews": [
+        {
+          "rating": 5,
+          "comment": "Very satisfied!",
+          "date": "2024-05-23T08:56:21.620Z",
+          "reviewerName": "Tyler Davis",
+          "reviewerEmail": "tyler.davis@x.dummyjson.com"
+        },
+        {
+          "rating": 5,
+          "comment": "Excellent quality!",
+          "date": "2024-05-23T08:56:21.620Z",
+          "reviewerName": "Hannah Robinson",
+          "reviewerEmail": "hannah.robinson@x.dummyjson.com"
+        },
+        {
+          "rating": 3,
+          "comment": "Waste of money!",
+          "date": "2024-05-23T08:56:21.620Z",
+          "reviewerName": "Madison Collins",
+          "reviewerEmail": "madison.collins@x.dummyjson.com"
+        }
+      ],
+      "returnPolicy": "7 days return policy",
+      "minimumOrderQuantity": 1,
+      "meta": {
+        "createdAt": "2024-05-23T08:56:21.620Z",
+        "updatedAt": "2024-05-23T08:56:21.620Z",
+        "barcode": "0426785817074",
+        "qrCode": "https://assets.dummyjson.com/public/qr-code.png"
+      },
+      "images": [
+        "https://cdn.dummyjson.com/products/images/furniture/Annibale%20Colombo%20Sofa/1.png",
+        "https://cdn.dummyjson.com/products/images/furniture/Annibale%20Colombo%20Sofa/2.png",
+        "https://cdn.dummyjson.com/products/images/furniture/Annibale%20Colombo%20Sofa/3.png"
+      ],
+      "thumbnail": "https://cdn.dummyjson.com/products/images/furniture/Annibale%20Colombo%20Sofa/thumbnail.png"
+    },
+    {
+      "id": "13",
+      "title": "Bedside Table African Cherry",
+      "description": "The Bedside Table in African Cherry is a stylish and functional addition to your bedroom, providing convenient storage space and a touch of elegance.",
+      "category": "furniture",
+      "price": 299.99,
+      "discountPercentage": 9.58,
+      "rating": 4.48,
+      "stock": 16,
+      "tags": [
+        "furniture",
+        "bedside tables"
+      ],
+      "brand": "Furniture Co.",
+      "sku": "OWPLTZYX",
+      "weight": 10,
+      "dimensions": {
+        "width": 25.43,
+        "height": 20.2,
+        "depth": 24.95
+      },
+      "warrantyInformation": "6 months warranty",
+      "shippingInformation": "Ships in 1-2 business days",
+      "availabilityStatus": "In Stock",
+      "reviews": [
+        {
+          "rating": 5,
+          "comment": "Very happy with my purchase!",
+          "date": "2024-05-23T08:56:21.620Z",
+          "reviewerName": "John Doe",
+          "reviewerEmail": "john.doe@x.dummyjson.com"
+        },
+        {
+          "rating": 4,
+          "comment": "Highly recommended!",
+          "date": "2024-05-23T08:56:21.620Z",
+          "reviewerName": "Avery Carter",
+          "reviewerEmail": "avery.carter@x.dummyjson.com"
+        },
+        {
+          "rating": 4,
+          "comment": "Very pleased!",
+          "date": "2024-05-23T08:56:21.620Z",
+          "reviewerName": "Evelyn Sanchez",
+          "reviewerEmail": "evelyn.sanchez@x.dummyjson.com"
+        }
+      ],
+      "returnPolicy": "No return policy",
+      "minimumOrderQuantity": 5,
+      "meta": {
+        "createdAt": "2024-05-23T08:56:21.620Z",
+        "updatedAt": "2024-05-23T08:56:21.620Z",
+        "barcode": "2913244159666",
+        "qrCode": "https://assets.dummyjson.com/public/qr-code.png"
+      },
+      "images": [
+        "https://cdn.dummyjson.com/products/images/furniture/Bedside%20Table%20African%20Cherry/1.png",
+        "https://cdn.dummyjson.com/products/images/furniture/Bedside%20Table%20African%20Cherry/2.png",
+        "https://cdn.dummyjson.com/products/images/furniture/Bedside%20Table%20African%20Cherry/3.png"
+      ],
+      "thumbnail": "https://cdn.dummyjson.com/products/images/furniture/Bedside%20Table%20African%20Cherry/thumbnail.png"
+    },
+    {
+      "id": "14",
+      "title": "Knoll Saarinen Executive Conference Chair",
+      "description": "The Knoll Saarinen Executive Conference Chair is a modern and ergonomic chair, perfect for your office or conference room with its timeless design.",
+      "category": "furniture",
+      "price": 499.99,
+      "discountPercentage": 15.23,
+      "rating": 4.11,
+      "stock": 47,
+      "tags": [
+        "furniture",
+        "office chairs"
+      ],
+      "brand": "Knoll",
+      "sku": "RKHVJ4FE",
+      "weight": 3,
+      "dimensions": {
+        "width": 16.59,
+        "height": 21.46,
+        "depth": 29.07
+      },
+      "warrantyInformation": "Lifetime warranty",
+      "shippingInformation": "Ships in 3-5 business days",
+      "availabilityStatus": "In Stock",
+      "reviews": [
+        {
+          "rating": 4,
+          "comment": "Very happy with my purchase!",
+          "date": "2024-05-23T08:56:21.620Z",
+          "reviewerName": "Leah Gutierrez",
+          "reviewerEmail": "leah.gutierrez@x.dummyjson.com"
+        },
+        {
+          "rating": 4,
+          "comment": "Would buy again!",
+          "date": "2024-05-23T08:56:21.620Z",
+          "reviewerName": "Nolan Gonzalez",
+          "reviewerEmail": "nolan.gonzalez@x.dummyjson.com"
+        },
+        {
+          "rating": 2,
+          "comment": "Waste of money!",
+          "date": "2024-05-23T08:56:21.620Z",
+          "reviewerName": "Stella Morris",
+          "reviewerEmail": "stella.morris@x.dummyjson.com"
+        }
+      ],
+      "returnPolicy": "30 days return policy",
+      "minimumOrderQuantity": 5,
+      "meta": {
+        "createdAt": "2024-05-23T08:56:21.620Z",
+        "updatedAt": "2024-05-23T08:56:21.620Z",
+        "barcode": "0726316339746",
+        "qrCode": "https://assets.dummyjson.com/public/qr-code.png"
+      },
+      "images": [
+        "https://cdn.dummyjson.com/products/images/furniture/Knoll%20Saarinen%20Executive%20Conference%20Chair/1.png",
+        "https://cdn.dummyjson.com/products/images/furniture/Knoll%20Saarinen%20Executive%20Conference%20Chair/2.png",
+        "https://cdn.dummyjson.com/products/images/furniture/Knoll%20Saarinen%20Executive%20Conference%20Chair/3.png"
+      ],
+      "thumbnail": "https://cdn.dummyjson.com/products/images/furniture/Knoll%20Saarinen%20Executive%20Conference%20Chair/thumbnail.png"
+    },
+    {
+      "id": "15",
+      "title": "Wooden Bathroom Sink With Mirror",
+      "description": "The Wooden Bathroom Sink with Mirror is a unique and stylish addition to your bathroom, featuring a wooden sink countertop and a matching mirror.",
+      "category": "furniture",
+      "price": 799.99,
+      "discountPercentage": 11.22,
+      "rating": 3.26,
+      "stock": 95,
+      "tags": [
+        "furniture",
+        "bathroom"
+      ],
+      "brand": "Bath Trends",
+      "sku": "7OLTIEVO",
+      "weight": 6,
+      "dimensions": {
+        "width": 7.32,
+        "height": 22.64,
+        "depth": 12.37
+      },
+      "warrantyInformation": "6 months warranty",
+      "shippingInformation": "Ships in 3-5 business days",
+      "availabilityStatus": "In Stock",
+      "reviews": [
+        {
+          "rating": 5,
+          "comment": "Highly recommended!",
+          "date": "2024-05-23T08:56:21.620Z",
+          "reviewerName": "Charlotte Lopez",
+          "reviewerEmail": "charlotte.lopez@x.dummyjson.com"
+        },
+        {
+          "rating": 1,
+          "comment": "Would not recommend!",
+          "date": "2024-05-23T08:56:21.620Z",
+          "reviewerName": "William Gonzalez",
+          "reviewerEmail": "william.gonzalez@x.dummyjson.com"
+        },
+        {
+          "rating": 2,
+          "comment": "Not worth the price!",
+          "date": "2024-05-23T08:56:21.620Z",
+          "reviewerName": "Ava Harrison",
+          "reviewerEmail": "ava.harrison@x.dummyjson.com"
+        }
+      ],
+      "returnPolicy": "7 days return policy",
+      "minimumOrderQuantity": 1,
+      "meta": {
+        "createdAt": "2024-05-23T08:56:21.620Z",
+        "updatedAt": "2024-05-23T08:56:21.620Z",
+        "barcode": "7839797529453",
+        "qrCode": "https://assets.dummyjson.com/public/qr-code.png"
+      },
+      "images": [
+        "https://cdn.dummyjson.com/products/images/furniture/Wooden%20Bathroom%20Sink%20With%20Mirror/1.png",
+        "https://cdn.dummyjson.com/products/images/furniture/Wooden%20Bathroom%20Sink%20With%20Mirror/2.png",
+        "https://cdn.dummyjson.com/products/images/furniture/Wooden%20Bathroom%20Sink%20With%20Mirror/3.png"
+      ],
+      "thumbnail": "https://cdn.dummyjson.com/products/images/furniture/Wooden%20Bathroom%20Sink%20With%20Mirror/thumbnail.png"
+    },
+    {
+      "id": "22",
+      "title": "Dog Food",
+      "description": "Specially formulated dog food designed to provide essential nutrients for your canine companion.",
+      "category": "groceries",
+      "price": 10.99,
+      "discountPercentage": 18.15,
+      "rating": 2.74,
+      "stock": 40,
+      "tags": [
+        "pet supplies",
+        "dog food"
+      ],
+      "sku": "A6QRCH37",
+      "weight": 2,
+      "dimensions": {
+        "width": 29.39,
+        "height": 29.77,
+        "depth": 20.54
+      },
+      "warrantyInformation": "1 year warranty",
+      "shippingInformation": "Ships in 1 month",
+      "availabilityStatus": "In Stock",
+      "reviews": [
+        {
+          "rating": 5,
+          "comment": "Highly impressed!",
+          "date": "2024-05-23T08:56:21.620Z",
+          "reviewerName": "Leo Rivera",
+          "reviewerEmail": "leo.rivera@x.dummyjson.com"
+        },
+        {
+          "rating": 4,
+          "comment": "Highly recommended!",
+          "date": "2024-05-23T08:56:21.620Z",
+          "reviewerName": "Alexander Jones",
+          "reviewerEmail": "alexander.jones@x.dummyjson.com"
+        },
+        {
+          "rating": 4,
+          "comment": "Would buy again!",
+          "date": "2024-05-23T08:56:21.620Z",
+          "reviewerName": "Addison Wright",
+          "reviewerEmail": "addison.wright@x.dummyjson.com"
+        }
+      ],
+      "returnPolicy": "90 days return policy",
+      "minimumOrderQuantity": 29,
+      "meta": {
+        "createdAt": "2024-05-23T08:56:21.620Z",
+        "updatedAt": "2024-05-23T08:56:21.620Z",
+        "barcode": "7957222289508",
+        "qrCode": "https://assets.dummyjson.com/public/qr-code.png"
+      },
+      "images": [
+        "https://cdn.dummyjson.com/products/images/groceries/Dog%20Food/1.png"
+      ],
+      "thumbnail": "https://cdn.dummyjson.com/products/images/groceries/Dog%20Food/thumbnail.png"
+    },
+    {
+      "id": "23",
+      "title": "Eggs",
+      "description": "Fresh eggs, a versatile ingredient for baking, cooking, or breakfast.",
+      "category": "groceries",
+      "price": 2.99,
+      "discountPercentage": 5.8,
+      "rating": 4.46,
+      "stock": 10,
+      "tags": [
+        "dairy"
+      ],
+      "sku": "YA617RI7",
+      "weight": 4,
+      "dimensions": {
+        "width": 12.3,
+        "height": 10.99,
+        "depth": 15.53
+      },
+      "warrantyInformation": "3 year warranty",
+      "shippingInformation": "Ships overnight",
+      "availabilityStatus": "In Stock",
+      "reviews": [
+        {
+          "rating": 2,
+          "comment": "Very unhappy with my purchase!",
+          "date": "2024-05-23T08:56:21.620Z",
+          "reviewerName": "Mateo Perez",
+          "reviewerEmail": "mateo.perez@x.dummyjson.com"
+        },
+        {
+          "rating": 4,
+          "comment": "Very happy with my purchase!",
+          "date": "2024-05-23T08:56:21.620Z",
+          "reviewerName": "Cameron Perez",
+          "reviewerEmail": "cameron.perez@x.dummyjson.com"
+        },
+        {
+          "rating": 5,
+          "comment": "Very happy with my purchase!",
+          "date": "2024-05-23T08:56:21.620Z",
+          "reviewerName": "Aurora Barnes",
+          "reviewerEmail": "aurora.barnes@x.dummyjson.com"
+        }
+      ],
+      "returnPolicy": "30 days return policy",
+      "minimumOrderQuantity": 43,
+      "meta": {
+        "createdAt": "2024-05-23T08:56:21.620Z",
+        "updatedAt": "2024-05-23T08:56:21.620Z",
+        "barcode": "7095702028776",
+        "qrCode": "https://assets.dummyjson.com/public/qr-code.png"
+      },
+      "images": [
+        "https://cdn.dummyjson.com/products/images/groceries/Eggs/1.png"
+      ],
+      "thumbnail": "https://cdn.dummyjson.com/products/images/groceries/Eggs/thumbnail.png"
+    },
+    {
+      "id": "24",
+      "title": "Fish Steak",
+      "description": "Quality fish steak, suitable for grilling, baking, or pan-searing.",
+      "category": "groceries",
+      "price": 14.99,
+      "discountPercentage": 7,
+      "rating": 4.83,
+      "stock": 99,
+      "tags": [
+        "seafood"
+      ],
+      "sku": "XNIH1MTA",
+      "weight": 8,
+      "dimensions": {
+        "width": 20.14,
+        "height": 8.4,
+        "depth": 10.01
+      },
+      "warrantyInformation": "1 year warranty",
+      "shippingInformation": "Ships in 1 month",
+      "availabilityStatus": "In Stock",
+      "reviews": [
+        {
+          "rating": 5,
+          "comment": "Great value for money!",
+          "date": "2024-05-23T08:56:21.620Z",
+          "reviewerName": "Michael Johnson",
+          "reviewerEmail": "michael.johnson@x.dummyjson.com"
+        },
+        {
+          "rating": 4,
+          "comment": "Would buy again!",
+          "date": "2024-05-23T08:56:21.620Z",
+          "reviewerName": "Julian Newton",
+          "reviewerEmail": "julian.newton@x.dummyjson.com"
+        },
+        {
+          "rating": 5,
+          "comment": "Excellent quality!",
+          "date": "2024-05-23T08:56:21.620Z",
+          "reviewerName": "Lila Hudson",
+          "reviewerEmail": "lila.hudson@x.dummyjson.com"
+        }
+      ],
+      "returnPolicy": "30 days return policy",
+      "minimumOrderQuantity": 49,
+      "meta": {
+        "createdAt": "2024-05-23T08:56:21.620Z",
+        "updatedAt": "2024-05-23T08:56:21.620Z",
+        "barcode": "4250692197342",
+        "qrCode": "https://assets.dummyjson.com/public/qr-code.png"
+      },
+      "images": [
+        "https://cdn.dummyjson.com/products/images/groceries/Fish%20Steak/1.png"
+      ],
+      "thumbnail": "https://cdn.dummyjson.com/products/images/groceries/Fish%20Steak/thumbnail.png"
+    },
+    {
+      "id": "25",
+      "title": "Green Bell Pepper",
+      "description": "Fresh and vibrant green bell pepper, perfect for adding color and flavor to your dishes.",
+      "category": "groceries",
+      "price": 1.29,
+      "discountPercentage": 15.5,
+      "rating": 4.28,
+      "stock": 89,
+      "tags": [
+        "vegetables"
+      ],
+      "sku": "HU7S7VQ0",
+      "weight": 7,
+      "dimensions": {
+        "width": 7.32,
+        "height": 14.31,
+        "depth": 21.38
+      },
+      "warrantyInformation": "5 year warranty",
+      "shippingInformation": "Ships overnight",
+      "availabilityStatus": "In Stock",
+      "reviews": [
+        {
+          "rating": 4,
+          "comment": "Excellent quality!",
+          "date": "2024-05-23T08:56:21.620Z",
+          "reviewerName": "Maya Reed",
+          "reviewerEmail": "maya.reed@x.dummyjson.com"
+        },
+        {
+          "rating": 4,
+          "comment": "Would buy again!",
+          "date": "2024-05-23T08:56:21.620Z",
+          "reviewerName": "Madison Collins",
+          "reviewerEmail": "madison.collins@x.dummyjson.com"
+        },
+        {
+          "rating": 5,
+          "comment": "Would buy again!",
+          "date": "2024-05-23T08:56:21.620Z",
+          "reviewerName": "Ethan Thompson",
+          "reviewerEmail": "ethan.thompson@x.dummyjson.com"
+        }
+      ],
+      "returnPolicy": "30 days return policy",
+      "minimumOrderQuantity": 1,
+      "meta": {
+        "createdAt": "2024-05-23T08:56:21.620Z",
+        "updatedAt": "2024-05-23T08:56:21.620Z",
+        "barcode": "7583442707568",
+        "qrCode": "https://assets.dummyjson.com/public/qr-code.png"
+      },
+      "images": [
+        "https://cdn.dummyjson.com/products/images/groceries/Green%20Bell%20Pepper/1.png"
+      ],
+      "thumbnail": "https://cdn.dummyjson.com/products/images/groceries/Green%20Bell%20Pepper/thumbnail.png"
+    },
+    {
+      "id": "26",
+      "title": "Green Chili Pepper",
+      "description": "Spicy green chili pepper, ideal for adding heat to your favorite recipes.",
+      "category": "groceries",
+      "price": 0.99,
+      "discountPercentage": 18.51,
+      "rating": 4.43,
+      "stock": 8,
+      "tags": [
+        "vegetables"
+      ],
+      "sku": "Y4RM3JCB",
+      "weight": 2,
+      "dimensions": {
+        "width": 18.67,
+        "height": 21.17,
+        "depth": 25.26
+      },
+      "warrantyInformation": "No warranty",
+      "shippingInformation": "Ships in 1-2 business days",
+      "availabilityStatus": "In Stock",
+      "reviews": [
+        {
+          "rating": 2,
+          "comment": "Disappointing product!",
+          "date": "2024-05-23T08:56:21.620Z",
+          "reviewerName": "Mateo Bennett",
+          "reviewerEmail": "mateo.bennett@x.dummyjson.com"
+        },
+        {
+          "rating": 5,
+          "comment": "Very pleased!",
+          "date": "2024-05-23T08:56:21.620Z",
+          "reviewerName": "Natalie Price",
+          "reviewerEmail": "natalie.price@x.dummyjson.com"
+        },
+        {
+          "rating": 4,
+          "comment": "Very satisfied!",
+          "date": "2024-05-23T08:56:21.620Z",
+          "reviewerName": "Avery Barnes",
+          "reviewerEmail": "avery.barnes@x.dummyjson.com"
+        }
+      ],
+      "returnPolicy": "30 days return policy",
+      "minimumOrderQuantity": 43,
+      "meta": {
+        "createdAt": "2024-05-23T08:56:21.620Z",
+        "updatedAt": "2024-05-23T08:56:21.620Z",
+        "barcode": "8400326844874",
+        "qrCode": "https://assets.dummyjson.com/public/qr-code.png"
+      },
+      "images": [
+        "https://cdn.dummyjson.com/products/images/groceries/Green%20Chili%20Pepper/1.png"
+      ],
+      "thumbnail": "https://cdn.dummyjson.com/products/images/groceries/Green%20Chili%20Pepper/thumbnail.png"
+    },
+    {
+      "id": "27",
+      "title": "Honey Jar",
+      "description": "Pure and natural honey in a convenient jar, perfect for sweetening beverages or drizzling over food.",
+      "category": "groceries",
+      "price": 6.99,
+      "discountPercentage": 1.91,
+      "rating": 3.5,
+      "stock": 25,
+      "tags": [
+        "condiments"
+      ],
+      "sku": "BTBNIIOU",
+      "weight": 9,
+      "dimensions": {
+        "width": 26.53,
+        "height": 27.11,
+        "depth": 6.63
+      },
+      "warrantyInformation": "2 year warranty",
+      "shippingInformation": "Ships overnight",
+      "availabilityStatus": "In Stock",
+      "reviews": [
+        {
+          "rating": 4,
+          "comment": "Fast shipping!",
+          "date": "2024-05-23T08:56:21.620Z",
+          "reviewerName": "Nicholas Bailey",
+          "reviewerEmail": "nicholas.bailey@x.dummyjson.com"
+        },
+        {
+          "rating": 5,
+          "comment": "Awesome product!",
+          "date": "2024-05-23T08:56:21.620Z",
+          "reviewerName": "Gabriel Hayes",
+          "reviewerEmail": "gabriel.hayes@x.dummyjson.com"
+        },
+        {
+          "rating": 5,
+          "comment": "Highly impressed!",
+          "date": "2024-05-23T08:56:21.620Z",
+          "reviewerName": "James Garcia",
+          "reviewerEmail": "james.garcia@x.dummyjson.com"
+        }
+      ],
+      "returnPolicy": "90 days return policy",
+      "minimumOrderQuantity": 1,
+      "meta": {
+        "createdAt": "2024-05-23T08:56:21.620Z",
+        "updatedAt": "2024-05-23T08:56:21.620Z",
+        "barcode": "0668665656044",
+        "qrCode": "https://assets.dummyjson.com/public/qr-code.png"
+      },
+      "images": [
+        "https://cdn.dummyjson.com/products/images/groceries/Honey%20Jar/1.png"
+      ],
+      "thumbnail": "https://cdn.dummyjson.com/products/images/groceries/Honey%20Jar/thumbnail.png"
+    },
+    {
+      "id": "28",
+      "title": "Ice Cream",
+      "description": "Creamy and delicious ice cream, available in various flavors for a delightful treat.",
+      "category": "groceries",
+      "price": 5.49,
+      "discountPercentage": 7.58,
+      "rating": 3.77,
+      "stock": 76,
+      "tags": [
+        "desserts"
+      ],
+      "sku": "VEZMU1EQ",
+      "weight": 5,
+      "dimensions": {
+        "width": 17.66,
+        "height": 24.49,
+        "depth": 25.98
+      },
+      "warrantyInformation": "2 year warranty",
+      "shippingInformation": "Ships in 2 weeks",
+      "availabilityStatus": "In Stock",
+      "reviews": [
+        {
+          "rating": 5,
+          "comment": "Great product!",
+          "date": "2024-05-23T08:56:21.620Z",
+          "reviewerName": "Elena Baker",
+          "reviewerEmail": "elena.baker@x.dummyjson.com"
+        },
+        {
+          "rating": 5,
+          "comment": "Highly impressed!",
+          "date": "2024-05-23T08:56:21.620Z",
+          "reviewerName": "Madeline Simpson",
+          "reviewerEmail": "madeline.simpson@x.dummyjson.com"
+        },
+        {
+          "rating": 5,
+          "comment": "Very happy with my purchase!",
+          "date": "2024-05-23T08:56:21.620Z",
+          "reviewerName": "Caleb Nelson",
+          "reviewerEmail": "caleb.nelson@x.dummyjson.com"
+        }
+      ],
+      "returnPolicy": "No return policy",
+      "minimumOrderQuantity": 19,
+      "meta": {
+        "createdAt": "2024-05-23T08:56:21.620Z",
+        "updatedAt": "2024-05-23T08:56:21.620Z",
+        "barcode": "9603960319256",
+        "qrCode": "https://assets.dummyjson.com/public/qr-code.png"
+      },
+      "images": [
+        "https://cdn.dummyjson.com/products/images/groceries/Ice%20Cream/1.png",
+        "https://cdn.dummyjson.com/products/images/groceries/Ice%20Cream/2.png",
+        "https://cdn.dummyjson.com/products/images/groceries/Ice%20Cream/3.png",
+        "https://cdn.dummyjson.com/products/images/groceries/Ice%20Cream/4.png"
+      ],
+      "thumbnail": "https://cdn.dummyjson.com/products/images/groceries/Ice%20Cream/thumbnail.png"
+    },
+    {
+      "id": "29",
+      "title": "Juice",
+      "description": "Refreshing fruit juice, packed with vitamins and great for staying hydrated.",
+      "category": "groceries",
+      "price": 3.99,
+      "discountPercentage": 5.45,
+      "rating": 3.41,
+      "stock": 99,
+      "tags": [
+        "beverages"
+      ],
+      "sku": "M2K19S06",
+      "weight": 2,
+      "dimensions": {
+        "width": 8.97,
+        "height": 12.26,
+        "depth": 15.05
+      },
+      "warrantyInformation": "1 week warranty",
+      "shippingInformation": "Ships in 1-2 business days",
+      "availabilityStatus": "In Stock",
+      "reviews": [
+        {
+          "rating": 4,
+          "comment": "Very satisfied!",
+          "date": "2024-05-23T08:56:21.620Z",
+          "reviewerName": "Leo Rivera",
+          "reviewerEmail": "leo.rivera@x.dummyjson.com"
+        },
+        {
+          "rating": 2,
+          "comment": "Not worth the price!",
+          "date": "2024-05-23T08:56:21.620Z",
+          "reviewerName": "Ethan Martinez",
+          "reviewerEmail": "ethan.martinez@x.dummyjson.com"
+        },
+        {
+          "rating": 4,
+          "comment": "Excellent quality!",
+          "date": "2024-05-23T08:56:21.620Z",
+          "reviewerName": "Max Parker",
+          "reviewerEmail": "max.parker@x.dummyjson.com"
+        }
+      ],
+      "returnPolicy": "90 days return policy",
+      "minimumOrderQuantity": 26,
+      "meta": {
+        "createdAt": "2024-05-23T08:56:21.620Z",
+        "updatedAt": "2024-05-23T08:56:21.620Z",
+        "barcode": "8546824122355",
+        "qrCode": "https://assets.dummyjson.com/public/qr-code.png"
+      },
+      "images": [
+        "https://cdn.dummyjson.com/products/images/groceries/Juice/1.png"
+      ],
+      "thumbnail": "https://cdn.dummyjson.com/products/images/groceries/Juice/thumbnail.png"
+    }
+  ],
+  "profile": {
+    "id": 200,
+    "name": "Bit",
+    "surname": "Boss",
+    "email": "bitboss@bitboss.it",
+    "phone": "0123456789",
+    "role": "admin",
+    "address": "C.so Vittorio Emanuele II, 74, 10121 Torino TO",
+    "created_at": "2023-10-30T20:33:49Z",
+    "updated_at": "2023-09-29T07:43:42Z",
+    "email_verified_at": "2024-03-08T12:58:08Z",
+    "avatar": "https://picsum.photos/200/300"
+  },
+  "faq": [
+    {
+      "id": "1",
+      "question": "How do I place an order?",
+      "answer": "You can place an order by adding items to your cart and proceeding to checkout.",
+      "category": "Order Placement"
+    },
+    {
+      "id": "2",
+      "question": "Can I place an order without creating an account?",
+      "answer": "Yes, you can place an order as a guest without creating an account.",
+      "category": "Order Placement"
+    },
+    {
+      "id": "3",
+      "question": "How can I track my order?",
+      "answer": "Once your order is shipped, you'll receive a tracking number via email to track your shipment.",
+      "category": "Shipping"
+    },
+    {
+      "id": "4",
+      "question": "What payment methods do you accept?",
+      "answer": "We accept credit cards, debit cards, PayPal, and other digital payment methods.",
+      "category": "Payment"
+    },
+    {
+      "id": "5",
+      "question": "Can I change the shipping address after placing an order?",
+      "answer": "You can update your shipping address within 24 hours of placing the order by contacting customer service.",
+      "category": "Order Modification"
+    },
+    {
+      "id": "6",
+      "question": "How do I cancel my order?",
+      "answer": "You can cancel your order within 2 hours of placing it through your account dashboard.",
+      "category": "Order Modification"
+    },
+    {
+      "id": "7",
+      "question": "What is the estimated delivery time?",
+      "answer": "Delivery times vary depending on your location and the shipping method selected. Typically, it ranges from 3-7 business days.",
+      "category": "Shipping"
+    },
+    {
+      "id": "8",
+      "question": "How do I return an item?",
+      "answer": "To return an item, visit the Returns section of your account and follow the instructions to request a return label.",
+      "category": "Returns"
+    },
+    {
+      "id": "9",
+      "question": "Will I receive a refund for shipping costs if I return my order?",
+      "answer": "Shipping costs are non-refundable, except in cases where the item is damaged or incorrect.",
+      "category": "Returns"
+    },
+    {
+      "id": "10",
+      "question": "Can I add items to an existing order?",
+      "answer": "Unfortunately, items cannot be added to an existing order. You'll need to place a new order for additional items.",
+      "category": "Order Modification"
+    },
+    {
+      "id": "11",
+      "question": "What happens if my order is delayed?",
+      "answer": "If your order is delayed, you'll receive an email notification with updated delivery details.",
+      "category": "Shipping"
+    },
+    {
+      "id": "12",
+      "question": "Do you offer international shipping?",
+      "answer": "Yes, we offer international shipping to select countries. Shipping fees and delivery times will vary.",
+      "category": "Shipping"
+    },
+    {
+      "id": "13",
+      "question": "How do I use a promo code on my order?",
+      "answer": "During checkout, enter your promo code in the 'Discount' field and click 'Apply'.",
+      "category": "Order Placement"
+    },
+    {
+      "id": "14",
+      "question": "What do I do if I receive the wrong item?",
+      "answer": "If you receive the wrong item, contact our customer service team to arrange for a return or exchange.",
+      "category": "Returns"
+    },
+    {
+      "id": "15",
+      "question": "Can I pay using multiple payment methods?",
+      "answer": "At this time, we only accept one payment method per order.",
+      "category": "Payment"
+    },
+    {
+      "id": "16",
+      "question": "How will I know when my order is confirmed?",
+      "answer": "Once your order is confirmed, you'll receive a confirmation email with your order details.",
+      "category": "Order Placement"
+    },
+    {
+      "id": "17",
+      "question": "What should I do if my payment is declined?",
+      "answer": "If your payment is declined, double-check your payment details or try a different payment method.",
+      "category": "Payment"
+    },
+    {
+      "id": "18",
+      "question": "Can I exchange an item instead of returning it?",
+      "answer": "Yes, exchanges are available for certain items. Visit the Returns section of your account for more details.",
+      "category": "Returns"
+    },
+    {
+      "id": "19",
+      "question": "How do I know if my order qualifies for free shipping?",
+      "answer": "Free shipping is available for orders over a certain amount, which will be indicated at checkout.",
+      "category": "Shipping"
+    },
+    {
+      "id": "20",
+      "question": "How long does it take to process a refund?",
+      "answer": "Refunds typically take 5-10 business days to process, depending on your bank or payment provider.",
+      "category": "Returns"
+    }
+  ],
+  "emails": [
+    {
+      "id": "1",
+      "sender": "john@example.com",
+      "recipient": "jane@example.com",
+      "subject": "Meeting Agenda",
+      "body": "Here is the agenda for tomorrow's meeting.",
+      "timestamp": "2024-10-15T09:30:00Z",
+      "isRead": true,
+      "isStarred": false,
+      "hasAttachments": false,
+      "attachments": [],
+      "priority": "normal",
+      "folder": "inbox",
+      "tags": [
+        "work",
+        "meeting"
+      ]
+    },
+    {
+      "id": "2",
+      "sender": "support@website.com",
+      "recipient": "jane@example.com",
+      "subject": "Password Reset Request",
+      "body": "Click the link below to reset your password.",
+      "timestamp": "2024-10-12T13:45:00Z",
+      "isRead": false,
+      "isStarred": false,
+      "hasAttachments": false,
+      "attachments": [],
+      "priority": "high",
+      "folder": "inbox",
+      "tags": [
+        "security",
+        "important"
+      ]
+    },
+    {
+      "id": "3",
+      "sender": "jane@example.com",
+      "recipient": "john@example.com",
+      "subject": "Re: Meeting Agenda",
+      "body": "Got it, thanks!",
+      "timestamp": "2024-10-15T10:00:00Z",
+      "isRead": true,
+      "isStarred": false,
+      "hasAttachments": false,
+      "attachments": [],
+      "priority": "low",
+      "folder": "sent",
+      "tags": []
+    },
+    {
+      "id": "4",
+      "sender": "newsletter@news.com",
+      "recipient": "jane@example.com",
+      "subject": "Weekly Update",
+      "body": "Here's what's new this week.",
+      "timestamp": "2024-10-11T16:00:00Z",
+      "isRead": true,
+      "isStarred": false,
+      "hasAttachments": false,
+      "attachments": [],
+      "priority": "low",
+      "folder": "inbox",
+      "tags": [
+        "newsletter"
+      ]
+    },
+    {
+      "id": "5",
+      "sender": "spam@scam.com",
+      "recipient": "jane@example.com",
+      "subject": "You won a million dollars!",
+      "body": "Click here to claim your prize.",
+      "timestamp": "2024-10-10T07:30:00Z",
+      "isRead": false,
+      "isStarred": false,
+      "hasAttachments": false,
+      "attachments": [],
+      "priority": "low",
+      "folder": "spam",
+      "tags": [
+        "spam",
+        "scam"
+      ]
+    },
+    {
+      "id": "6",
+      "sender": "john@example.com",
+      "recipient": "jane@example.com",
+      "subject": "Important Update",
+      "body": "Please read this important update about the project.",
+      "timestamp": "2024-10-09T18:20:00Z",
+      "isRead": false,
+      "isStarred": true,
+      "hasAttachments": true,
+      "attachments": [
+        "update.pdf"
+      ],
+      "priority": "high",
+      "folder": "inbox",
+      "tags": [
+        "work",
+        "urgent"
+      ]
+    },
+    {
+      "id": "7",
+      "sender": "noreply@social.com",
+      "recipient": "jane@example.com",
+      "subject": "New Friend Request",
+      "body": "You have a new friend request from Mike.",
+      "timestamp": "2024-10-08T11:10:00Z",
+      "isRead": false,
+      "isStarred": false,
+      "hasAttachments": false,
+      "attachments": [],
+      "priority": "normal",
+      "folder": "inbox",
+      "tags": [
+        "social"
+      ]
+    },
+    {
+      "id": "8",
+      "sender": "jane@example.com",
+      "recipient": "support@website.com",
+      "subject": "Issue with Account",
+      "body": "I'm facing issues with my account login.",
+      "timestamp": "2024-10-07T09:00:00Z",
+      "isRead": true,
+      "isStarred": true,
+      "hasAttachments": false,
+      "attachments": [],
+      "priority": "high",
+      "folder": "sent",
+      "tags": [
+        "support",
+        "important"
+      ]
+    },
+    {
+      "id": "9",
+      "sender": "alerts@bank.com",
+      "recipient": "jane@example.com",
+      "subject": "Suspicious Activity Detected",
+      "body": "We detected suspicious activity on your account.",
+      "timestamp": "2024-10-06T21:15:00Z",
+      "isRead": false,
+      "isStarred": true,
+      "hasAttachments": false,
+      "attachments": [],
+      "priority": "high",
+      "folder": "inbox",
+      "tags": [
+        "bank",
+        "security"
+      ]
+    },
+    {
+      "id": "10",
+      "sender": "news@company.com",
+      "recipient": "jane@example.com",
+      "subject": "October Newsletter",
+      "body": "Here are the latest updates for October.",
+      "timestamp": "2024-10-05T12:00:00Z",
+      "isRead": true,
+      "isStarred": false,
+      "hasAttachments": false,
+      "attachments": [],
+      "priority": "low",
+      "folder": "inbox",
+      "tags": [
+        "newsletter"
+      ]
+    },
+    {
+      "id": "11",
+      "sender": "john@example.com",
+      "recipient": "jane@example.com",
+      "subject": "Project Files",
+      "body": "Attached are the project files for review.",
+      "timestamp": "2024-10-04T15:45:00Z",
+      "isRead": true,
+      "isStarred": false,
+      "hasAttachments": true,
+      "attachments": [
+        "project.zip"
+      ],
+      "priority": "normal",
+      "folder": "sent",
+      "tags": [
+        "work"
+      ]
+    },
+    {
+      "id": "12",
+      "sender": "admin@forum.com",
+      "recipient": "jane@example.com",
+      "subject": "Forum Notification",
+      "body": "You have a new message in the forum.",
+      "timestamp": "2024-10-03T09:30:00Z",
+      "isRead": false,
+      "isStarred": false,
+      "hasAttachments": false,
+      "attachments": [],
+      "priority": "normal",
+      "folder": "inbox",
+      "tags": [
+        "forum"
+      ]
+    },
+    {
+      "id": "13",
+      "sender": "jane@example.com",
+      "recipient": "jane@example.com",
+      "subject": "Draft: Event Planning",
+      "body": "Need to finalize details for the event planning.",
+      "timestamp": "2024-10-02T14:00:00Z",
+      "isRead": false,
+      "isStarred": false,
+      "hasAttachments": false,
+      "attachments": [],
+      "priority": "low",
+      "folder": "drafts",
+      "tags": []
+    },
+    {
+      "id": "14",
+      "sender": "notifications@service.com",
+      "recipient": "jane@example.com",
+      "subject": "Subscription Renewal",
+      "body": "Your subscription is due for renewal.",
+      "timestamp": "2024-10-01T07:00:00Z",
+      "isRead": true,
+      "isStarred": false,
+      "hasAttachments": false,
+      "attachments": [],
+      "priority": "normal",
+      "folder": "inbox",
+      "tags": [
+        "subscription"
+      ]
+    },
+    {
+      "id": "15",
+      "sender": "spam@fake.com",
+      "recipient": "jane@example.com",
+      "subject": "Claim Your Reward!",
+      "body": "You have been selected for a special offer.",
+      "timestamp": "2024-09-30T08:30:00Z",
+      "isRead": false,
+      "isStarred": false,
+      "hasAttachments": false,
+      "attachments": [],
+      "priority": "low",
+      "folder": "spam",
+      "tags": [
+        "spam",
+        "advertisement"
+      ]
+    },
+    {
+      "id": "16",
+      "sender": "jane@example.com",
+      "recipient": "john@example.com",
+      "subject": "Final Report",
+      "body": "Here is the final report for your review.",
+      "timestamp": "2024-09-29T18:30:00Z",
+      "isRead": true,
+      "isStarred": true,
+      "hasAttachments": true,
+      "attachments": [
+        "report.pdf"
+      ],
+      "priority": "high",
+      "folder": "sent",
+      "tags": [
+        "work",
+        "urgent"
+      ]
+    }
+  ],
+  "wines": [
+    {
+      "id": "1",
+      "name": "Barolo Riserva 'Vigna Rionda'",
+      "producer": "Massolino",
+      "description": "Vino rosso italiano prodotto nella zona del Barolo, in Piemonte.",
+      "type": "white",
+      "size": 750,
+      "price": 100,
+      "region": "Piemonte, Langhe",
+      "vintages": [
+        {
+          "year": 2010,
+          "sale_price": 50,
+          "purchase_price": 30,
+          "list_price": 70,
+          "quantity": 5
+        },
+        {
+          "year": 2011,
+          "sale_price": 55,
+          "purchase_price": 35,
+          "list_price": 75,
+          "quantity": 8
+        },
+        {
+          "year": 2012,
+          "sale_price": 60,
+          "purchase_price": 40,
+          "list_price": 80,
+          "quantity": 12
+        },
+        {
+          "year": 2013,
+          "sale_price": 65,
+          "purchase_price": 45,
+          "list_price": 85,
+          "quantity": 15
+        },
+        {
+          "year": 2014,
+          "sale_price": 70,
+          "purchase_price": 50,
+          "list_price": 90,
+          "quantity": 20
+        },
+        {
+          "year": 2015,
+          "sale_price": 75,
+          "purchase_price": 55,
+          "list_price": 95,
+          "quantity": 25
+        },
+        {
+          "year": 2016,
+          "sale_price": 80,
+          "purchase_price": 60,
+          "list_price": 100,
+          "quantity": 30
+        },
+        {
+          "year": 2017,
+          "sale_price": 85,
+          "purchase_price": 65,
+          "list_price": 105,
+          "quantity": 35
+        },
+        {
+          "year": 2018,
+          "sale_price": 90,
+          "purchase_price": 70,
+          "list_price": 110,
+          "quantity": 10
+        },
+        {
+          "year": 2019,
+          "sale_price": 100,
+          "purchase_price": 80,
+          "list_price": 120,
+          "quantity": 100
+        },
+        {
+          "year": 2020,
+          "sale_price": 110,
+          "purchase_price": 90,
+          "list_price": 130,
+          "quantity": 100
+        },
+        {
+          "year": 2021,
+          "sale_price": 120,
+          "purchase_price": 100,
+          "list_price": 140,
+          "quantity": 100
+        }
+      ],
+      "sellers": [
+        {
+          "name": "Giuseppe Mascarello",
+          "year": "2018",
+          "code": "1234567890123",
+          "quantity": 10
+        },
+        {
+          "name": "Cantina Sociale di Barolo",
+          "year": "2020",
+          "code": "1234888890124",
+          "quantity": 28
+        },
+        {
+          "name": "Produttori Associati di Barolo",
+          "year": "2021",
+          "code": "1234888890125",
+          "quantity": 7
+        },
+        {
+          "name": "Testa",
+          "year": "2020",
+          "code": "1234888890126",
+          "quantity": 15
+        }
+      ]
+    }
+  ]
+}

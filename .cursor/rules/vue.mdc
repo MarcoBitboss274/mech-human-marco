@@ -1,0 +1,195 @@
+---
+alwaysApply: true
+---
+
+# Frontend Rules – Vue 3
+
+This rule defines the mandatory standards and best practices for projects
+using Vue.js 3.
+
+This rule is optional, but when enabled it must be strictly enforced.
+
+---
+
+## 1. Vue Version
+
+- Vue.js version must be 3.x
+- The Composition API is mandatory
+- Deprecated Vue 2 patterns must not be used
+
+---
+
+## 2. Component Definition
+
+Rules:
+
+- Components must use the Composition API
+- `<script setup>` syntax must be preferred
+- Each component must have a single responsibility
+
+Forbidden:
+
+- Options API usage
+- Mixing Composition API and Options API
+
+---
+
+## 3. Component Structure
+
+Single File Components must follow this structure and order:
+
+- `<script setup>`
+- `<template>`
+- `<style>`
+
+Rules:
+
+- All logic must live inside `<script setup>`
+- Templates must contain only rendering logic
+- Styles must not contain logic or dynamic behavior
+
+---
+
+## 4. Reactivity
+
+Rules:
+
+- Use `ref()` and `reactive()` explicitly
+- Avoid implicit reactivity
+- Destructure reactive objects carefully to avoid losing reactivity
+
+Forbidden:
+
+- Mutating props directly
+- Relying on side effects for reactive state
+
+---
+
+## 5. Props and Emits
+
+Rules:
+
+- Props must be explicitly defined
+- Props must be typed when possible
+- Emits must be explicitly declared
+
+Forbidden:
+
+- Accessing undeclared props
+- Emitting undeclared events
+
+---
+
+## 6. State Management
+
+Rules:
+
+- Local state must remain local
+- Shared state must be explicitly managed
+- Avoid ad-hoc global state
+
+Notes:
+
+- Vue does not enforce a global state solution
+- State boundaries must be intentional and explicit
+
+---
+
+## 7. Lifecycle Usage
+
+Rules:
+
+- Lifecycle hooks must be used intentionally
+- Side effects must be handled inside lifecycle hooks
+
+Forbidden:
+
+- Side effects during component setup without lifecycle control
+
+---
+
+## 8. Computed Properties and Watchers
+
+Rules:
+
+- Use computed properties for derived state
+- Use watchers only when side effects are required
+
+Forbidden:
+
+- Using watchers as a replacement for computed properties
+- Overusing watchers for simple state derivation
+
+---
+
+## 9. Template Rules
+
+Rules:
+
+- Templates must remain declarative
+- Avoid complex logic inside templates
+- Prefer computed properties for derived values
+
+Forbidden:
+
+- Complex expressions inside templates
+- Business logic inside templates
+
+---
+
+## 10. Error Handling
+
+Rules:
+
+- Errors must be handled explicitly
+- Components must not silently fail
+
+---
+
+## 11. Performance Rules
+
+Rules:
+
+- Avoid unnecessary re-renders
+- Use `key` correctly in lists
+- Avoid deeply nested reactive structures
+
+---
+
+## 12. Forbidden Patterns (Anti-Patterns)
+
+The following patterns are explicitly forbidden:
+
+- Options API usage
+- Business logic inside templates
+- Direct DOM manipulation
+- Mutating props
+- Implicit global state
+- Overusing watchers
+
+---
+
+## 13. Responsibility Boundaries
+
+- Components handle rendering and UI state
+- Business logic must live outside components
+- Data flow must be explicit and predictable
+
+---
+
+## 14. Rule Enforcement
+
+When this rule is enabled:
+
+- All Vue code must comply
+- Any deviation must be explicitly justified
+- Violations must be reported and corrected
+
+## 15. Components library
+
+- Use strictly the components library "bitboss-ui"
+- Follow the doc linked into the project
+
+## 16. General coding rules
+
+- Always update i18n translation files, if needed

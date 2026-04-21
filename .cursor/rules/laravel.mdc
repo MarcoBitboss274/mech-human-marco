@@ -1,0 +1,327 @@
+---
+alwaysApply: true
+---
+
+# Laravel 12 – Global Ruleset
+
+This document defines the **mandatory rules and constraints** for all Laravel 12 projects.
+All generated or written code must comply with these rules unless explicitly stated otherwise.
+
+These rules are designed to optimize **code quality, maintainability, and AI-assisted development**.
+
+---
+
+## 1. Infrastructure Rules
+
+### 1.1 Versions and Requirements
+
+- Laravel: **^12.x**
+- PHP: **>= 8.2**
+- Dependency manager: **Composer**
+- Frontend tooling: **Vite**
+
+All code must be compatible with official Laravel 12 APIs.
+
+---
+
+### 1.2 Project Structure
+
+The default Laravel project structure **must not be altered**.
+
+Core directories:
+
+- `app/`
+- `app/Models`
+- `app/Http/Controllers`
+- `app/Http/Middleware`
+- `app/Services`
+- `routes/`
+- `config/`
+- `database/migrations`
+- `database/seeders`
+- `resources/views`
+- `tests/`
+
+Each file must exist in the directory that reflects its responsibility.
+
+---
+
+### 1.3 Configuration and Environment
+
+- Configuration must live in `config/*.php`
+- Environment-specific values must live in `.env`
+- `.env` files must never be committed
+
+Rules:
+
+- `env()` must not be used outside configuration files
+- Configuration values must be accessed via `config()`
+- For any external services: create env key, and add these keys into config/services.php
+
+---
+
+### 1.4 Routing
+
+- `routes/web.php` → web traffic
+- `routes/api.php` → API traffic
+
+Rules:
+
+- Routes must not contain business logic
+- Routes must point to controllers or invokable actions
+- RESTful resource routes should be preferred
+
+---
+
+## 2. Code Style Rules
+
+### 2.1 Naming Conventions
+
+Follow these conventions for all code generation and refactoring to ensure consistency with Laravel 12 "Convention over Configuration" philosophy and PSR-12.
+
+#### 2.1.1 Database & Eloquent
+
+- **Models:** PascalCase, singular (e.g., `User`, `BlogPost`).
+- **Tables:** snake_case, plural (e.g., `users`, `blog_posts`).
+- **Pivot Tables:** Singular model names in alphabetical order, snake_case (e.g., `post_tag`).
+- **Columns:** snake_case (e.g., `first_name`, `published_at`).
+- **Foreign Keys:** Singular model name + `_id` suffix (e.g., `user_id`).
+
+#### 2.1.2 Controllers & Routes
+
+- **Controllers:** PascalCase with `Controller` suffix (e.g., `OrderController`).
+- **Controller Methods:** camelCase (e.g., `calculateTotal`).
+- **Resourceful Methods:** Use standard names (`index`, `create`, `store`, `show`, `edit`, `update`, `destroy`).
+- **Route URLs:** kebab-case (e.g., `/user-settings/profile`).
+- **Route Names:** snake_case with dot notation (e.g., `orders.store`, `admin.users.index`).
+
+#### 2.1.3 Files & Directories
+
+- **Blade Views:** snake_case, lowercase (e.g., `show_details.blade.php`).
+- **Config Files:** snake_case (e.g., `services.php`).
+- **Migrations:** Descriptive snake_case with timestamp prefix (e.g., `create_flights_table`).
+- **Namespaces:** PascalCase (matches folder structure, e.g., `App\Services\Payment`).
+
+#### 2.1.4 Coding Style (PSR-12)
+
+- **Variables & Properties:** camelCase (e.g., `$activeUsers`).
+- **Constants:** UPPER_SNAKE_CASE (e.g., `STATUS_PAID`).
+- **Methods:** camelCase (e.g., `isValid()`).
+- **Type Hinting:** Always use PHP 8.2+ type hinting for arguments and return types.
+
+---
+
+### 2.2 Controllers
+
+Controllers must be **thin**.
+
+Rules:
+
+- Controllers must not contain business logic
+- Controllers must only coordinate HTTP flow
+- Validation must be handled via Form Requests
+- Services must handle business logic
+- Always comment controller methods
+
+---
+
+### 2.3 Models (Eloquent)
+
+- Each model represents one database table
+- Relationships must be explicit
+- Controllers must not contain queries
+- Always comment model methods
+
+Allowed:
+
+- Query scopes
+- Accessors and mutators
+- Attribute casting
+
+---
+
+### 2.4 Service Layer
+
+Business logic must live in `app/Services`.
+
+Service classes must:
+
+- Follow Single Responsibility Principle
+- Be framework-agnostic (no HTTP concerns)
+- Be reusable and testable
+- Always comment service methods
+
+---
+
+### 2.5 Validation
+
+- Input validation must use Form Request classes
+- Validation logic must never live in controllers
+
+---
+
+## 3. Domain and Business Rules
+
+### 3.1 Separation of Concerns
+
+- HTTP layer handles requests and responses
+- Domain layer handles business rules
+- Infrastructure layer handles persistence and external services
+
+Responsibilities must never overlap.
+
+---
+
+### 3.2 Business Logic
+
+- Business rules must be explicit and centralized
+- Business logic must not live in:
+    - Controllers
+    - Views
+    - Routes
+    - Migrations
+
+---
+
+### 3.3 Reusability
+
+- Business logic must be reusable when needed
+- Duplication across services is forbidden
+- Shared logic must be extracted into dedicated services or domain classes
+
+---
+
+## 4. Database Rules
+
+### 4.1 Migrations
+
+- All schema changes must be done via migrations
+- Migrations must be reversible
+- Manual database changes are forbidden
+- All fields, except ID, must be nullable (the required logic is handled by php layer)
+
+---
+
+#### 4.1.1 Relationships
+
+- Every foreign key must follow this pattern, when possible:
+
+```php
+$table->unsignedBigInteger('analysis_id')->nullable();
+
+$table->foreign('analysis_id', 'analysis_requests_analysis_id_foreign')
+    ->references('id')
+    ->on('analyses')
+    ->cascadeOnDelete();
+```
+
+---
+
+### 4.2 Seeders
+
+- Seeders must be used for initial and test data
+- Seeders must not contain business logic
+
+---
+
+## 5. Frontend Rules
+
+- Blade is the default templating engine
+- Views must not contain business logic
+- Assets must be managed with Vite
+
+Views may only contain:
+
+- Presentation logic
+- Loops and conditionals for rendering
+
+---
+
+## 6. Security Rules
+
+- Routes must be protected via middleware
+- Passwords must be hashed using Laravel tools
+- Authorization must use Policies or Gates
+- Input must always be validated
+
+Security must rely on Laravel built-in mechanisms.
+
+---
+
+## 7. Testing Rules
+
+- Tests are mandatory
+- Feature tests must cover application flows
+- Unit tests must cover isolated logic
+
+Rules:
+
+- Business logic must be testable without HTTP context
+- Tests must run in CI environments
+
+---
+
+## 8. Explicit Anti-Patterns (Forbidden)
+
+The following patterns are explicitly forbidden:
+
+- Business logic inside controllers
+- Database queries inside controllers or views
+- Use of `env()` outside config files
+- Fat controllers
+- Logic-heavy Blade views
+- Duplicated business logic
+- Manual database changes
+- Skipping tests for new features
+
+---
+
+## 9. Architectural Principles
+
+The system must follow:
+
+- Single Responsibility Principle
+- Separation of Concerns
+- DRY
+- Skinny Controllers, Fat Services
+
+---
+
+## 10. Rule Evolution
+
+These rules apply to Laravel 12.
+
+Any exception:
+
+- Must be explicitly documented
+- Must include a justification
+- Must be approved before implementation
+
+---
+
+## 11. Personal structure
+
+Here some personal rules not from Laravel.
+
+### 11.1 Models
+
+Each model must have the following dedicated files:
+
+- The model class located in the `app/Models` directory
+- A controller located in the `app/Http/Controllers` directory
+- A Policy class located in the `app/Policies` directory
+- A static service class located in the `app/Services` directory
+- Any related Form Request classes located in  
+  `app/Http/Requests/{model-name-singular}/`
+
+---
+
+The file `app/Services/ModelService.php` is a custom file created to handle
+CRUD operations for models.
+
+It contains an abstract `ModelService` class that must be extended by
+each model-specific service class.
+
+---
+
+The `User` model must be used as the reference implementation.

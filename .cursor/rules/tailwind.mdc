@@ -1,0 +1,165 @@
+---
+alwaysApply: true
+---
+
+# Frontend Rules – Tailwind CSS v4
+
+This rule defines the mandatory standards and best practices for projects
+using **Tailwind CSS v4**.
+
+This rule is optional, but when enabled it must be strictly enforced.
+
+---
+
+## 1. Tailwind Version and Setup
+
+- Tailwind CSS version must be **4.x**
+- Tailwind must be installed and bundled using **Vite**
+- Configuration must follow the official Tailwind v4 setup
+
+Rules:
+
+- Do not use legacy Tailwind v2 or v3 patterns
+- Do not mix Tailwind with other utility-first CSS frameworks
+
+---
+
+## 2. Utility-First Philosophy
+
+Rules:
+
+- Styling must be done using Tailwind utility classes
+- Custom CSS must be minimized
+- Avoid semantic CSS class abstractions that duplicate Tailwind utilities
+
+Forbidden:
+
+- Writing custom CSS for styles already covered by Tailwind
+- Using traditional CSS frameworks or reset systems
+
+---
+
+## 3. Class Usage
+
+Rules:
+
+- Tailwind classes must be applied directly in markup
+- Class order must remain logical and readable
+- Avoid dynamically concatenating class strings when possible
+
+Allowed:
+
+- Conditional classes when required
+- Utility helpers for class merging when necessary
+
+---
+
+## 4. Custom Styles
+
+Rules:
+
+- Custom CSS must be defined only when Tailwind utilities are insufficient
+- Custom styles must live in dedicated CSS files
+- Custom CSS must not contain layout or spacing logic already provided by Tailwind
+
+---
+
+## 5. Configuration (tailwind.config.js)
+
+Rules:
+
+- Configuration must be centralized in `tailwind.config.js`
+- Theme customization must extend the default theme
+- Do not override core Tailwind defaults unless strictly necessary
+
+Allowed:
+
+- Theme extensions
+- Custom colors, spacing, and typography
+- Custom plugins when justified
+
+---
+
+## 6. Responsive Design
+
+Rules:
+
+- Responsive design must use Tailwind breakpoint utilities
+- Mobile-first approach must be followed
+- Avoid custom media queries when Tailwind breakpoints are sufficient
+
+---
+
+## 7. State and Variants
+
+Rules:
+
+- Use Tailwind variants for hover, focus, active, and disabled states
+- Avoid custom CSS for interactive states already supported by Tailwind
+
+Forbidden:
+
+- Hardcoded inline styles for states
+- JavaScript-driven visual states when Tailwind variants are sufficient
+
+---
+
+## 8. Dark Mode
+
+Rules:
+
+- Dark mode must use Tailwind’s built-in dark mode support
+- Dark mode strategy must be consistent across the project
+
+Forbidden:
+
+- Manual color switching logic outside Tailwind mechanisms
+
+---
+
+## 9. Performance and Maintainability
+
+Rules:
+
+- Unused classes must be removed via Tailwind’s build process
+- Avoid excessively long or unreadable class lists
+- Extract repeated patterns only when justified
+
+---
+
+## 10. Inline Styles
+
+Rules:
+
+- Inline styles must be avoided
+- Inline styles are allowed only for truly dynamic values not supported by Tailwind
+
+---
+
+## 11. Forbidden Patterns (Anti-Patterns)
+
+The following patterns are explicitly forbidden:
+
+- Mixing Tailwind with other CSS frameworks
+- Excessive custom CSS
+- Inline styling for static layouts
+- Recreating Tailwind utilities manually
+- Over-customizing the Tailwind configuration
+
+---
+
+## 12. Responsibility Boundaries
+
+- Tailwind handles styling and layout
+- Component logic must not influence styling decisions
+- Styling decisions must remain declarative
+
+---
+
+## 13. Rule Enforcement
+
+When this rule is enabled:
+
+- All styling must comply with this rule
+- Any deviation must be explicitly justified
+- Violations must be reported and corrected

@@ -1,0 +1,163 @@
+---
+alwaysApply: true
+---
+
+# Frontend Rules – Inertia.js v2
+
+This rule defines mandatory standards and constraints for projects using
+**Inertia.js v2** within a Laravel-based frontend stack.
+
+This rule is **optional**, but when enabled it must be strictly enforced.
+
+---
+
+## 1. Inertia.js Version
+
+- Inertia.js version: **v2**
+- Inertia must be used according to the official v2 API and conventions
+- Deprecated or legacy v1 patterns must not be used
+
+---
+
+## 2. Architectural Role of Inertia
+
+Inertia.js is responsible for:
+
+- Client-side navigation
+- Page-based state handling
+- Bridging Laravel backend and frontend components
+
+Rules:
+
+- Inertia pages represent **application screens**, not reusable UI components
+- Business logic must not live in Inertia pages
+- Inertia must not replace backend responsibilities
+
+---
+
+## 3. Page Structure
+
+- All Inertia pages must live in a dedicated `Pages` directory
+- Each page must represent a single route or resource view
+- Page components must be named using `PascalCase`
+
+Examples:
+
+- `Pages/Users/Index.vue`
+- `Pages/Users/Show.vue`
+- `Pages/Dashboard.vue`
+
+---
+
+## 4. Data Flow
+
+Rules:
+
+- Data passed from Laravel controllers must be explicit
+- Only the required data must be shared with the frontend
+- Avoid over-fetching data in Inertia responses
+
+Allowed:
+
+- Lazy props
+- Partial reloads
+- Shared props for global state
+
+---
+
+## 5. Navigation
+
+- Navigation must be handled via Inertia links
+- Full page reloads must be avoided unless explicitly required
+
+Rules:
+
+- Do not use traditional anchor tags for internal navigation
+- Preserve client-side state when appropriate
+
+---
+
+## 6. Forms and Requests
+
+- Forms must use Inertia form helpers when available
+- Small and utility requests, like filling select options must be implemented by Axios, not Inertia form helpers
+- Validation errors must be handled via Inertia error bags
+- Server-side validation remains the source of truth
+
+Rules:
+
+- Client-side validation must not replace backend validation
+- Form state must be preserved on validation errors when appropriate
+
+---
+
+## 7. State Management
+
+Rules:
+
+- Inertia is not a global state manager
+- Complex or shared state must be handled explicitly
+- Avoid implicit global state through shared props abuse
+
+---
+
+## 8. Error Handling
+
+- Validation errors must be returned using standard Laravel responses
+- Authorization and authentication errors must be handled server-side
+- Frontend must only render the error state, not determine it
+
+---
+
+## 9. Performance Rules
+
+- Use partial reloads to limit payload size
+- Avoid sending unnecessary relations or computed data
+- Paginate large datasets
+
+---
+
+## 10. Forbidden Patterns (Anti-Patterns)
+
+The following are explicitly forbidden:
+
+- Business logic inside Inertia pages
+- Fetching data directly from the frontend
+- Duplicating backend logic on the client
+- Treating Inertia pages as reusable UI components
+- Mixing routing logic inside Vue components
+
+---
+
+## 11. Responsibility Boundaries
+
+- Laravel controls:
+
+    - Routing
+    - Authorization
+    - Validation
+    - Data shaping
+
+- Inertia controls:
+    - Page rendering
+    - Client-side navigation
+    - UI state
+
+Responsibilities must not overlap.
+
+---
+
+## 12. Rule Enforcement
+
+When this rule is enabled:
+
+- All frontend code must comply
+- Any deviation must be explicitly justified
+- Violations must be reported and corrected
+
+---
+
+## 12. Translations
+
+- i18n system
+- always update i18n files when needed

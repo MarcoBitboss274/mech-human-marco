@@ -1,0 +1,115 @@
+@import './base.css';
+@import './theming.css';
+
+:root {
+    /* LAYOUT VARS */
+    --sidebar-min-w: 80px;
+    --sidebar-max-w: 250px;
+    --topbar-h: 60px;
+
+    /* GLOBAL VARS */
+    /* Minimum horizontal padding value */
+    --min-px: 14px;
+    --dynamic-px-no-min: clamp(0px, calc((100vw - var(--max-container-w)) / 2), var(--max-container-w));
+    --dynamic-px: clamp(var(--min-px), var(--dynamic-px-no-min), var(--max-container-w));
+    --dynamic-negative-m-no-min: calc(var(--dynamic-px-no-min) * -1);
+    --dynamic-negative-m: calc(var(--dynamic-px) * -1);
+    --transition-duration: 0.3s;
+    --transition-easing: cubic-bezier(0.4, 0, 0.2, 1);
+    /* This is the default maximum container width */
+    --max-container-w: 1200px;
+}
+
+body {
+    transition: background-color 0.3s ease-in-out;
+    display: grid;
+    grid-template-rows: 1fr;
+    grid-template-columns: 1fr;
+    color: var(--bb-text);
+    min-height: 100vh; /* Fallback for older browsers */
+    min-height: 100dvh; /* Modern browsers supporting dynamic viewport units */
+    line-height: 1.6;
+    font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        'Segoe UI',
+        Roboto,
+        Oxygen,
+        Ubuntu,
+        Cantarell,
+        'Fira Sans',
+        'Droid Sans',
+        'Helvetica Neue',
+        sans-serif;
+    font-size: 15px;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+#app {
+    display: grid;
+}
+/* Centered container with no minimum padding */
+.centered-container-no-min {
+    display: grid;
+    grid-template-columns: auto calc(min(100%, var(--max-container-w))) auto;
+    > * {
+        grid-column-start: 2;
+        grid-column-end: 2;
+    }
+}
+/* Centered container with minimum padding */
+.centered-container {
+    display: grid;
+    grid-template-columns: auto calc(min(100% - var(--min-px), var(--max-container-w))) auto;
+    > * {
+        grid-column-start: 2;
+        grid-column-end: 2;
+    }
+}
+/* Counters the action of the above containers so that nested containers can be full width while still being children of centered containers*/
+.full-width-container-no-min {
+    @apply col-span-full;
+}
+.full-width-container {
+    @apply col-span-full;
+}
+
+.form-grid {
+    @apply grid gap-x-4 gap-y-5;
+
+    fieldset {
+        @apply col-span-full grid;
+        grid-template-columns: inherit;
+        gap: inherit;
+
+        legend {
+            @apply mb-2 flex w-full items-center gap-3 text-base font-medium whitespace-nowrap;
+        }
+
+        legend::after {
+            content: '';
+            @apply top-1/2 right-0 h-px flex-auto translate-y-[1px] bg-current text-[var(--bb-border)];
+        }
+    }
+
+    .bb-alert {
+        @apply col-span-full;
+    }
+}
+
+.button-stack {
+    @apply space-y-4;
+}
+
+.filters-container {
+    --min-col-width: 200px;
+    --max-col-width: 300px;
+    @apply mb-3 grid gap-x-3 gap-y-3 sm:grid-cols-[repeat(auto-fill,_minmax(var(--min-col-width),_var(--max-col-width)))];
+}
+
+.ok-btn {
+    @apply relative top-1/2 -translate-y-1/2 rounded-[var(--bb-radius)] bg-[var(--bb-primary)] p-1 text-sm leading-none font-semibold !text-[var(--bb-contrasting)];
+}

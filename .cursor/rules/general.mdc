@@ -1,0 +1,80 @@
+---
+alwaysApply: true
+---
+
+# Project Context
+
+The application is structured into two distinct environments:
+
+- Administration Environment
+- Workspace Environment
+
+The goal is to maintain completely separated flows for model operations
+across these environments.
+
+Model operations must respect environment boundaries at all times.
+
+---
+
+## 1. Administration Environment (Admin Space)
+
+This environment is used by users with administrative roles, including:
+
+- superadmin
+- admin
+
+Rules:
+
+- Administrative operations must be isolated from workspace operations
+- Admin logic must not be mixed with customer logic
+- Admin controllers must not handle workspace-specific behavior
+
+---
+
+## 2. Workspace Environment (Workspace)
+
+This environment is used by users with the role:
+
+- customer
+
+Rules:
+
+- All customer-facing operations must be handled within the Workspace environment
+- Business flows for customers must remain separate from administrative flows
+- Workspace logic must not depend on admin-specific controllers
+- Questi utenti possono avere delle relazioni con i buildings, e per ogni relazione viene espresso un ruolo tra:
+    - admin
+    - member
+
+There is a dedicated controller:
+
+- `WorkspaceController`
+
+The `WorkspaceController` is responsible for handling all operations
+performed by customer users within the workspace environment.
+
+### 2.1 Building Membership Rules
+
+Users may have relationships with buildings.
+
+This relationship represents a membership and must always include a role.
+
+#### 2.1.1 Allowed Roles
+
+The role must be one of the following:
+
+- `admin`
+- `member`
+
+#### 2.1.2 Rules
+
+- The relationship between users and buildings must explicitly define the user's role
+- The role must always be present and must never be null
+- The role must be stored as a controlled value and must not allow arbitrary strings
+- Only the allowed roles (`admin`, `member`) are permitted
+- Authorization logic must rely on this role to determine permissions within the building context
+
+#### 2.1.3 Responsibility
+
+- A `building admin` has elevated permissions within the building
+- A `building member` has standard permissions within the building
