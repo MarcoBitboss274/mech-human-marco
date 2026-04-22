@@ -78,7 +78,7 @@
                         <div class="flex gap-x-2">
                             <BbButton
                                 v-if="can('users.edit')"
-                                icon="pencil"
+                                icon="pencil_line"
                                 size="xs"
                                 @click="
                                     () => {

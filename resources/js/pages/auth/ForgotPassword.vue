@@ -2,7 +2,7 @@
     <Head :title="t('Password dimenticata?')" />
     <AuthContainer>
         <div class="password-forgot">
-            <BaseButton class="home-btn" href="/"><AppLogo /><span class="home-btn__label">{{ t('Vai alla home') }}</span></BaseButton>
+            <BaseButton class="home-btn" href="/"><AppLogo auth /><span class="home-btn__label">{{ t('Vai alla home') }}</span></BaseButton>
             <h1 class="right-panel__title">{{ t('Password dimenticata?') }}</h1>
             <p class="right-panel__subtitle">
                 {{ t('Nessun problema! Inserisci l\'email con cui ti sei registrato e ti invieremo le istruzioni per reimpostare la tua password') }}

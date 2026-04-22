@@ -99,7 +99,7 @@
                         </template>
                         <template #actions="{ item }">
                             <div class="flex gap-x-2">
-                                <BbButton v-if="can('buildings.members.edit')" icon="pencil" size="xs" @click="openEditMemberModal(item)">
+                                <BbButton v-if="can('buildings.members.edit')" icon="pencil_line" size="xs" @click="openEditMemberModal(item)">
                                     {{ t('Modifica') }}
                                 </BbButton>
                                 <BbPopover v-if="can('buildings.members.delete') && item.id !== currentUser.id">
@@ -148,7 +148,7 @@
                             </template>
                             <template #actions="{ item }">
                                 <div class="flex gap-x-2">
-                                    <BbButton icon="pencil" size="xs" @click="openAddressModal(item)">
+                                    <BbButton icon="pencil_line" size="xs" @click="openAddressModal(item)">
                                         {{ t('Modifica') }}
                                     </BbButton>
                                     <BbButton v-if="!item.is_default" icon="check-circle" size="xs" @click="setDefaultAddress(item.id)">

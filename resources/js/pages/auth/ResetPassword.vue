@@ -32,7 +32,7 @@ const submit = () => {
     <AuthContainer>
         <div class="reset-password">
             <BaseButton class="mb-6 flex w-full items-center lg:hidden" href="/">
-                <AppLogo class="w-40" /><span class="home-btn__label">{{ t('Vai alla home') }}</span>
+                <AppLogo auth class="w-40" /><span class="home-btn__label">{{ t('Vai alla home') }}</span>
             </BaseButton>
             <h1 class="text-3xl font-bold text-[#171717]">{{ t('Imposta nuova password') }}</h1>
             <p class="my-4 text-sm text-[#374151]">{{ t('Per impostare la tua password, inserisci la tua password e clicca su "Imposta nuova password".') }}</p>

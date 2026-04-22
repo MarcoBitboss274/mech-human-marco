@@ -34,7 +34,7 @@ const submit = () => {
     <AuthContainer>
         <div class="accept-invitation">
             <BaseButton class="mb-6 flex w-full items-center lg:hidden" href="/">
-                <AppLogo class="w-40" /><span class="home-btn__label">{{ t('Vai alla home') }}</span>
+                <AppLogo auth class="w-40" /><span class="home-btn__label">{{ t('Vai alla home') }}</span>
             </BaseButton>
             <h1 class="text-3xl font-bold text-[#171717]">{{ t('Accetta invito') }}</h1>
             <p class="my-4 text-sm text-[#374151]">{{ t('Completa il tuo profilo inserendo nome, cognome e impostando una password per accedere.') }}</p>

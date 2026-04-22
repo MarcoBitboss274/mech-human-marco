@@ -1,7 +1,7 @@
 <template>
     <div v-if="latestPrescription" class="operations-show__details">
         <div class="operations-show__details-actions">
-            <BbButton v-if="latestPrescription.status === 'draft'" size="xs" icon="pencil" :disabled="processing" @click="openEditWizard">
+            <BbButton v-if="latestPrescription.status === 'draft'" size="xs" icon="pencil_line" :disabled="processing" @click="openEditWizard">
                 {{ t('Modifica') }}
             </BbButton>
             <BbButton

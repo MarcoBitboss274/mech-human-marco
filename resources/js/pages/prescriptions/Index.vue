@@ -60,7 +60,7 @@
                             </BbButton>
                             <!-- <BbButton
                                 v-if="can('prescriptions.edit')"
-                                icon="pencil"
+                                icon="pencil_line"
                                 size="xs"
                                 @click="
                                     () => {

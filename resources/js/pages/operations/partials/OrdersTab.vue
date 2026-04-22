@@ -195,7 +195,7 @@ const saveStatus = () => {
                 <div class="operation-orders__card-header">
                     <h3 class="operation-orders__card-title">{{ t('Ordine') }} {{ order.code ?? `#${order.id}` }}</h3>
                     <div class="operation-orders__actions">
-                        <BbButton v-if="can('operations.order.manage')" size="xs" icon="pencil" @click="openModal(order)">
+                        <BbButton v-if="can('operations.order.manage')" size="xs" icon="pencil_line" @click="openModal(order)">
                             {{ t('Modifica') }}
                         </BbButton>
                         <BbButton

@@ -54,7 +54,7 @@
                         <div class="flex gap-x-2">
                             <BbButton
                                 v-if="can('suppliers.edit')"
-                                icon="pencil"
+                                icon="pencil_line"
                                 size="xs"
                                 @click="
                                     () => {

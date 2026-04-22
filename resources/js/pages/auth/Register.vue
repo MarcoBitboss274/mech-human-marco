@@ -3,7 +3,7 @@
     <AuthContainer>
         <div class="register">
             <BaseButton class="home-btn" href="/"
-                ><AppLogo /><span class="home-btn__label">{{ t('Vai alla home') }}</span></BaseButton
+                ><AppLogo auth /><span class="home-btn__label">{{ t('Vai alla home') }}</span></BaseButton
             >
             <h1 class="register__title">{{ t('Benvenuto! 👋') }}</h1>
             <p class="register__subtitle"></p>

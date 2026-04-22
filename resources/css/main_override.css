@@ -1,0 +1,633 @@
+/* ============================================================
+   MAIN OVERRIDE
+   Override e aggiunte rispetto a main.css.
+   Non modificare main.css direttamente — usare questo file.
+   Gestito dalla skill Gestione_UI — registro: docs/ui/UI_ACTIVITY_LOG.md
+   ============================================================ */
+
+body {
+    font-family:
+        'Overpass',
+        -apple-system,
+        BlinkMacSystemFont,
+        'Segoe UI',
+        Roboto,
+        'Helvetica Neue',
+        sans-serif;
+}
+
+/* ── Rimozione ombra + bordo sottile su sidebar e navbar ─────────────────── */
+.layout-sidebar,
+.layout-topbar,
+.topbar-no-sidebar {
+    box-shadow: none !important;
+}
+
+.layout-sidebar {
+    border-right: 1px solid var(--bb-border-light);
+}
+
+.layout-topbar,
+.topbar-no-sidebar {
+    border-bottom: 1px solid var(--bb-border-light);
+}
+
+/* ── Allineamento verticale elementi navbar ───────────────────────────────── */
+.layout-topbar .bb-dropdown--user-dropdown .base-btn {
+    display: inline-flex !important;
+    align-items: center;
+}
+
+.layout-topbar .bb-popover__wrapper {
+    display: inline-flex !important;
+    align-items: center;
+    height: var(--topbar-h);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   PAGINE AUTH — Gradient left-panel basato su --bb-primary
+   Sostituisce il gradient hardcoded nero/blu-petrolio di AuthContainer.vue:51
+   con una versione animata che alterna --bb-primary e una versione scura (30%
+   primary + 70% nero). !important necessario perché lo <style> del SFC ha
+   stessa specificità e l'ordine di caricamento Vite non è deterministico.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.auth-container .left-panel {
+    background: linear-gradient(
+        60deg,
+        color-mix(in sRGB, var(--bb-primary) 30%, #000),
+        var(--bb-primary),
+        color-mix(in sRGB, var(--bb-primary) 30%, #000),
+        var(--bb-primary),
+        color-mix(in sRGB, var(--bb-primary) 30%, #000)
+    ) !important;
+    background-size: 1000% 1000% !important;
+}
+
+/* Logo auth: wordmark orizzontale, più largo dello stacked di prima (ratio 6.25:1 → serve più width).
+   Override sia per left-panel (desktop) che right-panel (mobile).
+   !important per vincere su `.app-logo { @apply w-40 }` dell'SFC (stessa specificità, ordine cascata non deterministico con Vite). */
+.auth-container .left-panel .home-btn .app-logo--auth {
+    width: 320px !important;
+}
+
+.auth-container .right-panel .home-btn .app-logo--auth {
+    width: 240px !important;
+}
+
+/* ── Pagine auth: button primary (Login, Registrati, Invia, Imposta password)
+   sempre blu primario. Override difensivo: il BbButton di default userebbe già
+   --bb-primary, ma questa regola esclude esplicitamente i secondary e assicura
+   il colore corretto indipendentemente da override o stati runtime.
+   -------------------------------------------------------------------------- */
+.auth-container
+    .bb-button:not(.bb-button--icon):not(.bb-button--secondary):not([variant='secondary']):not(.bb-button--primary-outline):not(.base-btn--disabled) {
+    --color: var(--bb-primary);
+    --border-color: var(--bb-primary);
+    --text-color: var(--bb-contrasting);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   LAYOUT VARS — sidebar più stretta + topbar più basso.
+   NOTA sulla cascade: `main.css` ridefinisce `:root { --topbar-h: 60px }` DOPO
+   l'import di questo file, quindi un `:root {…}` qui verrebbe sovrascritto.
+   Definisco le var direttamente sugli elementi (`.layout-topbar`, `.layout-sidebar`)
+   con specificità pari al `:root` ma che vince per proximity (più vicino al
+   target). Aggiungo `height !important` su topbar come belt-and-suspenders.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+:root {
+    --topbar-h: 50px;
+    --sidebar-min-w: 56px;
+    --sidebar-max-w: 180px;
+}
+
+.layout-topbar {
+    --topbar-h: 50px;
+    height: 50px !important;
+    min-height: 50px !important;
+}
+
+.layout-sidebar,
+.default-layout {
+    --sidebar-min-w: 56px;
+    --sidebar-max-w: 180px;
+}
+
+/* Sposta logo + toggle un pizzico più in alto: riduco --py della sidebar.
+   Il toggle è posizionato a `top: calc(var(--py) + var(--logo-h)/2)` (SFC),
+   quindi --py più piccolo = toggle + logo più in alto. */
+.layout-sidebar {
+    --py: 1px;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   SIDEBAR — Toggle con sfondo bianco + icone più piccole centrate col testo.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* Toggle sidebar: bg stesso della sidebar (grigio molto chiaro), quadrato */
+.layout-sidebar .sidebar-toggle {
+    background-color: color-mix(in sRGB, var(--bb-panel) 96%, var(--bb-text)) !important;
+    border: none !important;
+    border-radius: 0 !important;
+}
+
+.layout-sidebar .sidebar-toggle:hover:not(:disabled) {
+    background-color: color-mix(in sRGB, var(--bb-panel) 96%, var(--bb-text)) !important;
+    color: var(--bb-text);
+}
+
+/* Sidebar: sfondo grigio molto chiaro (più chiaro di --color-mix-100).
+   96% panel (bianco) + 4% text (scuro) = grigio molto delicato. */
+.layout-sidebar {
+    background-color: color-mix(in sRGB, var(--bb-panel) 96%, var(--bb-text)) !important;
+}
+
+/* Sidebar collapsed: nessuna voce evidenziata come "active".
+   Normalmente `.sidebar-link--active` ha bg `--color-mix-200` (theming_override).
+   Quando la sidebar è chiusa non ha senso mostrare la voce attiva — è invisibile. */
+.layout-sidebar:not(.layout-sidebar--expanded) .sidebar-link.sidebar-link--active {
+    background-color: transparent !important;
+    color: var(--bb-text) !important;
+}
+
+.layout-sidebar:not(.layout-sidebar--expanded) .sidebar-link.sidebar-link--active .bb-icon {
+    color: var(--bb-text) !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   FILTRI INDEX — 5 per riga, vanno a capo se sono di più.
+   Pattern comune: `<div class="my-4 flex flex-wrap items-end justify-start gap-3">
+   ...filters...</div>` figlia diretta di `.admin-view`. Ogni filtro ha
+   flex-basis FISSO di 1/5 (meno la quota di gap) così entrano esattamente 5
+   per riga e restano della stessa dimensione anche se ce ne sono meno (1, 2,
+   3 filtri occupano ciascuno 1/5, lasciando spazio vuoto a destra).
+   Calcolo: 5 item + 4 gap da 8px = 32px di gap totale. Ogni item larghezza
+   = (100% - 32px) / 5.
+   Icon button (Pulisci) mantiene dimensione naturale.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.admin-view > .flex.flex-wrap.items-end {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+}
+
+.admin-view > .flex.flex-wrap.items-end > .bb-base-input-outer-container {
+    flex: 0 0 calc((100% - 32px) / 5) !important;
+    min-width: 0 !important;
+    width: auto !important;
+    max-width: none !important;
+}
+
+.admin-view > .flex.flex-wrap.items-end > .bb-button {
+    flex: 0 0 auto !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   PAGE TITLE + SPACING VERTICALE PAGINE
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* Page title: 22px (h1 principale delle pagine) */
+.page__title {
+    font-size: 22px !important;
+    line-height: 28px !important;
+}
+
+/* Page subtitle: 14px (era text-base = 16px) */
+.page__subtitle {
+    font-size: 14px !important;
+    line-height: 20px !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   PAGINA DETTAGLIO LAVORAZIONE (/operations/…)
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* Status badge-edit: outer narrower.
+   Uso `html body` come prefisso per avere specificità (0,2,2) che batte
+   qualsiasi cascade ordering di SFC vs main.css. */
+html body .operation-status-badge-edit.operation-status-badge-edit {
+    width: 180px !important;
+    max-width: 180px !important;
+    min-width: 0 !important;
+    font-size: 12px !important;
+}
+
+/* Font-size 12px su tutti i figli del badge-edit (input, span, label, svg text, ecc.) */
+html body .operation-status-badge-edit,
+html body .operation-status-badge-edit * {
+    font-size: 12px !important;
+}
+
+/* Forzo anche i wrapper bb-select interni a non eccedere il parent 110px */
+html body .operation-status-badge-edit .operation-status-badge-edit__select,
+html body .operation-status-badge-edit .bb-base-input-outer-container,
+html body .operation-status-badge-edit .bb-base-input-container,
+html body .operation-status-badge-edit .bb-base-input-container__input,
+html body .operation-status-badge-edit .bb-common-input-outer-container,
+html body .operation-status-badge-edit .bb-common-input-inner-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+}
+
+/* Input testuale interno: bb-ui setta `min-width: min(100%, calc(var(--characters)*12px))`
+   e con `--characters: 10` (inline) forza 120px min-width. Azzero `--characters`
+   per far collassare l'input (lo style inline viene sovrascritto da !important
+   via CSS custom prop). */
+html body .operation-status-badge-edit .bb-base-select__text-input {
+    --characters: 0 !important;
+    min-width: 0 !important;
+    width: auto !important;
+    flex: 1 1 0 !important;
+}
+
+/* Status badge-edit select: matcha il badge "Produzione" (py-1 + text-xs
+   + leading-none + border 1px = ~22px). La SFC ha regole con stessa
+   specificità caricate DOPO main.css (via Vite), quindi serve specificità
+   più alta. Prefisso con la classe outer `.operation-status-badge-edit` per
+   passare da 2 a 3 classi. */
+.operation-status-badge-edit .operation-status-badge-edit__select .bb-base-input-container__input {
+    padding: 4px 12px !important;
+    height: auto !important;
+    min-height: 0 !important;
+}
+
+.operation-status-badge-edit .operation-status-badge-edit__select .bb-common-input-outer-container,
+.operation-status-badge-edit .operation-status-badge-edit__select .bb-common-input-inner-container,
+.operation-status-badge-edit .operation-status-badge-edit__select .bb-base-select__input-container {
+    padding: 0 !important;
+    height: 14px !important;
+    min-height: 14px !important;
+    max-height: 14px !important;
+    line-height: 14px !important;
+    overflow: visible !important;
+}
+
+.operation-status-badge-edit .operation-status-badge-edit__select .bb-base-select__text-input {
+    height: 14px !important;
+    min-height: 0 !important;
+    line-height: 14px !important;
+    padding: 0 !important;
+}
+
+/* Also allow visible overflow su bb-smooth-height (il wrapper JS-inline con height: 18px)
+   per non tagliare gli ascender delle lettere maiuscole. */
+.operation-status-badge-edit .operation-status-badge-edit__select .bb-smooth-height,
+.operation-status-badge-edit .operation-status-badge-edit__select .bb-smooth-height > .content {
+    overflow: visible !important;
+}
+
+/* Forza 12px su TUTTO il contenuto testuale del select (input, overlay span
+   del valore selezionato, placeholder, tag) — il testo "Produzione" viene
+   renderizzato in un elemento diverso dall'input, quindi cast a wider net. */
+.operation-status-badge-edit__select .bb-common-input-inner-container,
+.operation-status-badge-edit__select .bb-common-input-inner-container *,
+.operation-status-badge-edit__select .bb-base-select__text-input,
+.operation-status-badge-edit__select .bb-base-select__selected-value,
+.operation-status-badge-edit__select .bb-base-select__placeholder,
+.operation-status-badge-edit__select .bb-base-select__tag,
+.operation-status-badge-edit__select input {
+    font-size: 12px !important;
+    line-height: 1 !important;
+}
+
+.operation-status-badge-edit__select .bb-base-select__chevron {
+    width: 14px !important;
+    height: 14px !important;
+}
+
+/* Gap tra h1 e status badge/canceled/archived ridotto (era gap-4 = 16px) */
+.admin-view__header .flex.flex-wrap.items-center.gap-4 {
+    gap: 8px !important;
+}
+
+/* OperationNotice — rimuovi margin-top dall'hint-message (era mt-1 = 4px) */
+.operation-notice__hint-message {
+    margin-top: 0 !important;
+}
+
+/* Meno padding verticale all'inizio delle pagine (24→16px top, 40→24px bottom) */
+.default-layout__page-container > * {
+    padding-top: 16px !important;
+    padding-bottom: 24px !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   TAB BAR — meno spazio verticale tra label/linea e sopra la tab bar
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* Gap interno bb-tab (tra label-container e contenuto) ridotto: 24px → 8px */
+.bb-tab {
+    gap: 8px !important;
+}
+
+/* Padding bottom del label-container (spazio sotto il testo della tab, sopra
+   la linea indicatore): 12px → 0 (label attaccato alla riga indicatore) */
+.bb-tab--horizontal > .bb-tab__label-boundary .bb-tab__label-container {
+    padding-bottom: 0 !important;
+}
+
+/* Font size tab label: 14px (consistente con input, select, filtri) */
+.bb-tab .bb-tab__btn {
+    font-size: 14px !important;
+}
+
+/* Tab bar attaccate all'elemento sopra: `.admin-view > .mt-4` (wrapper della
+   BbTab) di default ha margin-top 16px. Riduco a 4px. */
+.admin-view > .mt-4:has(> .bb-tab) {
+    margin-top: 4px !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   EMPTY STATE — tabelle senza dati: padding verticale per non sembrare
+   appiccicate alla riga sopra/sotto.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* Empty state tabella: "Nessuna ... trovata" e simili.
+   bb-table è `display: grid`, quindi il no-data viene renderizzato come figlio
+   diretto di `.bb-table` FUORI dal <table> HTML. Target SOLO segnali specifici
+   di empty-state (colspan, classi esplicite, figli non-table) — evito
+   `:only-child` che catturerebbe anche tabelle con una sola riga legittima. */
+
+/* Direct child di .bb-table che NON è un elemento tabella:
+   è qui che bb-table mette lo slot no-data nel layout grid. */
+.bb-table > :not(table):not(thead):not(tbody):not(tfoot):not(colgroup):not(caption) {
+    padding-top: 48px !important;
+    padding-bottom: 48px !important;
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+    text-align: center !important;
+    color: var(--color-mix-600) !important;
+    font-size: 14px !important;
+}
+
+/* No-data dentro riga tabella: serve SEMPRE il colspan (bb-table lo mette su
+   cella unica che attraversa tutte le colonne). Niente `:only-child` qui. */
+.bb-table tbody > tr > td[colspan],
+.bb-table [class*='no-data'],
+.bb-table [class*='empty-state'],
+.bb-table__empty,
+.bb-table__no-data {
+    padding-top: 48px !important;
+    padding-bottom: 48px !important;
+    text-align: center !important;
+    color: var(--color-mix-600) !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   PAGINATION — cerchio perfetto (width = height, niente ovali per cifre doppie)
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.bb-pagination .bb-pagination__pages li .bb-pagination__page {
+    width: var(--size) !important;
+    height: var(--size) !important;
+    min-width: var(--size) !important;
+    min-height: var(--size) !important;
+    padding: 0 !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   DIALOG — solo l'ULTIMO button del footer resta primary, tutti gli altri
+   vengono downgradati a secondary. Così qualsiasi dialog con 2+ button ha
+   un solo primary anche senza variant="secondary" esplicito.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.bb-dialog .bb-button:not(:last-child):not(.bb-button--icon):not(.base-btn--disabled) {
+    --color: transparent !important;
+    --border-color: var(--color-mix-200) !important;
+    --text-color: var(--bb-text) !important;
+}
+
+.bb-dialog .bb-button:not(:last-child):not(.bb-button--icon):not(.base-btn--disabled):hover {
+    background-color: var(--color-mix-200) !important;
+    color: var(--bb-text) !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   WIZARD CREATE OPERATION — Upload file e Spedizione/Fatturazione.
+   I pulsanti "mode-option" sono div con role=button, non BbButton. Li
+   rendo visivamente coerenti con il design system: secondary (outline) a
+   riposo, primary (blu) quando selezionati.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.attachments-step__mode-option,
+.create-wizard__address-mode-option {
+    background-color: transparent !important;
+    border: 1px solid var(--color-mix-200) !important;
+    color: var(--bb-text) !important;
+    font-weight: 500 !important;
+    border-radius: var(--bb-radius) !important;
+    min-height: 30px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 4px 12px !important;
+}
+
+.attachments-step__mode-option:hover,
+.create-wizard__address-mode-option:hover {
+    background-color: var(--color-mix-200) !important;
+    border-color: var(--color-mix-200) !important;
+    color: var(--bb-text) !important;
+}
+
+.attachments-step__mode-option.selected,
+.create-wizard__address-mode-option.selected {
+    background-color: var(--bb-primary) !important;
+    border-color: var(--bb-primary) !important;
+    color: var(--bb-contrasting) !important;
+}
+
+.attachments-step__mode-option.selected:hover,
+.create-wizard__address-mode-option.selected:hover {
+    background-color: var(--bb-primary) !important;
+    border-color: var(--bb-primary) !important;
+    color: var(--bb-contrasting) !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   OPERATION PROGRESS — cerchi molto ridotti (da 28px a 14px) e dot proporzionale.
+   Il "current" è forzato al primary #1B6EC5 (la SFC usa `border-blue-500` /
+   `bg-blue-500` di Tailwind = #3b82f6, non il primary del tema).
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.operation-progress__circle {
+    width: 14px !important;
+    height: 14px !important;
+    border-width: 1px !important;
+}
+
+.operation-progress__dot {
+    width: 6px !important;
+    height: 6px !important;
+}
+
+.operation-progress__circle--current {
+    border-color: var(--bb-primary) !important;
+}
+
+.operation-progress__dot--current {
+    background-color: var(--bb-primary) !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   BB-SELECT — font 14px allineato al resto degli input/filtri/tab label
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.bb-select {
+    --bb-input-font-size: 14px;
+}
+
+.bb-select .bb-common-input-inner-container input,
+.bb-select .bb-base-select__selected-value,
+.bb-select .bb-base-select__placeholder,
+.bb-select .bb-base-select__tag {
+    font-size: 14px !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   ICONE — uniforma stroke-width a 1.5 su tutte le icone SVG con stroke.
+   Applica a icone renderizzate da BbIcon (classe `.bb-icon`). I file SVG
+   nell'asset set hanno stroke-width che variano (1.125 / 1.5 / 2 / 3 / 4);
+   questo override normalizza tutto a 1.5. Le icone filled (senza stroke) non
+   sono toccate — se vuoi anche quelle outline serve sostituire i file SVG.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.bb-icon svg,
+.bb-icon svg *,
+.sidebar-toggle svg,
+.sidebar-toggle svg * {
+    stroke-width: 1.5 !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   TOPBAR grigio come sidebar + SIDEBAR-LINK trasparente (eredita il grigio
+   del parent invece di avere bg bianco proprio) + BADGE testo giù 1px
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.layout-topbar {
+    background-color: color-mix(in sRGB, var(--bb-panel) 96%, var(--bb-text)) !important;
+}
+
+.layout-sidebar .sidebar-link {
+    background-color: transparent !important;
+}
+
+/* Badge: testo spostato più in basso (2px totali dal default: +1 via padding-top
+   e +1 via transform). Il line-height: 0 del bb-badge teneva il testo
+   "matematicamente" centrato; correggiamo il rendering ottico. */
+.bb-badge__content-container {
+    padding-top: 4px !important;
+    transform: translateY(1px);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   FALLBACK AVATAR — bg nero (era --bb-primary blu)
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.layout-topbar .bb-dropdown--user-dropdown .base-btn .fallback-avatar,
+.fallback-avatar {
+    background-color: #000 !important;
+    color: #fff !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   INDEX PAGES — stile uniforme su tutte le 8 Index:
+   • Label filtri e header colonne: stesso color + weight + size
+   • Contenuto righe tabella: stesso color + weight + size
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* Label filtri + header colonne: grigio scuro, weight regular, 14px, padding coerente */
+.admin-view > .flex.flex-wrap.items-end .bb-base-input-container__label,
+.bb-table .bb-table-header,
+.bb-table thead > tr > th {
+    color: var(--color-mix-700) !important;
+    font-weight: 400 !important;
+    font-size: 14px !important;
+}
+
+/* Forzatura padding uniforme su ogni tabella: reset --padding-x/--padding-y
+   così ogni pagina Index usa gli stessi valori indipendentemente da cosa
+   ha nel content delle righe (badge, div inline, text, ecc). */
+.bb-table {
+    --padding-x: 16px !important;
+    --padding-y: 8px !important;
+}
+
+/* Contenuto righe tabella: testo scuro, weight regular, 13px, padding uniforme.
+   Forza anche sul tr figlio diretto perché alcune pagine (buildings) con
+   formatter che ritornano testo raw e slot #approved custom possono ereditare
+   color da regole più generiche. */
+.bb-table tbody tr td,
+.bb-table tbody > tr > td {
+    color: var(--bb-text) !important;
+    font-weight: 400 !important;
+    font-size: 13px !important;
+    padding: 8px 16px !important;
+    height: var(--bb-table-cell-h) !important;
+}
+
+/* Reset color su tutti i discendenti diretti delle celle (catch-all per
+   slot templates che inseriscono div/span con text-gray Tailwind hardcoded) */
+.bb-table tbody > tr > td > *:not(.bb-button):not(.bb-badge):not(.bb-popover):not([class*='-badge']):not([class*='bb-icon']) {
+    color: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+}
+
+/* Sidebar icone: ridotte 20→16px, mantengono flex centering verticale col testo */
+.layout-sidebar .sidebar-link .sidebar-link__icon,
+.layout-sidebar .sidebar-link .sidebar-link__icon-chevron {
+    width: 16px !important;
+    height: 16px !important;
+}
+
+/* Lo spacer (per voci senza icona) deve matchare la nuova width icona per
+   allineare il testo come le voci con icona */
+.layout-sidebar .sidebar-link .sidebar-link__icon-spacer {
+    width: 16px !important;
+}
+
+/* Sidebar collapsed: tolgo padding orizzontale sul sidebar-link (px-4 dell'SFC
+   sarebbe 32px totali, più della larghezza interna della sidebar stretta) e
+   rimuovo il testo dal flex (opacity-0 lo nasconde ma occupa ancora spazio,
+   spingendo fuori l'icona). Così l'icona è visibile e centrata. */
+.layout-sidebar:not(.layout-sidebar--expanded) .sidebar-link {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    justify-content: center !important;
+}
+
+.layout-sidebar:not(.layout-sidebar--expanded) .sidebar-link .sidebar-link__text {
+    display: none !important;
+}
+
+/* Logo sidebar: override difensivo contro la rule `&.app-logo{opacity-0}` dell'SFC
+   (selettore compound buggato nel codice originale che in certi build di Tailwind
+   potrebbe venire interpretato come descendant e nascondere il logo).
+   Più: max-width 100% per farlo scalare nella sidebar più stretta.
+   Il `w-40` nel template darebbe 160px che overflowerebbe il container (padding). */
+.layout-sidebar .logo-container .app-logo {
+    opacity: 1 !important;
+    position: relative !important;
+    left: auto !important;
+    transform: none !important;
+    visibility: visible !important;
+    max-width: 100% !important;
+    height: auto !important;
+}
+
+/* Logo-container: padding verticale 0 (così il centro del logo coincide con il
+   centro del toggle a Y = --py + --logo-h/2) + padding orizzontale per staccare
+   il logo dai bordi della sidebar. Altezza fissa = --logo-h. */
+.layout-sidebar .logo-container {
+    padding: 0 !important;
+    height: var(--logo-h) !important;
+}
+
+.layout-sidebar.layout-sidebar--expanded .logo-container {
+    padding: 0 12px !important;
+    height: var(--logo-h) !important;
+}

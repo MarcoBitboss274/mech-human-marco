@@ -291,7 +291,7 @@ const cancelQuote = () => {
                 <div class="operation-quotes__card-header">
                     <h3 class="operation-quotes__card-title">{{ t('Preventivo') }} {{ quote.id }}</h3>
                     <div class="operation-quotes__actions">
-                        <BbButton v-if="can('operations.quote.manage')" size="xs" icon="pencil" @click="openModal(quote)">
+                        <BbButton v-if="can('operations.quote.manage')" size="xs" icon="pencil_line" @click="openModal(quote)">
                             {{ t('Modifica') }}
                         </BbButton>
                         <BbButton

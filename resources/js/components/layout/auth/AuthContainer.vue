@@ -2,7 +2,7 @@
     <div class="auth-container" :class="{ 'auth-container--no-illustration': !illustration }">
         <div class="left-panel">
             <slot name="panel:left">
-                <BaseButton class="home-btn" href="/"><AppLogo stacked /><span class="home-btn__label">{{ t('Vai alla home') }}</span></BaseButton>
+                <BaseButton class="home-btn" href="/"><AppLogo auth /><span class="home-btn__label">{{ t('Vai alla home') }}</span></BaseButton>
             </slot>
         </div>
         <main class="right-panel">

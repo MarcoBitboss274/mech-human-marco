@@ -92,7 +92,7 @@
                             <div class="flex gap-x-2">
                                 <BbButton
                                     v-if="item.id !== currentUser.id && canInWorkspace('workspace.building.members.edit')"
-                                    icon="pencil"
+                                    icon="pencil_line"
                                     size="xs"
                                     @click="openEditMemberModal(item)"
                                 >
@@ -146,7 +146,7 @@
                                 <div class="flex gap-x-2">
                                     <BbButton
                                         v-if="canInWorkspace('workspace.building.addresses.manage')"
-                                        icon="pencil"
+                                        icon="pencil_line"
                                         size="xs"
                                         @click="openAddressModal(item)"
                                     >

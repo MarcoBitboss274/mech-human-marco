@@ -38,7 +38,7 @@
                         <template #no-data>{{ t('Nessun utente trovato') }}</template>
                         <template #actions="{ item }">
                             <div class="flex gap-x-2">
-                                <BbButton icon="pencil" size="xs" @click="editModal = true">{{ t('Modifica') }}</BbButton>
+                                <BbButton icon="pencil_line" size="xs" @click="editModal = true">{{ t('Modifica') }}</BbButton>
                             </div>
                         </template>
                     </BbTable>
@@ -56,7 +56,7 @@
                         <template #no-data>{{ t('Nessun utente trovato') }}</template>
                         <template #actions="{ item }">
                             <div class="flex gap-x-2">
-                                <BbButton icon="pencil" size="xs" @click="editModal = true">{{ t('Modifica') }}</BbButton>
+                                <BbButton icon="pencil_line" size="xs" @click="editModal = true">{{ t('Modifica') }}</BbButton>
                             </div>
                         </template>
                     </BbTable>

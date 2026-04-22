@@ -3,7 +3,7 @@
         <SidebarToggle :aria-label="`${open ? t('Chiudi') : t('Espandi')} sidebar`" :open="open" @click="uiStore.toggleSidebar" />
         <BaseButton :aria-label="t('Vai alla homepage')" :href="route('home')" @click="onLinkClick">
             <div class="logo-container">
-                <AppLogo :stacked="!open" :class="open ? 'w-40' : 'w-8'" />
+                <AppLogo :black="open" :compressed="!open" :class="open ? 'w-40' : 'w-8'" />
             </div>
         </BaseButton>
         <div class="layout-sidebar__content" @click="onContentClick">

@@ -35,7 +35,7 @@ watch(status, (s) => {
     <Head :title="t('Verifica la tua email')" />
     <AuthContainer>
         <div>
-            <BaseButton class="home-btn" href="/"> <AppLogo class="w-40" /><span class="home-btn__label">{{ t('Vai alla home') }}</span> </BaseButton>
+            <BaseButton class="home-btn" href="/"> <AppLogo auth class="w-40" /><span class="home-btn__label">{{ t('Vai alla home') }}</span> </BaseButton>
 
             <h1 class="right-panel__title">
                 {{ t('Hai quasi finito!') }} <br />

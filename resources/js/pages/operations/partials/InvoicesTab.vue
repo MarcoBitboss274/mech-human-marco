@@ -212,7 +212,7 @@ const saveStatus = () => {
                 <div class="operation-invoices__card-header">
                     <h3 class="operation-invoices__card-title">{{ t('Fattura') }} {{ invoice.code ?? `#${invoice.id}` }}</h3>
                     <div class="operation-invoices__actions">
-                        <BbButton v-if="can('operations.invoice.manage')" size="xs" icon="pencil" @click="openModal(invoice)">
+                        <BbButton v-if="can('operations.invoice.manage')" size="xs" icon="pencil_line" @click="openModal(invoice)">
                             {{ t('Modifica') }}
                         </BbButton>
                         <BbButton
