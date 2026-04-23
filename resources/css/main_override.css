@@ -576,6 +576,15 @@ html body .prescription-details-card .rounded-md.border.whitespace-nowrap {
     line-height: 16px !important;
 }
 
+/* Tab Fornitore: la card del fornitore selezionato deve restare bianca con
+   bordo grigio (come le altre, nessun highlight verde). La SFC applica
+   `border-emerald-200 bg-emerald-50` su `.operation-suppliers__card--selected`
+   (SuppliersTab.vue:290); li annullo con i valori dello state di default. */
+.operation-suppliers__card--selected {
+    background-color: #fff !important;
+    border-color: rgb(229 231 235) !important;
+}
+
 /* Alert di errore degli input (bb-base-input): piccolo padding-top per staccarli
    dall'input sopra. Applicato all'item singolo dell'errore. */
 .bb-base-input-container__error {
@@ -622,6 +631,19 @@ html body .prescription-details-card .rounded-md.border.whitespace-nowrap {
     background-color: #fff !important;
     border-color: #fff !important;
     color: #000 !important;
+}
+
+/* Hint: compattare spazio verticale title↔message (i `<p>` ricevono residui
+   di margin dall'UA/preflight). Message in grigio chiaro invece che bianco
+   per gerarchia visiva (title resta bianco pieno). */
+.operation-notice__item--hint .operation-notice__hint-title,
+.operation-notice__item--hint .operation-notice__hint-message {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+.operation-notice__item--hint .operation-notice__hint-message {
+    color: #b8bdc1 !important;
 }
 
 /* Meno padding verticale all'inizio delle pagine (24→16px top, 40→24px bottom) */

@@ -5,6 +5,26 @@ Ogni voce rappresenta una singola richiesta di Marco.
 
 ---
 
+### [2026-04-23] — Entity show (Quotes/Prescriptions/Invoices): wrapper come card — REVERTITO
+
+**Richiesta:** "nelle pagine di dettaglio entità, gli elementi quotes-show__details, prescriptions-show__details, invoices-show__details siano in formato card con border grigio leggero" → subito dopo: "no ripristina come prima"
+
+**File modificati:**
+- `resources/css/main_override.css` — aggiunta regola su `.quotes-show__details, .prescriptions-show__details, .invoices-show__details` con border `var(--bb-border-light)` + radius `var(--bb-radius)` + bg panel + padding 16px, poi **rimossa su richiesta di Marco**.
+
+**Note:** Nessuna variazione netta nel file. Stato finale: i 3 wrapper mantengono lo stile originale delle SFC (`@apply py-4` e nient'altro). Log tenuto per tracciabilità del tentativo.
+
+### [2026-04-23] — OperationNotice hint: meno spazio title↔message + message grigio
+
+**Richiesta:** "Prendi i operation-notice__item operation-notice__item--hint: 1. Riduci spazio verticale che separa operation-notice__hint-title e operation-notice__hint-message. Rendi il operation-notice__hint-message di un grigino e non bianco."
+
+**File modificati:**
+- `resources/css/main_override.css`:
+  - `.operation-notice__item--hint .operation-notice__hint-title, …__hint-message { margin-top/bottom: 0 !important }` — azzera il margin residuo sui `<p>` (la SFC ha solo `mt-1` sul message, ma i `<p>` ricevono comunque margin dall'UA se il preflight di Tailwind non li neutralizza nel contesto scoped).
+  - `.operation-notice__item--hint .operation-notice__hint-message { color: #b8bdc1 !important }` — grigio chiaro invece di bianco; vince sulla regola precedente che imponeva `#fff` a title+message+icon (source order, entrambi `!important`).
+
+**Note:** Il title resta bianco pieno per gerarchia visiva. Hex `#b8bdc1` scelto per contrasto sufficiente sul bg `#24282a` (~4.5:1) senza competere con il title.
+
 ### [2026-04-23] — Fix scroll fantasma ~50px su tutte le pagine
 
 **Richiesta:** "perché la pagina mi scrolla in basso anche se non c'è contenuto. Lo stesso avviene in tutte le altre pagine"
@@ -428,5 +448,14 @@ Ogni voce rappresenta una singola richiesta di Marco.
 - **Eccezione mai usata**: main.css NON è stato modificato nella versione finale (c'era una modifica temporanea `15→14px` su body, ripristinata quando l'utente ha chiarito che tutto deve stare in `_override`).
 - **Root cause del bug 2-colonne wizard**: la regola `theming.css:356` applica `grid md:grid-cols-2` solo se c'è antenato `.admin-form`. I componenti step (`ProtrusorStep.vue`, `LybraAlignerStep.vue`, ecc.) hanno solo `<div class="admin-form__grid">` senza wrapper → la regola non matchava → block flow → 1 colonna. Fix: forzare `display: grid + grid-template-columns` sull'elemento direttamente.
 - **Design system**: tutti i valori in px usati sono pari (2, 4, 8, 12, 16, 20, 24, 32, 80, 880, 1040, 1120, 1440).
+
+### [2026-04-23] — Tab Fornitore: card del fornitore selezionato resta bianca con bordo grigio
+
+**Richiesta:** "Devi fare in modo che la card di un fornitore scelto sia comunque bianca con bordo grigino."
+
+**File modificati:**
+- `resources/css/main_override.css` — aggiunta regola `.operation-suppliers__card--selected { background-color: #fff !important; border-color: rgb(229 231 235) !important }` → annulla il `border-emerald-200 bg-emerald-50` applicato dalla SFC `SuppliersTab.vue:290` allo stato `--selected` e ripristina lo stesso look dello stato di default (`bg-white + border-gray-200`).
+
+**Note:** `rgb(229 231 235)` = Tailwind `gray-200`, stesso colore dello stato non selezionato. La classe `--selected` viene applicata via `:class` conditional in SFC riga 147 quando `supplier.pivot?.selected`: lasciata invariata (logica di selezione preservata, solo l'aspetto visivo è neutralizzato).
 
 <!-- Le voci vengono aggiunte qui dalla skill Gestione_UI -->
