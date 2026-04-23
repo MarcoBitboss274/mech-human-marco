@@ -5,6 +5,97 @@ Ogni voce rappresenta una singola richiesta di Marco.
 
 ---
 
+### [2026-04-23] — Fix scroll fantasma ~50px su tutte le pagine
+
+**Richiesta:** "perché la pagina mi scrolla in basso anche se non c'è contenuto. Lo stesso avviene in tutte le altre pagine"
+
+**File modificati:**
+- `resources/css/main_override.css` — aggiunto `.default-layout__page-container { min-height: calc(100dvh - var(--topbar-h)) !important }`
+
+**Note:** Causa: la SFC `DefaultLayout.vue:54-55` mette `min-height: 100dvh` sul page-container, ma il container sta già in una riga `1fr` del grid `auto+1fr` sotto la topbar da 50px. Risultato: `50px topbar + 100dvh container = 100dvh + 50px` → scroll di ~50px anche su pagine vuote. Fix: sottrarre `--topbar-h` al `min-height`.
+
+### [2026-04-23] — Topbar: esperimento bg bianco + sticky, ripristinato
+
+**Richiesta:** "rendi la topbar con bg bianco" → "ripristinala grigia. inoltre deve essere sticky" → "no non deve essere sticky"
+
+**File modificati:**
+- `resources/css/main_override.css` — bg topbar sperimentato `var(--bb-panel)` e `position: sticky`, poi ripristinato stato precedente (`color-mix(in sRGB, var(--bb-panel) 96%, var(--bb-text))`, no sticky).
+
+**Note:** Nessuna variazione netta nel file. Loggo solo per tracciabilità dei tentativi.
+
+### [2026-04-23] — Pagina /profile: layout restretto, card senza border/ombra, dropzone ridotto
+
+**Richiesta:** sequenza di richieste su /profile: "Rimuovi border e ombre dalle card" → "applica gli stessi margin top delle pagine dettaglio lavorazione" → "1 solo select per linea, allinea tutto sull'asse verticale, riduci dropzone" → "restringere ulteriormente il contenuto"
+
+**File modificati:**
+- `resources/css/main_override.css`:
+  - `.profile-view { margin-top: 32px !important; max-width: 480px !important }` (allineato a `.admin-view:has(> .mx-auto.max-w-7xl)` e `.admin-view.boxed`; era `max-w-3xl` = 768px).
+  - `.profile-view .card { border: none !important; box-shadow: none !important; padding: 0 !important; margin-left/right: 0 !important }` (rimossi border/shadow del CardContainer + tolto `mx-auto` per left-align).
+  - `.profile-view .form-grid { grid-template-columns: 1fr !important }` (sovrascrive `md:grid-cols-2` → 1 campo per riga).
+  - `.profile-view .propic-container { justify-content: flex-start !important; margin-bottom: 0 !important }` (era `justify-center`, ora left-aligned).
+  - `.profile-view .propic-container .bb-dropzone { border-width: 2px !important }` (era `border-4` = 4px).
+  - `.profile-view .dropzone__inner-container { width/height: 96px !important }` (era 160×160).
+
+**Note:** Tutti i valori rispettano la regola design-system (pari in px): 32, 480, 96, 2.
+
+### [2026-04-23] — Status badge-edit select: border più chiaro
+
+**Richiesta:** "rendi meno opaco il border del badge status dei dettagli delle lavorazioni del bb-base-input-outer-container bb-select operation-status-badge-edit__select"
+
+**File modificati:**
+- `resources/css/main_override.css` — aggiunta regola con specificità `html body .bb-base-input-outer-container.bb-select.operation-status-badge-edit__select` che forza `border-color: var(--bb-border-light)` su `.bb-base-input-container__input`, `.bb-common-input-outer-container`, `.bb-common-input-inner-container`.
+
+### [2026-04-23] — Operation production labels: ritorno a 12px
+
+**Richiesta:** "ripristina a 12 i testi degli operation-production__label"
+
+**File modificati:**
+- `resources/css/main_override.css` — `.operation-production__content .operation-production__label { font-size: 12px; line-height: 16px }` (era 14/20).
+
+**Note:** 12 e 16 entrambi pari, coerenti col design system.
+
+### [2026-04-23] — PrescriptionDetailsCard: rimozione ombra (più iterazioni)
+
+**Richiesta:** "Rimuovi l'ombra da prescription-details-card. Deve avere solo border sottile." → "l'ombra c'è ancora" → "l'ombra c'è ancora"
+
+**File modificati:**
+- `resources/css/main_override.css` — regola evoluta in 3 step:
+  1. `.prescription-details-card { box-shadow: none !important }` (generalizzata da `.operations-show__details-main .prescription-details-card` pre-esistente).
+  2. Aggiunti reset di tutte le `--tw-shadow*` custom properties + `filter: none` (Tailwind v4 compila `shadow-sm` via CSS vars).
+  3. Specificità alzata a `html body .prescription-details-card, html body .prescription-details-card *` (0,1,2) per vincere su Tailwind v4 layer cascade.
+
+**Note:** Il border-gray-200 del SFC resta. Gli step 2-3 sono stati necessari perché Tailwind v4 mette le utility in `@layer utilities` e la compilazione di `@apply shadow-sm` passa dalle var `--tw-shadow*` — un semplice `box-shadow: none !important` può essere "riattivato" dalle vars se ridefinite altrove.
+
+### [2026-04-23] — InvoicesTab: button "Elimina" trigger come secondary (CSS-only)
+
+**Richiesta:** "nelle operation-invoices__list l'azione di elimina deve essere un secondary button" → successiva correzione di Marco: "avresti dovuto modificare solo i file css _override".
+
+**File modificati:**
+- `resources/js/pages/operations/partials/InvoicesTab.vue` — **[VIOLAZIONE SKILL, poi revertita]** inizialmente avevo cambiato `variant="danger"` → `"secondary"` sul BbButton trigger del BbPopover di conferma (linea 229). Marco ha corretto: anche i cambi di `variant` puramente estetici vanno fatti in CSS. **Revert eseguito al valore originale (`variant="danger"`)**.
+- `resources/css/main_override.css` — aggiunto override CSS equivalente: `.operation-invoices__actions .bb-button.bb-button--danger:not(.base-btn--disabled)` → `--color: transparent`, `--border-color: var(--color-mix-200)`, `--text-color: var(--bb-text)` + hover su `var(--color-mix-200)`. Il button di conferma interno al popover è teleportato a body e NON viene colpito → mantiene il danger.
+
+**Note:** Lezione registrata in memoria utente (`feedback_solo_override_no_codice.md`): cambi di `variant`/`size` puramente estetici vanno in override CSS, non nel template Vue. Vue si tocca solo per vere modifiche strutturali/funzionali.
+
+### [2026-04-23] — OperationProgress: giallo → blu primario
+
+**Richiesta:** "rendi l'operation-progress e sostituisci il giallo con il blu primario" → "non è vero è ancora gialla"
+
+**File modificati:**
+- `resources/css/main_override.css`:
+  - `.operation-progress__line--completed`, `.operation-progress__circle--completed`, `.operation-progress__dot--completed` → `var(--bb-primary)` (sostituisce `bg-amber-400`/`border-amber-400` della SFC).
+  - `.operation-progress__circle--current` e `.operation-progress__dot--current` già usavano `var(--bb-primary)`: invariato.
+
+**Note:** L'utente inizialmente non vedeva la differenza per cache HMR/browser; dopo reload il blu è visibile. Tutti i 5 step del wizard (linea + cerchio + dot) usano ora il blu primario del brand.
+
+### [2026-04-23] — OperationNotice hint: colore scuro anziché nero puro
+
+**Richiesta:** "prendi class='operation-notice__item operation-notice__item--hint' e rendili del colore scuro dei title ma non nero nero" → follow-up: "rendilo un pizzico più scuro"
+
+**File modificati:**
+- `resources/css/main_override.css` — `.operation-notice__item--hint` `background-color` e `border-color` da `#000` a `#24282a` (partendo da `#313638`, poi scurito di un pizzico su richiesta di Marco)
+
+**Note:** Colore hardcoded per coerenza con gli altri override della stessa regola. Il testo interno resta `#fff` e il button interno mantiene `bg #fff` / `color #000`.
+
 ### [2026-04-22] — Applicazione tema da theme builder interno
 
 **Richiesta:** Implementare snippet `:root` generato dal theme builder interno con variabili `bb` per colori, sizing input, button, form controls e table.
@@ -270,5 +361,72 @@ Ogni voce rappresenta una singola richiesta di Marco.
 5. Voci sidebar: icone più piccole ma centrate col testo (flex `items-center`).
 6. Titoli di pagina (`h1` con `text-3xl`/`text-4xl` in auth/index): font leggermente più piccoli.
 7. Pagination: tondini più piccoli (22px), cerchio perfetto, numero 12px.
+
+### [2026-04-23] — Sessione consolidata: auth gradient, OperationNotice, wizard /operations/create, tab Prescrizione, body 14px, badge opacity, pagine Show
+
+**Richieste (in ordine cronologico):**
+1. Auth: ripristinare animazione gradient left-panel.
+2. OperationNotice `--hint`: card nera (poi grigio-scuro) con testi bianchi e button bianco/testo nero.
+3. Flusso /operations/create: allineare `page__title` al `mx-auto max-w-7xl` sotto.
+4. Restringere flusso /operations/create + margin laterali.
+5. Margin verticale tra fieldset/bb-base-input/bb-select/bb-textarea nel wizard.
+6. Margin-top su `.admin-view` del flusso create.
+7. Più margin-top + restringimento ulteriore wizard.
+8. Linea separatrice sotto `admin-view__header` del flusso.
+9. Forzare 2 colonne sul grid (root cause: `.admin-form .admin-form__grid` richiede wrapper `.admin-form`, assente nei componenti step).
+10. `my-2` (ProtrusorStep): 2 sezioni testo+input sulla stessa riga; campo Note sempre full-width.
+11. Odontogramma full-width.
+12. Tab Prescrizione: rimossa ombra `.prescription-details-card`.
+13. Font-size 14px su `__value` e simili.
+14. Label production-content 12px.
+15. Body 14px (inizialmente modificato main.css, poi ripristinato e forzato via main_override.css).
+16. Border badge meno opachi (`color-mix` su currentColor 30%).
+17. Fieldset radio full-width nel wizard.
+18. Pagine dettaglio: margin-top + margin laterali + width 80%.
+19. Buildings Show: tab equal-width.
+20. Tab bar: linea indicatore da 5 → 2px.
+21. Prescription details card: padding section 24, gap field 2, linea divisoria con inset laterale, header flex con border-bottom.
+22. Tab prescrizione: column-gap 32px tra main e aside.
+
+**File modificati:**
+
+- `resources/css/main_override.css`:
+  - **Body font-size 14px !important** (difensivo contro il `15px` di `main.css:48`).
+  - **Auth gradient animato** ridichiarato con `animation: gradientAnimationOverride 20s linear infinite !important` + `@keyframes` locali (robustezza contro ordine di caricamento Vite vs SFC).
+  - **OperationNotice `--hint`**: card `#313638` con testo/icona bianchi, button bianco con testo nero (hover incluso).
+  - **Flusso /operations/create** (scoped via `.admin-view:has(> .mx-auto.max-w-7xl)`):
+    - Margin-top 32px + max-width 880px + mx-auto su header + container.
+    - Border-bottom 1px su header + padding-bottom 16px.
+    - Margin verticale 8px top/bottom su fieldset, bb-base-input-outer-container, bb-select, bb-textarea.
+    - `display: grid !important` + `repeat(2, 1fr)` + gap 16px su `.admin-form__grid` (fix per i componenti step che non hanno `.admin-form` come wrapper).
+    - `.my-2` con `grid-auto-flow: column` + `grid-template-rows: auto auto` → 2 sezioni side-by-side.
+    - `.bb-textarea` + `.odontogram-input` → `grid-column: 1 / -1`.
+    - `fieldset` → `grid-column: 1 / -1` + `grid-template-columns: 1fr` (radio in 1 colonna).
+  - **Pagine Show** (buildings, prescriptions, quotes, productions, invoices + operations):
+    - Operations Show (`admin-view.boxed`): margin-top 32 + max-width 1120.
+    - Gli altri 5 (via `:has(> .{resource}-show__content)`): margin-top 32 + width 80% + mx-auto + box-sizing border-box.
+    - `{resource}-show__label` → font-size 12px, line-height 16px.
+    - `{resource}-show__details-item` → gap 2px.
+    - Buildings Show tab: grid con `grid-auto-columns: 1fr` → tab equal-width.
+  - **Tab Prescrizione** (operations Show):
+    - `.operations-show__details-grid` column-gap 32px.
+    - `.prescription-details-card` box-shadow none.
+    - `.prescription-details-card__section` padding 24 + border-b sostituito da `::after` absolute con `left: 24; right: 24` (linea rientrata).
+    - `.prescription-details-card__field` gap 2px.
+    - Header flex (title + StatusBadge): padding-bottom 4 + margin-bottom 20 + border-bottom 1px.
+    - `__value` 14px, `__label` 12px (entrambi con `html body` per massima specificità).
+    - Badge custom (pattern `rounded-md.border.whitespace-nowrap`) dentro la card: 12px + padding 2px/8px.
+  - **Badge in generale**: border-color `color-mix(in srgb, currentColor 30%, transparent)` su `.rounded-md.border.whitespace-nowrap` → bordo faded con tinta del testo.
+  - **Tab bar**: `.bb-tab__label-container::before` height 2px (horizontal) / width 2px (vertical) — da 5px originali.
+  - **Tab Lavorazioni**: `.operation-production__content .operation-production__label` → font 12/16.
+  - **Alert error input**: `.bb-base-input-container__error` padding-top 4px.
+
+- `resources/css/main.css`: **nessuna modifica finale** (modifica intermedia a `font-size: 14` ripristinata a `15` — override gestito solo in main_override.css).
+
+**Note:**
+- **Sessione non loggata per turno** — l'utente ha segnalato che avrei dovuto aggiornare il log man mano; questa entry consolida tutte le modifiche della giornata.
+- **Eccezione mai usata**: main.css NON è stato modificato nella versione finale (c'era una modifica temporanea `15→14px` su body, ripristinata quando l'utente ha chiarito che tutto deve stare in `_override`).
+- **Root cause del bug 2-colonne wizard**: la regola `theming.css:356` applica `grid md:grid-cols-2` solo se c'è antenato `.admin-form`. I componenti step (`ProtrusorStep.vue`, `LybraAlignerStep.vue`, ecc.) hanno solo `<div class="admin-form__grid">` senza wrapper → la regola non matchava → block flow → 1 colonna. Fix: forzare `display: grid + grid-template-columns` sull'elemento direttamente.
+- **Design system**: tutti i valori in px usati sono pari (2, 4, 8, 12, 16, 20, 24, 32, 80, 880, 1040, 1120, 1440).
 
 <!-- Le voci vengono aggiunte qui dalla skill Gestione_UI -->
