@@ -5,6 +5,106 @@ Ogni voce rappresenta una singola richiesta di Marco.
 
 ---
 
+### [2026-04-23] — Dialog: Password 2-col, Aggiungi indirizzo switch allineato, larghezza globale -10%
+
+**Richiesta:**
+1. "Nei dialog 'Modifica utente' devi disporre gli input Password e Conferma password allineati in due colonne sulla stessa linea."
+2. "In generale nei dialog 'Aggiungi indirizzo' allinea il toggle default all'input del campo 'Paese'."
+3. "Restringi la larghezza di tutti i dialog della piattaforma in tutte le aree del 10%."
+
+**File modificati:**
+- `resources/css/main_override.css`:
+  - **(1) Password + Conferma password 2-col**: `.bb-dialog fieldset > form { grid-column: 1 / -1 !important; display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 16px !important }`. Il fieldset "Cambio password" in [users/partials/Form.vue](resources/js/pages/users/partials/Form.vue#L292) annida un `<form>` nested con i 2 BbTextInput impilati. Forzo `<form>` a span 2 col del fieldset + grid 2-col interno così i 2 input vanno side-by-side. Scopato a `fieldset > form` — in Form.vue è l'unico fieldset che annida un form (gli altri hanno div o campi diretti).
+  - **(2) Switch Default allineato a Paese**: `.bb-dialog .admin-form__grid > .bb-switch { align-self: end !important }`. In [buildings/partials/AddressForm.vue](resources/js/pages/buildings/partials/AddressForm.vue#L91-L92) (e la gemella workspace) la row 3 ha Paese (BbTextInput, label stacked) + Default (BbSwitch, label inline) — senza `align-self` lo switch si posizionerebbe in alto. Con `end` scende a filo col bordo inferiore dell'input. Scopato a `.bb-switch` in admin-form__grid dentro dialog: in Form.vue utenti gli switch sono in righe solo-switch (Attivo+Email verificata), quindi end/start sono equivalenti visivamente.
+  - **(3) Dialog -10%**: override via attribute selector `[style*="…px"]` sui 3 size map dati da BbDialog (sm=384 / md=652 / lg=896, mappati in `bitboss-ui/dist/index25.js:134`). Nuovi valori arrotondati al pari più vicino: sm 346px, md 586px, lg 806px.
+
+**Note:**
+- BbDialog applica `max-width` inline su `.bb-base-dialog__panel` via `style="max-width: …px"`. Uso attribute selector perché CSS non può leggere valori inline per derivare calcoli; gli 3 size predefiniti coprono tutti gli usi attuali (grep conferma: solo sm/md/lg nel codice, nessun size numerico custom).
+- Valori in px tutti pari: 16, 346, 586, 806 — rispetta il design system.
+
+### [2026-04-23] — /users dialog Aggiungi utente: pulizia visiva "Relazioni strutture" (linee + full-width + righe su 2 colonne)
+
+**Richieste:**
+1. "nella pagina /users, nel dialog Aggiungi utente, nel fieldset con 'Relazioni strutture' devi fare in modo di rimuovere la linea di separazione sopra il div class='space-y-3'."
+2. "Ottimo, rimuovi anche quella sotto."
+3. "ora devi fare in modo che la sezione 'Relazioni strutture', ovvero il class='space-y-3', occupi l'intera linea a due colonne del dialog e non sia solo una colonna del dialog."
+4. "Innanzitutto devi ripristinare la linea orizzontale di fianco a 'Relazioni strutture'. Per quanto riguarda il contenuto dei vari 'flex flex-wrap items-end gap-2 border-t border-gray-200 pt-2 dark:border-gray-700' dentro la sezione Relazioni strutture: Devi fare in modo che il select 'Aggiungi struttura' occupi una colonna del dialog e che il select Ruolo + il pulsante Aggiungi/rimuovi occupino un altra colonna (in due)"
+
+**File modificati:**
+- `resources/css/main_override.css` — stato finale dopo le 4 iterazioni:
+  - **Linea sopra (legend::after)**: inizialmente rimossa con `display: none`, poi **ripristinata** nell'iterazione 4 eliminando la regola. Ora usa il default di [theming.css:368](resources/css/theming.css#L368) (h-px flex-auto bg-current a destra del testo legend).
+  - **Linea sotto** (tra l'elenco relazioni e la riga "Aggiungi struttura"): `.bb-dialog fieldset > .space-y-3 > div:last-child { border-top: 0 !important; padding-top: 0 !important }`. Azzera il `border-t border-gray-200 pt-2` applicato dalla SFC [users/partials/Form.vue](resources/js/pages/users/partials/Form.vue#L229) all'ultimo figlio di `.space-y-3`. Mantenuta.
+  - **Full-width su 2 colonne**: `.bb-dialog fieldset > .space-y-3 { grid-column: 1 / -1 !important }`. Il fieldset è `display: grid` con `grid-template-columns: inherit` (2 cols dal parent `.admin-form__grid`, vedi [theming.css:361](resources/css/theming.css#L361)), quindi `.space-y-3` come grid item diretto occupava solo 1 colonna.
+  - **Layout righe 2-colonne**: `.bb-dialog fieldset > .space-y-3 > div.flex.flex-wrap.items-end.gap-2:has(> :nth-child(3))` riportata a `flex-wrap: nowrap` + `gap: 16px`. Figli: 1° = `flex: 0 0 calc(50% - 8px)` (col 1), 2° = `flex: 1 1 auto` (col 2 shared), 3° = `flex: 0 0 auto` (button natural width). Il `:has(> :nth-child(3))` esclude le righe a 2 figli del fieldset gemello "Strutture gestite" (solo Select + Button / TextInput + Button). Gap 16px coerente con `.admin-form__grid` così i bordi delle colonne interne si allineano a quelli del dialog.
+
+**Note:**
+- Scopo `.bb-dialog` + pattern strutturale `.space-y-3` (grep conferma che è presente solo in users/Form.vue).
+- Le righe target sono: `<div v-for="...rel">` per le relazioni esistenti (3 figli: Struttura+Ruolo+Rimuovi) + `<div class="...border-t...">` per la riga "Aggiungi struttura" (3 figli: Aggiungi struttura+Ruolo+Aggiungi). Tutte e due coerenti visivamente.
+- Il fieldset gemello "Strutture gestite" ha 2 figli per riga → non toccato dal selettore `:has(> :nth-child(3))`.
+- Valori in px tutti pari (8, 16), coerenti con il design system.
+
+### [2026-04-23] — Pagina /create-building: margin-top sul contenuto + titolo left-aligned
+
+**Richieste:**
+1. "Devi fare in modo di aggiungere margin top al contenuto della pagina /create-building"
+2. "Il titolo non deve essere centrato ma allineato a sinistra"
+
+**File modificati:**
+- `resources/css/main_override.css`:
+  - Aggiunta regola `.default-layout__page-container > div:has(> .mx-auto.max-w-2xl > form.admin-form) { margin-top: 32px !important }`. La SFC [workspace/CreateBuilding.vue](resources/js/pages/workspace/CreateBuilding.vue) ha un wrapper `<div>` senza classi, quindi il selettore si aggancia via `:has()` al suo figlio caratteristico (`.mx-auto.max-w-2xl > form.admin-form`) — pattern unico di questa pagina (grep su `max-w-2xl` conferma: solo CreateBuilding + Dashboard, e Dashboard non ha `form.admin-form`). Stile puro → niente Vue, solo CSS.
+  - Aggiunta regola follow-up `… > h1.text-center { text-align: left !important }` → sovrascrive il `text-center` Tailwind sull'h1 della pagina senza toccare la Vue.
+
+**Note:** 32px allineato alle altre pagine con margin-top (`.admin-view.boxed`, `.admin-view:has(> .mx-auto.max-w-7xl)`, `.profile-view`). Valore pari, rispetta il design system.
+
+### [2026-04-23] — Parità Admin↔Workspace — Fix follow-up: ops Show workspace troppo stretto
+
+**Richiesta:** "No attenzione: nel dettaglio della lavorazione hai ristretto troppo! Deve essere come è nell'area Admin!"
+
+**File modificati:**
+- `resources/css/main_override.css` — regola `.workspace-view:has(.operation-progress)`:
+  - `max-width: 1120px` → **1280px** (= `max-w-7xl` di Tailwind, default di `.workspace-view.boxed` in theming.css:398).
+  - Aggiunto `width: 100% !important` per parità con `.admin-view.boxed` che riceve `w-full` dal theming (in precedenza il mio override workspace non aveva width esplicita, risultando più stretto visivamente in alcuni contesti).
+
+**Note:** Il valore 1120 era il risultato di una mia mia assunzione che bisognasse replicare `.admin-view.boxed` che nel mio override precedente narrowava `max-w-7xl` (1280) → 1120. Marco ha confermato che visivamente l'area admin appare più larga, quindi riporto workspace al max-w-7xl originale (1280). Se opportuno in futuro anche admin potrebbe essere riportato a 1280 per uniformità, ma Marco non l'ha chiesto.
+
+### [2026-04-23] — Parità Admin↔Workspace — Follow-up: ops Show + building Show
+
+**Richiesta:** "1. Nei dettagli di una Lavorazione /workspace/.../operations/... devi applicare i margin o la larghezza del contenuto principale della pagina, top e laterali adeguati come hai usato nell'area admin. 2. Nei dettagli della struttura /workspace/.... devi applicare i margin o la larghezza del contenuto principale della pagina, top e laterali adeguati come hai usato nel dettaglio struttura nell'area admin."
+
+**File modificati:**
+- `resources/css/main_override.css`:
+  - **Building Show workspace**: aggiunto `.workspace-view:has(> .buildings-show__content)` al gruppo esistente `margin-top 32px + width 80%` (la SFC [workspace/building/Index.vue](resources/js/pages/workspace/building/Index.vue) usa `.workspace-view` + figlio `.buildings-show__content`, stesso pattern delle altre show admin).
+  - **Operations Show workspace**: nuova regola `.workspace-view:has(.operation-progress) { margin-top: 32px; max-width: 1120px; margin-left/right: auto }`. Replica le metriche di `.admin-view.boxed`. Il selettore `:has(.operation-progress)` identifica la Show perché il componente `OperationProgress` è renderizzato solo in [workspace/operations/Show.vue](resources/js/pages/workspace/operations/Show.vue) (confermato: grep su `workspace/operations/`). Soluzione pulita senza toccare il template Vue. **→ valore successivamente portato a 1280px, vedi voce successiva.**
+
+**Note:** Nel round precedente avevo consapevolmente escluso `.admin-view.boxed` dall'estensione (niente marker equivalente in workspace). Qui lo riprendo usando un marker alternativo affidabile (`.operation-progress`) al posto del class name sul wrapper. Per `.buildings-show__content` invece era un mio oversight — il pattern c'era già e andava incluso nel gruppo.
+
+### [2026-04-23] — Parità di stile Admin ↔ Workspace: estensione selettori
+
+**Richiesta:** "applica tutte le modifiche di stile anche alle altre aree. Devi essere sicuro di applicare stessi margin, padding, font size, color e logiche che hai applicato nelle varie pagine dell'area admin anche nelle pagine dell'area workspace."
+
+**Audit preliminare (nessuna modifica qui, solo diagnosi):**
+- **Layout workspace**: [`layouts/workspace/WorkspaceHeaderLayout.vue`](resources/js/layouts/workspace/WorkspaceHeaderLayout.vue) usa le stesse identiche classi della versione admin (`.default-layout`, `.layout-sidebar`, `.layout-topbar`, `.default-layout__page-container`). Anche i componenti `components/layout/workspace/{LayoutSidebar,TopbarDefault}.vue` usano le stesse BEM di base. → **Tutti gli override di layout già coprono entrambe le aree senza modifiche**.
+- **Wrapper pagine**: admin usa `.admin-view` / `.admin-view__header` / `.admin-view.boxed`. Workspace usa `.workspace-view` / `.workspace-view__header`, **MA** non esiste `.workspace-view.boxed`.
+- **Profile workspace**: usa `.profile-view` identico → già coperto.
+- **Componenti riusati** (classi condivise Admin↔Workspace): `.page__title`, `.page__subtitle`, `.prescription-details-card`, `.operation-progress__*`, `.operation-invoices__*`, `.operation-production__*`, `.operation-notice__*`, `.operation-status-badge-edit*`, tutte le `.bb-*`. → **Già coperti**.
+
+**File modificati:**
+- `resources/css/main_override.css` — **esteso** (selector expansion, non duplicato) i blocchi di regole scoped ad `.admin-view` aggiungendo `.workspace-view` come selettore gemello. Operazioni concrete:
+  - **Filtri Index (5/riga, gap 8px)**: `.admin-view > .flex.flex-wrap.items-end` → aggiunto `.workspace-view > …` (tre regole separate: wrapper, `.bb-base-input-outer-container`, `.bb-button`).
+  - **Header gap ridotto**: `.admin-view__header .flex.flex-wrap.items-center.gap-4` → aggiunto `.workspace-view__header …`.
+  - **Wizard container 880px + margin-top 32px**: `.admin-view:has(> .mx-auto.max-w-7xl)` → aggiunto `.workspace-view:has(…)` con relative figlie `__header` e `.mx-auto.max-w-7xl`. **Applica a `workspace/operations/Edit.vue`**.
+  - **Wizard header separator**: `.admin-view:has(…) > .admin-view__header` → aggiunto `.workspace-view:has(…) > .workspace-view__header`.
+  - **Wizard field spacing** (`fieldset/bb-base-input-outer-container/bb-select/bb-textarea`): esteso a `.workspace-view:has(…)`.
+  - **admin-form__grid 2 colonne + `.my-2` + `.bb-textarea/odontogram-input` full-width + `fieldset` full-width**: esteso a `.workspace-view:has(…) .admin-form__grid`.
+  - **Tab bar spacing (mt-4 → 4px)**: `.admin-view > .mt-4:has(> .bb-tab)` → aggiunto `.workspace-view > …`.
+  - **Index pages Show (margin-top 32px, width 80%, center)**: `.admin-view:has(> .{resource}-show__content)` → aggiunti i 3 casi workspace (`.workspace-view:has(> .quotes-show__content|.prescriptions-show__content|.invoices-show__content)`). I workspace ops Show non hanno wrapper show-content dedicato → rimane fuori (stesso comportamento che avrebbe un admin-view senza boxed).
+  - **Label filtri Index** (`.bb-base-input-container__label`): esteso a `.workspace-view > .flex.flex-wrap.items-end …`.
+
+**Non esteso (deliberatamente):**
+- `.admin-view.boxed` → la pagina workspace `operations/Show.vue` non ha alcun marker di classe equivalente a `.boxed`, e `.workspace-view` è usato uniformemente su Index/Show/Create. Estendere indiscriminatamente metterebbe 32px margin-top e cap 1120px anche sugli Index workspace, comportamento non desiderato. Se Marco vuole il boxed anche su workspace Show, serve prima un marker (es. aggiungere `.boxed` al template Vue — eccezione skill — oppure un selettore `:has()` più specifico).
+
+**Note:** Preferita expansion del selettore (`.admin-view, .workspace-view { … }`) invece della duplicazione dei blocchi, per avere una sola source of truth da mantenere quando cambia lo stile.
+
 ### [2026-04-23] — Entity show (Quotes/Prescriptions/Invoices): wrapper come card — REVERTITO
 
 **Richiesta:** "nelle pagine di dettaglio entità, gli elementi quotes-show__details, prescriptions-show__details, invoices-show__details siano in formato card con border grigio leggero" → subito dopo: "no ripristina come prima"

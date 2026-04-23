@@ -183,19 +183,22 @@ body {
    Icon button (Pulisci) mantiene dimensione naturale.
    ════════════════════════════════════════════════════════════════════════════ */
 
-.admin-view > .flex.flex-wrap.items-end {
+.admin-view > .flex.flex-wrap.items-end,
+.workspace-view > .flex.flex-wrap.items-end {
     flex-wrap: wrap !important;
     gap: 8px !important;
 }
 
-.admin-view > .flex.flex-wrap.items-end > .bb-base-input-outer-container {
+.admin-view > .flex.flex-wrap.items-end > .bb-base-input-outer-container,
+.workspace-view > .flex.flex-wrap.items-end > .bb-base-input-outer-container {
     flex: 0 0 calc((100% - 32px) / 5) !important;
     min-width: 0 !important;
     width: auto !important;
     max-width: none !important;
 }
 
-.admin-view > .flex.flex-wrap.items-end > .bb-button {
+.admin-view > .flex.flex-wrap.items-end > .bb-button,
+.workspace-view > .flex.flex-wrap.items-end > .bb-button {
     flex: 0 0 auto !important;
 }
 
@@ -322,7 +325,8 @@ html body .bb-base-input-outer-container.bb-select.operation-status-badge-edit__
 }
 
 /* Gap tra h1 e status badge/canceled/archived ridotto (era gap-4 = 16px) */
-.admin-view__header .flex.flex-wrap.items-center.gap-4 {
+.admin-view__header .flex.flex-wrap.items-center.gap-4,
+.workspace-view__header .flex.flex-wrap.items-center.gap-4 {
     gap: 8px !important;
 }
 
@@ -336,12 +340,15 @@ html body .bb-base-input-outer-container.bb-select.operation-status-badge-edit__
    toccate. 1040 è pari (rispetta il design system).
    ════════════════════════════════════════════════════════════════════════════ */
 
-.admin-view:has(> .mx-auto.max-w-7xl) {
+.admin-view:has(> .mx-auto.max-w-7xl),
+.workspace-view:has(> .mx-auto.max-w-7xl) {
     margin-top: 32px !important;
 }
 
 .admin-view:has(> .mx-auto.max-w-7xl) > .admin-view__header,
-.admin-view:has(> .mx-auto.max-w-7xl) > .mx-auto.max-w-7xl {
+.admin-view:has(> .mx-auto.max-w-7xl) > .mx-auto.max-w-7xl,
+.workspace-view:has(> .mx-auto.max-w-7xl) > .workspace-view__header,
+.workspace-view:has(> .mx-auto.max-w-7xl) > .mx-auto.max-w-7xl {
     width: 100% !important;
     max-width: 880px !important;
     margin-left: auto !important;
@@ -350,7 +357,8 @@ html body .bb-base-input-outer-container.bb-select.operation-status-badge-edit__
 
 /* Linea di separazione sotto l'header (page__title + back button) per staccare
    visivamente dal wizard sotto. padding-bottom per aria tra titolo e linea. */
-.admin-view:has(> .mx-auto.max-w-7xl) > .admin-view__header {
+.admin-view:has(> .mx-auto.max-w-7xl) > .admin-view__header,
+.workspace-view:has(> .mx-auto.max-w-7xl) > .workspace-view__header {
     padding-bottom: 16px !important;
     border-bottom: 1px solid var(--bb-border-light) !important;
 }
@@ -359,7 +367,8 @@ html body .bb-base-input-outer-container.bb-select.operation-status-badge-edit__
    bb-select / bb-textarea ottengono margin verticale aggiuntivo per non
    sembrare appiccicati. I field sono in admin-form__grid con gap-4 (16px):
    +8px top +8px bottom = 32px effettivi fra righe (16 margin + 16 gap). */
-.admin-view:has(> .mx-auto.max-w-7xl) :is(fieldset, .bb-base-input-outer-container, .bb-select, .bb-textarea) {
+.admin-view:has(> .mx-auto.max-w-7xl) :is(fieldset, .bb-base-input-outer-container, .bb-select, .bb-textarea),
+.workspace-view:has(> .mx-auto.max-w-7xl) :is(fieldset, .bb-base-input-outer-container, .bb-select, .bb-textarea) {
     margin-top: 8px !important;
     margin-bottom: 8px !important;
 }
@@ -373,7 +382,8 @@ html body .bb-base-input-outer-container.bb-select.operation-status-badge-edit__
    fallback block flow (1 colonna).
    FIX: forzo `display: grid` + 2 colonne + gap direttamente sull'elemento,
    a prescindere dal wrapper. */
-.admin-view:has(> .mx-auto.max-w-7xl) .admin-form__grid {
+.admin-view:has(> .mx-auto.max-w-7xl) .admin-form__grid,
+.workspace-view:has(> .mx-auto.max-w-7xl) .admin-form__grid {
     display: grid !important;
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     gap: 16px !important;
@@ -385,7 +395,8 @@ html body .bb-base-input-outer-container.bb-select.operation-status-badge-edit__
    (text1, input1, text2, input2) si dispongono column-first:
    col 1 = text1 / input1 ; col 2 = text2 / input2 → le 2 sezioni stanno
    finalmente sulla stessa riga del parent. */
-.admin-view:has(> .mx-auto.max-w-7xl) .admin-form__grid > .my-2 {
+.admin-view:has(> .mx-auto.max-w-7xl) .admin-form__grid > .my-2,
+.workspace-view:has(> .mx-auto.max-w-7xl) .admin-form__grid > .my-2 {
     grid-column: 1 / -1 !important;
     display: grid !important;
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
@@ -399,7 +410,9 @@ html body .bb-base-input-outer-container.bb-select.operation-status-badge-edit__
 /* BbTextarea (es. campo Note) + OdontogramInput nel wizard: sempre full-width,
    1 riga intera del grid. */
 .admin-view:has(> .mx-auto.max-w-7xl) .admin-form__grid > .bb-textarea,
-.admin-view:has(> .mx-auto.max-w-7xl) .admin-form__grid > .odontogram-input {
+.admin-view:has(> .mx-auto.max-w-7xl) .admin-form__grid > .odontogram-input,
+.workspace-view:has(> .mx-auto.max-w-7xl) .admin-form__grid > .bb-textarea,
+.workspace-view:has(> .mx-auto.max-w-7xl) .admin-form__grid > .odontogram-input {
     grid-column: 1 / -1 !important;
 }
 
@@ -423,13 +436,33 @@ html body .bb-base-input-outer-container.bb-select.operation-status-badge-edit__
 .admin-view:has(> .prescriptions-show__content),
 .admin-view:has(> .quotes-show__content),
 .admin-view:has(> .productions-show__content),
-.admin-view:has(> .invoices-show__content) {
+.admin-view:has(> .invoices-show__content),
+.workspace-view:has(> .buildings-show__content),
+.workspace-view:has(> .prescriptions-show__content),
+.workspace-view:has(> .quotes-show__content),
+.workspace-view:has(> .invoices-show__content) {
     margin-top: 32px !important;
     width: 80% !important;
     max-width: none !important;
     margin-left: auto !important;
     margin-right: auto !important;
     box-sizing: border-box !important;
+}
+
+/* Workspace operations Show (/workspace/{slug}/operations/{id}): usa solo
+   `.workspace-view` senza marker `.boxed` come la controparte admin. Lo
+   identifico via `:has(.operation-progress)` — il componente OperationProgress
+   è renderizzato SOLO nella pagina Show (confermato: grep su workspace/operations/).
+   Marco ha detto che 1120px era "ristretto troppo" rispetto ad admin: passo a
+   1280px (Tailwind `max-w-7xl` — default di `.workspace-view.boxed` in
+   theming.css:398). `width: 100%` esplicito per parità con `.admin-view.boxed`
+   che ha `w-full` dal theming. */
+.workspace-view:has(.operation-progress) {
+    margin-top: 32px !important;
+    width: 100% !important;
+    max-width: 1280px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
 }
 
 /* Detail show pages (buildings/prescriptions/quotes/productions/invoices):
@@ -519,7 +552,8 @@ html body .bb-base-input-outer-container.bb-select.operation-status-badge-edit__
    (stack verticale) — sovrascrivo anche `grid-template-columns` per i casi
    in cui la SFC è avvolta in `.admin-form` (che in theming.css:360 imposta
    `grid-template-columns: inherit` → 2 cols ereditate dal padre). */
-.admin-view:has(> .mx-auto.max-w-7xl) .admin-form__grid > fieldset {
+.admin-view:has(> .mx-auto.max-w-7xl) .admin-form__grid > fieldset,
+.workspace-view:has(> .mx-auto.max-w-7xl) .admin-form__grid > fieldset {
     grid-column: 1 / -1 !important;
     grid-template-columns: 1fr !important;
 }
@@ -683,7 +717,8 @@ html body .prescription-details-card .rounded-md.border.whitespace-nowrap {
 
 /* Tab bar attaccate all'elemento sopra: `.admin-view > .mt-4` (wrapper della
    BbTab) di default ha margin-top 16px. Riduco a 4px. */
-.admin-view > .mt-4:has(> .bb-tab) {
+.admin-view > .mt-4:has(> .bb-tab),
+.workspace-view > .mt-4:has(> .bb-tab) {
     margin-top: 4px !important;
 }
 
@@ -912,6 +947,7 @@ html body .prescription-details-card .rounded-md.border.whitespace-nowrap {
 
 /* Label filtri + header colonne: grigio scuro, weight regular, 14px, padding coerente */
 .admin-view > .flex.flex-wrap.items-end .bb-base-input-container__label,
+.workspace-view > .flex.flex-wrap.items-end .bb-base-input-container__label,
 .bb-table .bb-table-header,
 .bb-table thead > tr > th {
     color: var(--color-mix-700) !important;
@@ -1047,6 +1083,125 @@ html body .prescription-details-card .rounded-md.border.whitespace-nowrap {
 .profile-view .dropzone__inner-container {
     width: 96px !important;
     height: 96px !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   DIALOG /users — fieldset "Relazioni strutture" (Form.vue del dialog
+   Aggiungi/Modifica utente).
+   - `.space-y-3` full-width sulle 2 colonne del dialog (il fieldset eredita
+     `grid-template-columns` dal parent `.admin-form__grid` via theming.css:361,
+     quindi senza `grid-column: 1 / -1` `.space-y-3` occuperebbe solo 1 colonna).
+   - Linea orizzontale sopra il contenuto (`legend::after`) RIPRISTINATA: non
+     sovrascritta qui — usa il default theming.css:368.
+   - Linea inferiore (`border-t` sull'ultimo figlio, riga "Aggiungi struttura")
+     rimossa: `border-top: 0` + `padding-top: 0`.
+   - Layout righe: col 1 = primo input, col 2 = Ruolo select + button. Scopato
+     alle righe con 3+ figli via `:has(> :nth-child(3))` per NON toccare il
+     fieldset gemello "Strutture gestite" (che ha righe a 2 figli).
+   ════════════════════════════════════════════════════════════════════════════ */
+.bb-dialog fieldset > .space-y-3 {
+    grid-column: 1 / -1 !important;
+}
+
+.bb-dialog fieldset > .space-y-3 > div:last-child {
+    border-top: 0 !important;
+    padding-top: 0 !important;
+}
+
+/* Riga 3-colonne (Struttura input + Ruolo select + button) → layout 2 colonne
+   allineate al grid del dialog: item1 riempie col 1, item2+item3 si dividono
+   col 2 (item2 flex-grow, item3 natural width). `:has(> :nth-child(3))`
+   esclude le righe a 2 figli del fieldset "Strutture gestite". */
+.bb-dialog fieldset > .space-y-3 > div.flex.flex-wrap.items-end.gap-2:has(> :nth-child(3)) {
+    flex-wrap: nowrap !important;
+    gap: 16px !important;
+}
+
+.bb-dialog fieldset > .space-y-3 > div.flex.flex-wrap.items-end.gap-2:has(> :nth-child(3)) > *:first-child {
+    flex: 0 0 calc(50% - 8px) !important;
+    min-width: 0 !important;
+    width: auto !important;
+    max-width: none !important;
+}
+
+.bb-dialog fieldset > .space-y-3 > div.flex.flex-wrap.items-end.gap-2:has(> :nth-child(3)) > *:nth-child(2) {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    width: auto !important;
+    max-width: none !important;
+}
+
+.bb-dialog fieldset > .space-y-3 > div.flex.flex-wrap.items-end.gap-2:has(> :nth-child(3)) > *:nth-child(3) {
+    flex: 0 0 auto !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   DIALOG "Modifica utente" — Password + Conferma password affiancate in 2 col.
+   Il fieldset "Cambio password" contiene un `<form>` nested con i 2 BbTextInput
+   impilati verticalmente. Forzo il `<form>` a spanning 2 col del fieldset
+   (grid-column: 1 / -1) e a sua volta a grid 2-col, così i 2 input vanno sulla
+   stessa riga. Scopato a `.bb-dialog fieldset > form` — in Form.vue è l'unico
+   fieldset che annida un `<form>` (gli altri hanno div o campi diretti).
+   ════════════════════════════════════════════════════════════════════════════ */
+.bb-dialog fieldset > form {
+    grid-column: 1 / -1 !important;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 16px !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   DIALOG "Aggiungi indirizzo" — allinea BbSwitch "Default" al BbTextInput
+   "Paese" (stessa riga del grid). Il switch ha container più corto del text
+   input (label inline vs stacked), quindi senza align-self verrebbe posizionato
+   in alto. Con `align-self: end` scende a filo col bordo inferiore dell'input.
+   Scopato a `.bb-dialog .admin-form__grid > .bb-switch`: si applica anche ad
+   altri dialog con switch in admin-form__grid (es. Form.vue utenti), ma gli
+   switch lì sono in righe solo-switch, quindi end/start sono equivalenti.
+   ════════════════════════════════════════════════════════════════════════════ */
+.bb-dialog .admin-form__grid > .bb-switch {
+    align-self: end !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   DIALOGS — larghezza ridotta del 10% (applicata a tutti i BbDialog).
+   BbDialog imposta `max-width` inline su `.bb-base-dialog__panel` in base al
+   prop `size` (sm=384, md=652, lg=896 — vedi bitboss-ui/dist/index25.js:134).
+   Override via attribute selector su `[style*="…px"]` per ciascun size; il
+   valore è il 90% arrotondato al pari più vicino (design system).
+   - sm: 384 → 346 (384*0.9 = 345.6 → pari sup 346)
+   - md: 652 → 586 (652*0.9 = 586.8 → pari inf 586)
+   - lg: 896 → 806 (896*0.9 = 806.4 → pari inf 806)
+   ════════════════════════════════════════════════════════════════════════════ */
+.bb-base-dialog__panel[style*="384px"] {
+    max-width: 346px !important;
+}
+
+.bb-base-dialog__panel[style*="652px"] {
+    max-width: 586px !important;
+}
+
+.bb-base-dialog__panel[style*="896px"] {
+    max-width: 806px !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   PAGINA /create-building (workspace) — margin-top sul contenuto.
+   La SFC workspace/CreateBuilding.vue ha un wrapper <div> senza classi con
+   al suo interno <h1> + `<div class="mx-auto max-w-2xl"><form class="admin-form">`.
+   Aggancio via :has() sul figlio diretto di `.default-layout__page-container`
+   per evitare di toccare la Vue (stile puro → solo CSS). Selettore unico alla
+   pagina (nessun'altra pagina ha `.mx-auto.max-w-2xl > form.admin-form`).
+   32px coerente con le altre pagine che usano margin-top (`.profile-view`,
+   `.admin-view.boxed`, `.admin-view:has(> .mx-auto.max-w-7xl)`).
+   ════════════════════════════════════════════════════════════════════════════ */
+.default-layout__page-container > div:has(> .mx-auto.max-w-2xl > form.admin-form) {
+    margin-top: 32px !important;
+}
+
+/* Titolo della pagina allineato a sinistra (la SFC ha `text-center` sull'h1). */
+.default-layout__page-container > div:has(> .mx-auto.max-w-2xl > form.admin-form) > h1.text-center {
+    text-align: left !important;
 }
 
 /* ════════════════════════════════════════════════════════════════════════════
