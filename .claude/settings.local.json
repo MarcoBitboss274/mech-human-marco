@@ -1,0 +1,47 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(*)",
+      "Read(*)",
+      "Glob(*)",
+      "Grep(*)",
+      "mcp__laravel-boost__application-info",
+      "Skill(pianifica-da-specifiche)",
+      "Skill(pianifica-da-specifiche:*)",
+      "Skill(clean-code)",
+      "Skill(clean-code:*)",
+      "Skill(crea-specifiche)",
+      "Skill(crea-specifiche:*)",
+      "Skill(review-frontend)",
+      "Skill(review-frontend:*)",
+      "Skill(review-feature)",
+      "Skill(review-feature:*)",
+      "mcp__playwright__browser_resize",
+      "mcp__playwright__browser_navigate",
+      "mcp__playwright__browser_fill_form",
+      "mcp__playwright__browser_click",
+      "mcp__playwright__browser_take_screenshot",
+      "mcp__playwright__browser_evaluate",
+      "mcp__playwright__browser_close",
+      "WebFetch(domain:developer.vimeo.com)"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./secrets/**)"
+    ],
+    "ask": [
+      "Bash(rm -rf:*)",
+      "Bash(rm -r:*)",
+      "Bash(git push --force:*)",
+      "Bash(git push -f:*)",
+      "Bash(git reset --hard:*)",
+      "Bash(git clean -fd:*)"
+    ],
+    "defaultMode": "acceptEdits"
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "laravel-boost"
+  ]
+}
