@@ -44,6 +44,7 @@ export type OperationForm = {
 
 export type OperationCreateWizardForm = {
     draft: boolean;
+    submit_revision: boolean;
     building_id: number | null;
     user_id: number | null;
     typology: string | null;

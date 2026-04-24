@@ -56,6 +56,7 @@ class UpdateOperationWithPrescriptionRequest extends FormRequest
 
         $rules = [
             'draft' => 'sometimes|boolean',
+            'submit_revision' => 'sometimes|boolean',
             'building_id' => 'required|integer|exists:buildings,id',
             'user_id' => 'nullable|integer|exists:users,id',
             'typology' => ['required', 'string', Rule::in(PrescriptionTypologyEnum::toArray())],
@@ -120,8 +121,13 @@ class UpdateOperationWithPrescriptionRequest extends FormRequest
                 return;
             }
 
-            if ($latestPrescription->status !== PrescriptionStatusEnum::DRAFT->value) {
-                $validator->errors()->add('operation', 'Only draft prescriptions can be edited from the wizard.');
+            $editableStatuses = [
+                PrescriptionStatusEnum::DRAFT->value,
+                PrescriptionStatusEnum::IN_REVIEW->value,
+            ];
+
+            if (! in_array($latestPrescription->status, $editableStatuses, true)) {
+                $validator->errors()->add('operation', 'Only draft or in-review prescriptions can be edited from the wizard.');
             }
         });
     }

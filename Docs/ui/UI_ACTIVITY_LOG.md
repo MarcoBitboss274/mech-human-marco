@@ -1,5 +1,21 @@
 # UI Activity Log
 
+## 2026-04-24 — Revisione prescrizione: wizard edit per stato `in_review`
+
+- `pages/operations/Create.vue` (admin) e `pages/workspace/operations/Edit.vue` (workspace): titolo pagina e bottone di submit finale condizionali sullo stato della prescrizione editata. In "revision mode" (prop `wizard.prescriptionStatus === 'in_review'`): titolo → "Revisiona prescrizione", bottone finale → "Invia revisione". Altrimenti copy invariato.
+- Il submit del wizard in revision mode invia `submit_revision: true` al backend, che dopo aver salvato i campi chiama `PrescriptionService::sendPrescription` per portare la prescrizione da `IN_REVIEW` a `REVISED`. Stato operation non toccato, `expire_at` invariato. Il "Salva bozza" in revision mode non fa sendPrescription (rimane IN_REVIEW).
+- `types/Operation.ts`: aggiunto `submit_revision: boolean` a `OperationCreateWizardForm`.
+- Nessuna modifica CSS: stessa struttura/classi del wizard create.
+
+## 2026-04-24 — Revisione prescrizione: stati, badge, dialog motivo, banner workspace
+
+- `components/prescriptions/PrescriptionStatusBadge.vue`: aggiunti due nuovi stati — `in_review` (classi `!bg-orange-200 border-orange-500 !text-orange-700`, label "In revisione") e `revised` (classi `!bg-sky-200 border-sky-500 !text-sky-700`, label "Revisionata").
+- `pages/operations/partials/PrescriptionTab.vue` (admin): rimosso il bottone "Resetta" (e relativo handler). Aggiunti bottoni condizionali: "Modifica" ora visibile anche per `in_review` (oltre a `draft`), "Invia revisione" per `in_review` (submit diretto senza dialog — l'admin è operatore interno, non firma disclaimer legale), "Conferma presa in carico" per `sent`/`revised`, "Richiedi revisione" (`variant="outline"`) per `sent`/`revised`/`confirmed`. Nuovo `BbDialog` "Richiedi revisione al customer" con `BbTextarea` motivo (validazione 5–2000 caratteri) + contatore `text-xs text-gray-500`. Nuova card "Motivo della revisione" (`.operations-show__revision-card`, border/bg arancio) mostrata per `in_review`/`revised` quando `latest_revision_reason` è presente.
+- `pages/workspace/operations/partials/PrescriptionTab.vue` (workspace/customer): aggiunti banner "Revisione richiesta" (`.operations-show__revision-banner`, arancio) per `in_review` con testo del motivo + hint; messaggio informativo "Prescrizione revisionata inviata, in attesa di conferma" (`.operations-show__revision-info`, azzurro) per `revised`. Bottone "Modifica" ora visibile anche per `in_review`; nuovo bottone "Invia revisione" (riusa il dialog Disclaimer esistente) per `in_review`.
+- `components/activity/ActivitySlider.vue`: label rivisti — ora la sidebar preferisce `description` (testo umano già salvato dai log di revisione) e ha mappa fallback per gli event `prescription_revision_requested` / `prescription_resubmitted` / `prescription_confirmed`.
+- Tutte le classi sono locali ai tre SFC (namespace `.operations-show__*`). Valori in pixel pari (`p-4` 16px, `mt-2` 8px, `gap-2` 8px).
+- Nessuna modifica a `base.css` / `main.css` / `theming.css`.
+
 ## 2026-04-24 — Tab Panoramica: redirect inline sul titolo di sezione
 
 - `components/operations/overview/OverviewSection.vue`: rimosso il footer con bottone "Vai a [Tab]"; il redirect è ora un `BbButton icon="arrow-right" size="xs"` (stesso stile dei pulsanti icon-only Archivia/Cancella/Riattiva della lista operazioni: quadrato, colore primario `--bb-primary`) accostato a destra del titolo (gap `8px`). L'icona interna (`.bb-button__icon`) viene ruotata `-45deg` via CSS per ottenere la freccia obliqua verso l'alto-destra. Emit `go-to` al click; stato disabled ereditato da BbButton. Solo il button è cliccabile: il titolo resta testo statico.

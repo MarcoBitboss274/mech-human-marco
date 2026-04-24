@@ -20,6 +20,8 @@ const classes = computed(() => ({
     '!text-xl': props.size === 'xl',
     '!bg-gray-200 border-gray-500 !text-gray-700': props.status === 'draft',
     '!bg-blue-200 border-blue-500 !text-blue-700': props.status === 'sent',
+    '!bg-orange-200 border-orange-500 !text-orange-700': props.status === 'in_review',
+    '!bg-sky-200 border-sky-500 !text-sky-700': props.status === 'revised',
     '!bg-green-200 border-green-500 !text-green-700': props.status === 'confirmed',
 }));
 
@@ -29,6 +31,10 @@ const text = computed(() => {
             return t('Bozza');
         case 'sent':
             return t('Inviata');
+        case 'in_review':
+            return t('In revisione');
+        case 'revised':
+            return t('Revisionata');
         case 'confirmed':
             return t('Confermata');
         default:

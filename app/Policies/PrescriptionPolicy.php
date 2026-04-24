@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Enums\PrescriptionStatusEnum;
 use App\Models\Prescription;
 use App\Models\User;
 
@@ -44,6 +45,10 @@ class PrescriptionPolicy
      */
     public function delete(User $user, Prescription $model): bool
     {
+        if ($model->status !== PrescriptionStatusEnum::DRAFT->value) {
+            return false;
+        }
+
         return $user->can('prescriptions.destroy');
     }
 

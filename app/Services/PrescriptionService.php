@@ -5,15 +5,20 @@ namespace App\Services;
 use App\Enums\OperationStatusEnum;
 use App\Enums\PrescriptionStatusEnum;
 use App\Enums\PrescriptionTypologyEnum;
+use App\Models\Operation;
 use App\Models\Prescription;
+use App\Models\User;
+use App\Notifications\Admin\ResubmittedPrescriptionForAdmin;
 use App\Notifications\Admin\SendPrescriptionForAdmin;
 use App\Notifications\Agent\SendPrescriptionForAgent;
+use App\Notifications\User\RequestPrescriptionRevisionForUser;
 use App\Notifications\User\SendPrescriptionForUser;
 use App\Services\NotificationService;
 use App\Services\OperationService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Spatie\Activitylog\Models\Activity;
 
 class PrescriptionService extends ModelService
 {
@@ -76,13 +81,27 @@ class PrescriptionService extends ModelService
     }
 
     /**
-     * Mark prescription as sent.
+     * Mark prescription as sent (from DRAFT) or as revised (resubmit from IN_REVIEW).
      */
-    public static function sendPrescription(Prescription $prescription): void
+    public static function sendPrescription(Prescription $prescription, ?User $causer = null): void
     {
         if (! static::validatePrescription($prescription)) {
             throw ValidationException::withMessages([
                 'prescription' => 'Prescrizione non valida, verificare tutti i campi',
+            ]);
+        }
+
+        $currentStatus = $prescription->status;
+
+        if ($currentStatus === PrescriptionStatusEnum::IN_REVIEW->value) {
+            static::resubmitRevision($prescription, $causer);
+
+            return;
+        }
+
+        if ($currentStatus !== PrescriptionStatusEnum::DRAFT->value) {
+            throw ValidationException::withMessages([
+                'prescription' => 'Stato della prescrizione non valido per l\'invio',
             ]);
         }
 
@@ -102,29 +121,162 @@ class PrescriptionService extends ModelService
     }
 
     /**
-     * Mark prescription as confirmed.
+     * Mark prescription as confirmed (only from SENT or REVISED).
      */
-    public static function confirmPrescription(Prescription $prescription): void
+    public static function confirmPrescription(Prescription $prescription, ?User $causer = null): void
     {
+        $allowed = [
+            PrescriptionStatusEnum::SENT->value,
+            PrescriptionStatusEnum::REVISED->value,
+        ];
+
+        if (! in_array($prescription->status, $allowed, true)) {
+            throw ValidationException::withMessages([
+                'prescription' => 'Impossibile confermare: la prescrizione non è in uno stato conferma-abile',
+            ]);
+        }
+
         $prescription->update([
             'status' => PrescriptionStatusEnum::CONFIRMED->value,
         ]);
 
         OperationService::updateStatus($prescription->operation, OperationStatusEnum::IN_PROGRESS->value);
+
+        static::logOnOperation(
+            $prescription,
+            'prescription_confirmed',
+            ['prescription_id' => $prescription->id],
+            static::causerName($causer) . ' ha confermato la prescrizione',
+            $causer,
+        );
     }
 
     /**
-     * Reset prescription status to draft.
+     * Request a revision (from SENT / CONFIRMED / REVISED).
      */
-    public static function resetPrescription(Prescription $prescription): void
+    public static function requestRevision(Prescription $prescription, string $reason, ?User $causer = null): void
     {
+        $allowed = [
+            PrescriptionStatusEnum::SENT->value,
+            PrescriptionStatusEnum::CONFIRMED->value,
+            PrescriptionStatusEnum::REVISED->value,
+        ];
+
+        if (! in_array($prescription->status, $allowed, true)) {
+            throw ValidationException::withMessages([
+                'prescription' => 'La prescrizione non è in uno stato che consente la richiesta di revisione',
+            ]);
+        }
+
+        $fromStatus = $prescription->status;
+
         $prescription->update([
-            'status' => PrescriptionStatusEnum::DRAFT->value,
-            'send_at' => null,
-            'expire_at' => null,
+            'status' => PrescriptionStatusEnum::IN_REVIEW->value,
         ]);
 
-        OperationService::updateStatus($prescription->operation, OperationStatusEnum::DRAFT->value);
+        static::logOnOperation(
+            $prescription,
+            'prescription_revision_requested',
+            [
+                'prescription_id' => $prescription->id,
+                'reason' => $reason,
+                'from_status' => $fromStatus,
+            ],
+            static::causerName($causer) . ' ha richiesto una revisione: ' . $reason,
+            $causer,
+        );
+
+        NotificationService::sendToUser(
+            $prescription->user,
+            new RequestPrescriptionRevisionForUser($prescription, $reason),
+        );
+    }
+
+    /**
+     * Resubmit a revised prescription (IN_REVIEW -> REVISED). Internal.
+     */
+    protected static function resubmitRevision(Prescription $prescription, ?User $causer = null): void
+    {
+        $prescription->update([
+            'status' => PrescriptionStatusEnum::REVISED->value,
+            'send_at' => now(),
+        ]);
+
+        $revisionNumber = static::countRevisionRequests($prescription);
+
+        static::logOnOperation(
+            $prescription,
+            'prescription_resubmitted',
+            [
+                'prescription_id' => $prescription->id,
+                'revision_number' => $revisionNumber,
+            ],
+            static::causerName($causer) . ' ha reinviato la prescrizione revisionata (revisione #' . $revisionNumber . ')',
+            $causer,
+        );
+
+        NotificationService::sendToAdmins(new ResubmittedPrescriptionForAdmin($prescription, $revisionNumber));
+    }
+
+    /**
+     * Log an activity event on the prescription's operation.
+     *
+     * @param  array<string, mixed>  $properties
+     */
+    protected static function logOnOperation(
+        Prescription $prescription,
+        string $event,
+        array $properties,
+        string $description,
+        ?User $causer,
+    ): void {
+        $operation = $prescription->operation;
+
+        if ($operation === null) {
+            return;
+        }
+
+        $logger = activity()
+            ->performedOn($operation)
+            ->withProperties($properties)
+            ->event($event);
+
+        if ($causer !== null) {
+            $logger->causedBy($causer);
+        }
+
+        $logger->log($description);
+    }
+
+    /**
+     * Count revision requests logged so far for this prescription.
+     */
+    protected static function countRevisionRequests(Prescription $prescription): int
+    {
+        if ($prescription->operation_id === null) {
+            return 0;
+        }
+
+        return (int) Activity::query()
+            ->where('subject_type', Operation::class)
+            ->where('subject_id', $prescription->operation_id)
+            ->where('event', 'prescription_revision_requested')
+            ->where('properties->prescription_id', $prescription->id)
+            ->count();
+    }
+
+    /**
+     * Resolve causer full name for activity log description.
+     */
+    protected static function causerName(?User $causer): string
+    {
+        if ($causer === null) {
+            return 'Sistema';
+        }
+
+        $full = trim(($causer->name ?? '') . ' ' . ($causer->surname ?? ''));
+
+        return $full !== '' ? $full : 'Sistema';
     }
 
     /**

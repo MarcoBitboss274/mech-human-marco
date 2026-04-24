@@ -12,6 +12,8 @@ export type Prescription = {
     gender: string | null;
     send_at: string | null;
     expire_at: string | null;
+    confirmed_at: string | null;
+    latest_revision_reason: string | null;
     company_name: string | null;
     address: string | null;
     city: string | null;

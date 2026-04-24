@@ -56,8 +56,22 @@ const formatDateTime = (value: string) => {
     });
 };
 
+const eventLabels: Record<string, string> = {
+    prescription_revision_requested: 'Richiesta di revisione prescrizione',
+    prescription_resubmitted: 'Prescrizione revisionata reinviata',
+    prescription_confirmed: 'Prescrizione confermata',
+};
+
 const activityLabel = (activity: ActivityItem) => {
-    return activity.event ?? activity.description ?? '--';
+    if (activity.description && activity.description.trim() !== '') {
+        return activity.description;
+    }
+
+    if (activity.event && eventLabels[activity.event]) {
+        return eventLabels[activity.event];
+    }
+
+    return activity.event ?? '--';
 };
 
 const causerLabel = (activity: ActivityItem) => {

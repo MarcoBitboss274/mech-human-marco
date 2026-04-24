@@ -31,6 +31,7 @@ use App\Models\Quote;
 use App\Models\Supplier;
 use App\Policies\OperationChatPolicy;
 use App\Services\OperationService;
+use App\Services\PrescriptionService;
 use App\Services\UserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -86,6 +87,13 @@ class OperationController extends Controller
         Gate::authorize('managePrescription', $operation);
 
         OperationService::updateWithPrescription($operation, $request->validated());
+
+        if ($request->boolean('submit_revision')) {
+            $prescription = $operation->latestPrescription()->first();
+            if ($prescription !== null) {
+                PrescriptionService::sendPrescription($prescription, $request->user());
+            }
+        }
 
         return to_route('operations.show', ['operation' => $operation->id]);
     }

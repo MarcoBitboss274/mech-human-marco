@@ -212,13 +212,13 @@ class WorkspaceController extends Controller
     /**
      * Mark the workspace prescription as sent.
      */
-    public function prescriptionsSend(Building $building, Prescription $prescription)
+    public function prescriptionsSend(Request $request, Building $building, Prescription $prescription)
     {
         Gate::authorize('workspaceAbility', [$building, WorkspaceAbilityEnum::PRESCRIPTIONS_SEND->value]);
 
         abort_unless((int) $prescription->building_id === (int) $building->id, 404);
 
-        PrescriptionService::sendPrescription($prescription);
+        PrescriptionService::sendPrescription($prescription, $request->user());
 
         return back();
     }
@@ -457,6 +457,13 @@ class WorkspaceController extends Controller
         }
 
         OperationService::updateWithPrescription($operation, $validated);
+
+        if ($request->boolean('submit_revision')) {
+            $prescription = $operation->latestPrescription()->first();
+            if ($prescription !== null) {
+                PrescriptionService::sendPrescription($prescription, $request->user());
+            }
+        }
 
         return to_route('workspace.operations.show', [
             'building' => $building->slug,

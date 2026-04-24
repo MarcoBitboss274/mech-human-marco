@@ -1,7 +1,7 @@
 <template>
     <div v-if="latestPrescription" class="operations-show__details">
         <div class="operations-show__details-actions">
-            <BbButton v-if="latestPrescription.status === 'draft'" size="xs" icon="pencil" @click="openEditWizard">
+            <BbButton v-if="canEdit" size="xs" icon="pencil" @click="openEditWizard">
                 {{ t('Modifica') }}
             </BbButton>
             <BbButton
@@ -13,7 +13,39 @@
             >
                 {{ t('Invia prescrizione') }}
             </BbButton>
+            <BbButton
+                v-if="latestPrescription.status === 'in_review'"
+                append:icon="play"
+                size="xs"
+                :disabled="processing"
+                @click="openSubmitConfirmation"
+            >
+                {{ t('Invia revisione') }}
+            </BbButton>
         </div>
+
+        <div
+            v-if="latestPrescription.status === 'in_review' && latestPrescription.latest_revision_reason"
+            class="operations-show__revision-banner"
+        >
+            <p class="operations-show__revision-banner-title">
+                {{ t('Revisione richiesta dall\'amministrazione') }}
+            </p>
+            <p class="operations-show__revision-banner-text">
+                {{ latestPrescription.latest_revision_reason }}
+            </p>
+            <p class="operations-show__revision-banner-hint">
+                {{ t('Applica le modifiche richieste e reinvia la prescrizione.') }}
+            </p>
+        </div>
+
+        <div
+            v-if="latestPrescription.status === 'revised'"
+            class="operations-show__revision-info"
+        >
+            {{ t('Prescrizione revisionata inviata, in attesa di conferma.') }}
+        </div>
+
         <div class="operations-show__details-grid">
             <div class="operations-show__details-main">
                 <PrescriptionDetailsCard :prescription="latestPrescription" :operation="operation" />
@@ -82,6 +114,11 @@ const processing = ref(false);
 const confirmSubmitModal = ref(false);
 const legalConsentChecked = ref(false);
 
+const canEdit = computed(() => {
+    const status = latestPrescription.value?.status;
+    return status === 'draft' || status === 'in_review';
+});
+
 const openSubmitConfirmation = () => {
     if (processing.value) return;
 
@@ -118,6 +155,7 @@ const confirmAndSendPrescription = () => {
 
     closeSubmitConfirmation();
     processing.value = true;
+    const isRevision = latestPrescription.value.status === 'in_review';
     router.post(
         route('workspace.prescriptions.send', {
             building: workspace.value?.slug,
@@ -127,7 +165,7 @@ const confirmAndSendPrescription = () => {
         {
             preserveScroll: true,
             onSuccess: () => {
-                success('Prescrizione inviata con successo');
+                success(isRevision ? 'Prescrizione revisionata inviata correttamente' : 'Prescrizione inviata con successo');
                 emit('updated');
             },
             onError: (errors: Record<string, string>) => {
@@ -170,5 +208,25 @@ const confirmAndSendPrescription = () => {
 
 .operations-show__details-aside-title {
     @apply text-lg font-semibold text-gray-900;
+}
+
+.operations-show__revision-banner {
+    @apply mb-4 rounded-md border border-orange-400 bg-orange-50 p-4;
+}
+
+.operations-show__revision-banner-title {
+    @apply text-sm font-semibold text-orange-800;
+}
+
+.operations-show__revision-banner-text {
+    @apply mt-2 whitespace-pre-line text-sm text-orange-900;
+}
+
+.operations-show__revision-banner-hint {
+    @apply mt-2 text-xs text-orange-700;
+}
+
+.operations-show__revision-info {
+    @apply mb-4 rounded-md border border-sky-400 bg-sky-50 p-4 text-sm text-sky-800;
 }
 </style>

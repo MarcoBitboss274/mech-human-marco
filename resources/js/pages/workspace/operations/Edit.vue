@@ -1,7 +1,7 @@
 <template>
     <div class="workspace-view">
         <div class="workspace-view__header">
-            <h1 class="page__title">{{ isEditMode ? t('Modifica lavorazione') : t('Nuova lavorazione') }}</h1>
+            <h1 class="page__title">{{ pageTitle }}</h1>
             <BbButton icon="arrow-left" @click="router.get(route('workspace.operations.index', { building: workspace?.slug }))">{{
                 t('Torna alla lista')
             }}</BbButton>
@@ -229,7 +229,7 @@
                                 </div>
                                 <div class="admin-form__actions">
                                     <BbButton :loading="form.processing" @click="openSubmitConfirmation">
-                                        {{ isEditMode ? t('Salva lavorazione e prescrizione') : t('Crea lavorazione e prescrizione') }}
+                                        {{ submitButtonLabel }}
                                     </BbButton>
                                 </div>
                             </div>
@@ -320,6 +320,7 @@ type Props = {
         mode: 'create' | 'edit';
         operationId: number | null;
         prescriptionId: number | null;
+        prescriptionStatus?: string | null;
         initialForm: OperationCreateWizardForm | null;
         buildings: WizardBuilding[];
     };
@@ -351,6 +352,15 @@ const leaveConfirmModalOpen = ref(false);
 const allowNavigation = ref(false);
 const pendingNavigation = ref<null | (() => void)>(null);
 const isEditMode = computed(() => props.wizard.mode === 'edit' && props.wizard.operationId !== null);
+const isRevisionMode = computed(() => isEditMode.value && props.wizard.prescriptionStatus === 'in_review');
+const pageTitle = computed(() => {
+    if (isRevisionMode.value) return t('Revisiona prescrizione');
+    return isEditMode.value ? t('Modifica lavorazione') : t('Nuova lavorazione');
+});
+const submitButtonLabel = computed(() => {
+    if (isRevisionMode.value) return t('Invia revisione');
+    return isEditMode.value ? t('Salva lavorazione e prescrizione') : t('Crea lavorazione e prescrizione');
+});
 
 const { select: selectUsers } = useSelect('users');
 const { select: selectTypologies } = useSelect('prescription-typologies');
@@ -389,6 +399,7 @@ const shippingAddressError = ref<string | null>(null);
 
 const defaultForm = (): OperationCreateWizardForm => ({
     draft: false,
+    submit_revision: false,
     building_id: null,
     user_id: null,
     typology: null,
@@ -928,6 +939,7 @@ const { execute } = useAsyncFn(
 
         allowNavigation.value = true;
         form.draft = false;
+        form.submit_revision = isRevisionMode.value;
         const method = isEditMode.value ? 'put' : 'post';
         const targetRoute = isEditMode.value
             ? route('workspace.operations.update-wizard', { building: workspace.value?.slug, operation: props.wizard.operationId })
@@ -1035,6 +1047,7 @@ const { execute: saveDraft } = useAsyncFn(
 
         allowNavigation.value = true;
         form.draft = true;
+        form.submit_revision = false;
         const method = isEditMode.value ? 'put' : 'post';
         const targetRoute = isEditMode.value
             ? route('workspace.operations.update-wizard', { building: workspace.value?.slug, operation: props.wizard.operationId })

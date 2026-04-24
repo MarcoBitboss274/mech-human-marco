@@ -370,6 +370,59 @@ class OperationService extends ModelService
     public static function updateWithPrescription(Operation $operation, array $payload): void
     {
         DB::transaction(function () use ($operation, $payload) {
+            $latestPrescription = $operation->latestPrescription()->first();
+
+            if (! $latestPrescription) {
+                throw ValidationException::withMessages([
+                    'operation' => 'The selected operation has no linked prescription.',
+                ]);
+            }
+
+            $editableStatuses = [
+                PrescriptionStatusEnum::DRAFT->value,
+                PrescriptionStatusEnum::IN_REVIEW->value,
+            ];
+
+            if (! in_array($latestPrescription->status, $editableStatuses, true)) {
+                throw ValidationException::withMessages([
+                    'operation' => 'Only draft or in-review prescriptions can be edited from the wizard.',
+                ]);
+            }
+
+            $isInReview = $latestPrescription->status === PrescriptionStatusEnum::IN_REVIEW->value;
+            $building = Building::query()->select(['id', 'name'])->find($payload['building_id']);
+
+            if ($isInReview) {
+                $operation->fill([
+                    'building_id' => $payload['building_id'],
+                    'typology' => $payload['typology'],
+                ]);
+                $operation->save();
+
+                $latestPrescription->fill([
+                    'building_id' => $payload['building_id'],
+                    'user_id' => $payload['user_id'] ?? null,
+                    'typology' => $payload['typology'],
+                    'ref' => $payload['ref'] ?? null,
+                    'manual' => $payload['manual'] ?? null,
+                    'name' => $payload['name'] ?? null,
+                    'surname' => $payload['surname'] ?? null,
+                    'age' => $payload['age'] ?? null,
+                    'gender' => $payload['gender'] ?? null,
+                    'company_name' => $building?->name,
+                    'address' => $payload['address'] ?? null,
+                    'city' => $payload['city'] ?? null,
+                    'province' => $payload['province'] ?? null,
+                    'cap' => $payload['cap'] ?? null,
+                    'notes' => $payload['notes'] ?? null,
+                ]);
+                $latestPrescription->save();
+
+                static::syncPrescriptionDetails($latestPrescription, $payload);
+
+                return;
+            }
+
             $isDraft = (bool) ($payload['draft'] ?? false);
             $sendAt = $isDraft ? null : now();
             $operationStatus = $isDraft
@@ -379,28 +432,12 @@ class OperationService extends ModelService
                 ? PrescriptionStatusEnum::DRAFT->value
                 : PrescriptionStatusEnum::SENT->value;
 
-            $latestPrescription = $operation->latestPrescription()->first();
-
-            if (! $latestPrescription) {
-                throw ValidationException::withMessages([
-                    'operation' => 'The selected operation has no linked prescription.',
-                ]);
-            }
-
-            if ($latestPrescription->status !== PrescriptionStatusEnum::DRAFT->value) {
-                throw ValidationException::withMessages([
-                    'operation' => 'Only draft prescriptions can be edited from the wizard.',
-                ]);
-            }
-
             $operation->fill([
                 'building_id' => $payload['building_id'],
                 'typology' => $payload['typology'],
                 'status' => $operationStatus,
             ]);
             $operation->save();
-
-            $building = Building::query()->select(['id', 'name'])->find($payload['building_id']);
 
             $latestPrescription->fill([
                 'building_id' => $payload['building_id'],
@@ -456,9 +493,14 @@ class OperationService extends ModelService
             ]);
         }
 
-        if ($latestPrescription->status !== PrescriptionStatusEnum::DRAFT->value) {
+        $editableStatuses = [
+            PrescriptionStatusEnum::DRAFT->value,
+            PrescriptionStatusEnum::IN_REVIEW->value,
+        ];
+
+        if (! in_array($latestPrescription->status, $editableStatuses, true)) {
             throw ValidationException::withMessages([
-                'operation' => 'Only draft prescriptions can be edited from the wizard.',
+                'operation' => 'Only draft or in-review prescriptions can be edited from the wizard.',
             ]);
         }
 
@@ -534,6 +576,7 @@ class OperationService extends ModelService
             'mode' => 'edit',
             'operationId' => $operation->id,
             'prescriptionId' => $latestPrescription->id,
+            'prescriptionStatus' => $latestPrescription->status,
             'initialForm' => $form,
             'buildings' => static::getWizardBuildingsPayload(),
         ];

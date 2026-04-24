@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Prescription\RequestRevisionRequest;
+use App\Http\Requests\Prescription\StorePrescriptionRequest;
 use App\Models\Prescription;
 use App\Services\PrescriptionService;
-use App\Http\Requests\Prescription\StorePrescriptionRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
@@ -64,11 +65,11 @@ class PrescriptionController extends Controller
     /**
      * Mark the prescription as sent.
      */
-    public function send(Prescription $prescription)
+    public function send(Request $request, Prescription $prescription)
     {
         Gate::authorize('update', $prescription);
 
-        PrescriptionService::sendPrescription($prescription);
+        PrescriptionService::sendPrescription($prescription, $request->user());
 
         return back();
     }
@@ -76,23 +77,25 @@ class PrescriptionController extends Controller
     /**
      * Mark the prescription as confirmed.
      */
-    public function confirm(Prescription $prescription)
+    public function confirm(Request $request, Prescription $prescription)
     {
         Gate::authorize('update', $prescription);
 
-        PrescriptionService::confirmPrescription($prescription);
+        PrescriptionService::confirmPrescription($prescription, $request->user());
 
         return back();
     }
 
     /**
-     * Reset the prescription status to draft.
+     * Request a revision of a SENT / CONFIRMED / REVISED prescription.
      */
-    public function reset(Prescription $prescription)
+    public function requestRevision(RequestRevisionRequest $request, Prescription $prescription)
     {
-        Gate::authorize('update', $prescription);
-
-        PrescriptionService::resetPrescription($prescription);
+        PrescriptionService::requestRevision(
+            $prescription,
+            (string) $request->validated('reason'),
+            $request->user(),
+        );
 
         return back();
     }
