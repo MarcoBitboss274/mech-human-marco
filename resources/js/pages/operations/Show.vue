@@ -40,7 +40,12 @@
         <div class="operations-show__content">
             <BbTab v-model="tab" :items="tabs">
                 <template #overview>
-                    <div class="operations-show__placeholder" />
+                    <OverviewTab
+                        :operation="props.operation"
+                        :overview="props.overview"
+                        @change-tab="(key: string) => (tab = key)"
+                        @operation:updated="reloadOperation"
+                    />
                 </template>
                 <template v-if="can('operations.prescription.view')" #prescription>
                     <PrescriptionTab :operation="props.operation" @updated="reloadOperation" />
@@ -98,6 +103,7 @@ import { useOperationStatus } from '@/composables/useOperationStatus';
 import { usePermissions } from '@/composables/usePermissions';
 import AppLayout from '@/layouts/AppLayout.vue';
 import InvoicesTab from '@/pages/operations/partials/InvoicesTab.vue';
+import OverviewTab from '@/pages/operations/partials/OverviewTab.vue';
 import PrescriptionTab from '@/pages/operations/partials/PrescriptionTab.vue';
 import ProductionsTab from '@/pages/operations/partials/ProductionsTab.vue';
 import QuotesTab from '@/pages/operations/partials/QuotesTab.vue';
@@ -114,8 +120,25 @@ defineOptions({
     layout: (h: any, page: any) => h(AppLayout, { title: 'Dettaglio lavorazione' }, () => [page]),
 });
 
+type OverviewPayload = {
+    actors: {
+        requester: { name: string | null; email: string | null } | null;
+        building: { name: string | null; email: string | null } | null;
+        agent: { name: string | null; email: string | null } | null;
+        supplier: { name: string | null; email: string | null } | null;
+    };
+    summary: {
+        prescription: { empty: boolean; count: number; status: string | null; updated_at: string | null; main_id: number | null };
+        suppliers?: { empty: boolean; count: number; status: string | null; updated_at: string | null; main_id: number | null };
+        quotes: { empty: boolean; count: number; status: string | null; updated_at: string | null; main_id: number | null };
+        production: { empty: boolean; count: number; status: string | null; updated_at: string | null; main_id: number | null };
+        invoices: { empty: boolean; count: number; status: string | null; updated_at: string | null; main_id: number | null };
+    };
+};
+
 type Props = {
     operation: Operation;
+    overview: OverviewPayload;
     chat: {
         can_read: boolean;
         can_send: boolean;
@@ -181,7 +204,7 @@ const confirmOperationAction = () => {
 
 const reloadOperation = () => {
     router.reload({
-        only: ['operation'],
+        only: ['operation', 'overview'],
     });
 };
 
