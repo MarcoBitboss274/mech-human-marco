@@ -419,7 +419,7 @@ class WorkspaceService
 
         $operation->load([
             'building:id,name',
-            'prescriptions' => fn($q) => $q->latest()->with(['user:id,name,surname', 'building:id,name']),
+            'prescriptions' => fn($q) => $q->latest()->with(['user:id,name,surname,email', 'building:id,name']),
             'quotes' => fn($q) => $q->latest()->whereNotIn('status', [QuoteStatusEnum::DRAFT->value]),
             'orders' => fn($q) => $q->latest()->whereIn('status', [OrderStatusEnum::CONFIRMED->value]),
             'productions' => fn($q) => $q->oldest(),
@@ -429,6 +429,7 @@ class WorkspaceService
 
         return [
             'operation' => OperationResource::make($operation)->resolve(),
+            'overview' => OperationService::buildOverviewPayload($operation, asCustomer: true),
         ];
     }
 

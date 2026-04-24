@@ -545,9 +545,10 @@ class OperationService extends ModelService
     public static function getAdminShowData(Operation $operation): array
     {
         $operation->load([
-            'building:id,name',
+            'building:id,name,agent_id',
+            'building.agent:id,name,surname,email',
             'prescriptions' => fn($q) => $q->latest()->with([
-                'user:id,name,surname',
+                'user:id,name,surname,email',
                 'building:id,name',
                 'protrusorDetails',
                 'lybraAlignerDetails',
@@ -571,6 +572,102 @@ class OperationService extends ModelService
 
         return [
             'operation' => $operationData,
+            'overview' => static::buildOverviewPayload($operation, asCustomer: false),
+        ];
+    }
+
+    /**
+     * Build the aggregated Panoramica payload for the operation show page.
+     *
+     * Relazioni attese già caricate: building, building.agent, prescriptions.user,
+     * quotes, productions, invoices, suppliers, selectedSupplier.
+     * Per i flussi customer l'agente e i fornitori vengono oscurati; le entità
+     * non inviate (prescription.send_at null, quote draft, invoice.sent_at null)
+     * vengono escluse dal conteggio e dallo stato aggregato.
+     */
+    public static function buildOverviewPayload(Operation $operation, bool $asCustomer): array
+    {
+        $visiblePrescriptions = $asCustomer
+            ? $operation->prescriptions->filter(fn(Prescription $p) => $p->send_at !== null)->values()
+            : $operation->prescriptions;
+
+        $visibleQuotes = $asCustomer
+            ? $operation->quotes->filter(fn(Quote $q) => $q->status !== QuoteStatusEnum::DRAFT->value)->values()
+            : $operation->quotes;
+
+        $visibleInvoices = $asCustomer
+            ? $operation->invoices->filter(fn(Invoice $i) => $i->sent_at !== null)->values()
+            : $operation->invoices;
+
+        $visibleProductions = $operation->productions;
+
+        $requesterPrescription = $visiblePrescriptions->sortByDesc('created_at')->first();
+        $requesterUser = $requesterPrescription?->user;
+
+        $buildPerson = function ($user) {
+            if (! $user) {
+                return null;
+            }
+            $name = trim(($user->name ?? '') . ' ' . ($user->surname ?? ''));
+
+            return [
+                'name' => $name !== '' ? $name : null,
+                'email' => $user->email,
+            ];
+        };
+
+        $selectedSupplier = $asCustomer ? null : $operation->selectedSupplier->first();
+
+        $actors = [
+            'requester' => $buildPerson($requesterUser),
+            'building' => $operation->building ? [
+                'name' => $operation->building->name,
+                'email' => null,
+            ] : null,
+            'agent' => ! $asCustomer ? $buildPerson($operation->building?->agent) : null,
+            'supplier' => $selectedSupplier ? [
+                'name' => $selectedSupplier->name,
+                'email' => $selectedSupplier->mail,
+            ] : null,
+        ];
+
+        $summarize = function ($collection, $main) {
+            return [
+                'empty' => $collection->isEmpty(),
+                'count' => $collection->count(),
+                'status' => $main?->status,
+                'updated_at' => $main?->updated_at?->toISOString(),
+                'main_id' => $main?->id,
+            ];
+        };
+
+        $mainQuote = $visibleQuotes->firstWhere('status', QuoteStatusEnum::ACCEPTED->value)
+            ?? $visibleQuotes->firstWhere('status', QuoteStatusEnum::SENT->value)
+            ?? $visibleQuotes->first();
+
+        $mainProduction = $visibleProductions->firstWhere('status', ProductionStatusEnum::CONFIRMED->value)
+            ?? $visibleProductions->first();
+
+        $summary = [
+            'prescription' => $summarize($visiblePrescriptions, $visiblePrescriptions->sortByDesc('created_at')->first()),
+            'quotes' => $summarize($visibleQuotes, $mainQuote),
+            'production' => $summarize($visibleProductions, $mainProduction),
+            'invoices' => $summarize($visibleInvoices, $visibleInvoices->first()),
+        ];
+
+        if (! $asCustomer) {
+            $summary['suppliers'] = [
+                'empty' => $operation->suppliers->isEmpty(),
+                'count' => $operation->suppliers->count(),
+                'status' => $selectedSupplier?->pivot?->status,
+                'updated_at' => $selectedSupplier?->pivot?->updated_at?->toISOString(),
+                'main_id' => $selectedSupplier?->id,
+            ];
+        }
+
+        return [
+            'actors' => $actors,
+            'summary' => $summary,
         ];
     }
 
