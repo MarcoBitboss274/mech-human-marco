@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import OperationQuoteStatusBadge from '@/components/operations/OperationQuoteStatusBadge.vue';
+import QuoteCard from '@/components/operations/QuoteCard.vue';
 import { useMainToast } from '@/composables/useMainToast';
 import { usePermissions } from '@/composables/usePermissions';
 import type { Operation } from '@/types/Operation';
 import type { Quote } from '@/types/Quote';
-import { dateTime } from '@/utils/formatters/date';
 import { router, useForm } from '@inertiajs/vue3';
-import { BbButton, BbDialog, BbDropzone, BbPopover, BbTextInput, BbTextarea } from 'bitboss-ui';
+import { BbButton, BbDialog, BbDropzone, BbTextInput, BbTextarea } from 'bitboss-ui';
 import { computed, reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -287,91 +286,20 @@ const cancelQuote = () => {
         </div>
 
         <div v-else class="operation-quotes__list">
-            <article v-for="quote in quotes" :key="quote.id" class="operation-quotes__card">
-                <div class="operation-quotes__card-header">
-                    <h3 class="operation-quotes__card-title">{{ t('Preventivo') }} {{ quote.id }}</h3>
-                    <div class="operation-quotes__actions">
-                        <BbButton v-if="can('operations.quote.manage')" size="xs" icon="pencil" @click="openModal(quote)">
-                            {{ t('Modifica') }}
-                        </BbButton>
-                        <BbButton
-                            v-if="can('operations.quote.manage') && quote.status === 'draft'"
-                            size="xs"
-                            append:icon="play"
-                            :disabled="sendingQuoteId === quote.id"
-                            @click="sendQuote(quote)"
-                        >
-                            {{ t('Invia') }}
-                        </BbButton>
-                        <BbButton
-                            v-if="can('operations.quote.manage') && quote.status === 'sent'"
-                            size="xs"
-                            :disabled="acceptingQuoteId === quote.id"
-                            @click="acceptQuote(quote)"
-                        >
-                            {{ t('Accetta') }}
-                        </BbButton>
-                        <BbButton
-                            v-if="can('operations.quote.manage') && quote.status === 'sent'"
-                            size="xs"
-                            variant="outline"
-                            @click="openRejectModal(quote)"
-                        >
-                            {{ t('Rifiuta') }}
-                        </BbButton>
-                        <BbButton
-                            v-if="can('operations.quote.manage') && quote.status === 'sent'"
-                            size="xs"
-                            variant="outline"
-                            @click="openCancelModal(quote)"
-                        >
-                            {{ t('Annulla') }}
-                        </BbButton>
-                        <BbPopover v-if="can('operations.quote.manage')">
-                            <template #activator="{ props }">
-                                <BbButton size="xs" variant="danger" v-bind="props">
-                                    {{ t('Elimina') }}
-                                </BbButton>
-                            </template>
-                            <template #default="{ close }">
-                                <p class="mb-2 max-w-[250px]">
-                                    {{ t('Sei sicuro di voler eliminare') }}
-                                    <strong> {{ t('Preventivo') }} {{ quote.id }}?</strong>
-                                </p>
-                                <div class="text-right">
-                                    <BbButton
-                                        variant="danger"
-                                        size="xs"
-                                        @click="
-                                            () => {
-                                                removeQuote(quote.id);
-                                                close();
-                                            }
-                                        "
-                                    >
-                                        {{ t('Elimina') }}
-                                    </BbButton>
-                                </div>
-                            </template>
-                        </BbPopover>
-                    </div>
-                </div>
-
-                <div class="operation-quotes__status">
-                    <OperationQuoteStatusBadge :status="quote.status" size="xs" />
-                </div>
-
-                <div class="operation-quotes__meta">
-                    <div class="operation-quotes__meta-item">
-                        <span class="operation-quotes__meta-label">{{ t('Accettato il') }}</span>
-                        <span>{{ dateTime(quote.accepted_at) ?? '--' }}</span>
-                    </div>
-                    <div class="operation-quotes__meta-item">
-                        <span class="operation-quotes__meta-label">{{ t('Note') }}</span>
-                        <span>{{ quote.notes ?? '--' }}</span>
-                    </div>
-                </div>
-            </article>
+            <QuoteCard
+                v-for="quote in quotes"
+                :key="quote.id"
+                :quote="quote"
+                mode="admin"
+                :sending-id="sendingQuoteId"
+                :accepting-id="acceptingQuoteId"
+                @edit="openModal"
+                @send="sendQuote"
+                @accept="acceptQuote"
+                @reject="openRejectModal"
+                @cancel="openCancelModal"
+                @delete="(q) => removeQuote(q.id)"
+            />
         </div>
 
         <BbDialog v-model="modal" :title="selectedQuote?.id ? t('Modifica preventivo') : t('Aggiungi preventivo')" size="md">
@@ -586,38 +514,6 @@ const cancelQuote = () => {
 
 .operation-quotes__list {
     @apply space-y-4;
-}
-
-.operation-quotes__card {
-    @apply rounded-lg border border-gray-200 bg-white p-4;
-}
-
-.operation-quotes__card-header {
-    @apply flex items-start justify-between gap-3;
-}
-
-.operation-quotes__card-title {
-    @apply text-base font-semibold text-gray-900;
-}
-
-.operation-quotes__actions {
-    @apply flex items-center gap-2;
-}
-
-.operation-quotes__status {
-    @apply mt-3;
-}
-
-.operation-quotes__meta {
-    @apply mt-3 space-y-2;
-}
-
-.operation-quotes__meta-item {
-    @apply flex flex-col gap-1 text-sm text-gray-700;
-}
-
-.operation-quotes__meta-label {
-    @apply text-xs text-gray-500;
 }
 
 .operation-quotes__dialog {
