@@ -14,11 +14,13 @@ type Props = {
     mode: Mode;
     sendingId?: number | null;
     acceptingId?: number | null;
+    readonly?: boolean;
 };
 
 const props = withDefaults(defineProps<Props>(), {
     sendingId: null,
     acceptingId: null,
+    readonly: false,
 });
 
 const emit = defineEmits<{
@@ -33,10 +35,11 @@ const emit = defineEmits<{
 const { t } = useI18n();
 const { can } = usePermissions();
 
-const canManage = computed(() => props.mode === 'admin' && can('operations.quote.manage'));
+const canManage = computed(() => !props.readonly && props.mode === 'admin' && can('operations.quote.manage'));
 const isSent = computed(() => props.quote.status === 'sent');
 const isDraft = computed(() => props.quote.status === 'draft');
 const showAcceptReject = computed(() => {
+    if (props.readonly) return false;
     if (!isSent.value) return false;
     return props.mode === 'customer' || canManage.value;
 });

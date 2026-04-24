@@ -423,7 +423,10 @@ class WorkspaceService
             'quotes' => fn($q) => $q->latest()->whereNotIn('status', [QuoteStatusEnum::DRAFT->value]),
             'orders' => fn($q) => $q->latest()->whereIn('status', [OrderStatusEnum::CONFIRMED->value]),
             'productions' => fn($q) => $q->oldest(),
-            'invoices' => fn($q) => $q->latest()->whereIn('status', [InvoiceStatusEnum::SENT->value]),
+            'invoices' => fn($q) => $q->latest()->whereIn('status', [
+                InvoiceStatusEnum::SENT->value,
+                InvoiceStatusEnum::CANCELED->value,
+            ]),
             'latestPrescription',
         ]);
 

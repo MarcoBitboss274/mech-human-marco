@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\PrescriptionStatusEnum;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
@@ -33,6 +34,7 @@ class Prescription extends Model
         'gender',
         'send_at',
         'expire_at',
+        'confirmed_at',
         'company_name',
         'address',
         'city',
@@ -53,7 +55,32 @@ class Prescription extends Model
             'manual' => 'boolean',
             'send_at' => 'datetime',
             'expire_at' => 'datetime',
+            'confirmed_at' => 'datetime',
         ];
+    }
+
+    /**
+     * Sync confirmed_at when status transitions in/out of confirmed.
+     */
+    protected static function booted(): void
+    {
+        static::saving(function (Prescription $prescription): void {
+            if (! $prescription->isDirty('status')) {
+                return;
+            }
+
+            $confirmedValue = PrescriptionStatusEnum::CONFIRMED->value;
+
+            if ($prescription->status === $confirmedValue) {
+                if ($prescription->getOriginal('status') !== $confirmedValue) {
+                    $prescription->confirmed_at = now();
+                }
+
+                return;
+            }
+
+            $prescription->confirmed_at = null;
+        });
     }
 
     /**

@@ -631,37 +631,70 @@ class OperationService extends ModelService
             ] : null,
         ];
 
-        $summarize = function ($collection, $main) {
-            return [
-                'empty' => $collection->isEmpty(),
-                'count' => $collection->count(),
-                'status' => $main?->status,
-                'updated_at' => $main?->updated_at?->toISOString(),
-                'main_id' => $main?->id,
-            ];
-        };
-
-        $mainQuote = $visibleQuotes->firstWhere('status', QuoteStatusEnum::ACCEPTED->value)
-            ?? $visibleQuotes->firstWhere('status', QuoteStatusEnum::SENT->value)
-            ?? $visibleQuotes->first();
+        $mainPrescription = $visiblePrescriptions->sortByDesc('created_at')->first();
 
         $mainProduction = $visibleProductions->firstWhere('status', ProductionStatusEnum::CONFIRMED->value)
+            ?? $visibleProductions->firstWhere('status', ProductionStatusEnum::CANCELED->value)
             ?? $visibleProductions->first();
 
+        $acceptedQuote = $visibleQuotes->firstWhere('status', QuoteStatusEnum::ACCEPTED->value);
+        $sentQuotes = $visibleQuotes->where('status', QuoteStatusEnum::SENT->value)->values();
+        $rejectedCount = $visibleQuotes->where('status', QuoteStatusEnum::REJECTED->value)->count();
+        $canceledQuotesCount = $visibleQuotes->where('status', QuoteStatusEnum::CANCELED->value)->count();
+
+        $sentInvoices = $visibleInvoices->where('status', InvoiceStatusEnum::SENT->value)->values();
+        $canceledInvoicesCount = $visibleInvoices->where('status', InvoiceStatusEnum::CANCELED->value)->count();
+
         $summary = [
-            'prescription' => $summarize($visiblePrescriptions, $visiblePrescriptions->sortByDesc('created_at')->first()),
-            'quotes' => $summarize($visibleQuotes, $mainQuote),
-            'production' => $summarize($visibleProductions, $mainProduction),
-            'invoices' => $summarize($visibleInvoices, $visibleInvoices->first()),
+            'prescription' => [
+                'empty' => $visiblePrescriptions->isEmpty(),
+                'count' => $visiblePrescriptions->count(),
+                'status' => $mainPrescription?->status,
+                'main_id' => $mainPrescription?->id,
+                'sent_at' => $mainPrescription?->send_at?->toISOString(),
+                'confirmed_at' => $mainPrescription?->confirmed_at?->toISOString(),
+            ],
+            'quotes' => [
+                'empty' => $visibleQuotes->isEmpty(),
+                'count' => $visibleQuotes->count(),
+                'main_id' => ($acceptedQuote ?? $sentQuotes->first() ?? $visibleQuotes->first())?->id,
+                'accepted' => $acceptedQuote ? [
+                    'id' => $acceptedQuote->id,
+                    'accepted_at' => $acceptedQuote->accepted_at?->toISOString(),
+                ] : null,
+                'sent_ids' => $sentQuotes->pluck('id')->values()->all(),
+                'rejected_count' => $rejectedCount,
+                'canceled_count' => $canceledQuotesCount,
+            ],
+            'production' => [
+                'empty' => $visibleProductions->isEmpty(),
+                'count' => $visibleProductions->count(),
+                'status' => $mainProduction?->status,
+                'main_id' => $mainProduction?->id,
+                'confirmed_at' => $mainProduction?->status === ProductionStatusEnum::CONFIRMED->value
+                    ? $mainProduction?->confirmed_at?->toISOString()
+                    : null,
+                'canceled_at' => $mainProduction?->status === ProductionStatusEnum::CANCELED->value
+                    ? $mainProduction?->canceled_at?->toISOString()
+                    : null,
+            ],
+            'invoices' => [
+                'empty' => $visibleInvoices->isEmpty(),
+                'sent_ids' => $sentInvoices->pluck('id')->values()->all(),
+                'canceled_count' => $canceledInvoicesCount,
+            ],
         ];
 
         if (! $asCustomer) {
             $summary['suppliers'] = [
                 'empty' => $operation->suppliers->isEmpty(),
-                'count' => $operation->suppliers->count(),
-                'status' => $selectedSupplier?->pivot?->status,
-                'updated_at' => $selectedSupplier?->pivot?->updated_at?->toISOString(),
-                'main_id' => $selectedSupplier?->id,
+                'selected' => $selectedSupplier ? [
+                    'id' => $selectedSupplier->id,
+                    'name' => $selectedSupplier->name,
+                    'selected_at' => $selectedSupplier->pivot?->selected_at
+                        ? Carbon::parse($selectedSupplier->pivot->selected_at)->toISOString()
+                        : null,
+                ] : null,
             ];
         }
 
@@ -792,11 +825,13 @@ class OperationService extends ModelService
                 ->where('operation_id', $operation->id)
                 ->update([
                     'selected' => false,
+                    'selected_at' => null,
                     'updated_at' => now(),
                 ]);
 
             $operation->suppliers()->updateExistingPivot($supplier->id, [
                 'selected' => true,
+                'selected_at' => now(),
                 'updated_at' => now(),
             ]);
         });

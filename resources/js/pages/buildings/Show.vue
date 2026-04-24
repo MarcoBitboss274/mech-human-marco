@@ -414,7 +414,7 @@ const openInviteModal = () => {
 };
 
 const submitInviteMember = () => {
-    inviteMemberForm.post(route('buildings.members.invite', { building: building.id }), {
+    inviteMemberForm.post(route('buildings.members.invite', { building: building.value.id }), {
         onSuccess: () => {
             inviteMemberModal.value = false;
             success('Invito inviato con successo');
@@ -436,7 +436,7 @@ const openEditMemberModal = (member: BuildingShowUser) => {
 const submitEditMemberRole = () => {
     if (selectedMemberId.value === null) return;
 
-    editMemberForm.put(route('buildings.members.edit', { building: building.id, user: selectedMemberId.value }), {
+    editMemberForm.put(route('buildings.members.edit', { building: building.value.id, user: selectedMemberId.value }), {
         onSuccess: () => {
             editMemberModal.value = false;
             selectedMemberId.value = null;
@@ -450,7 +450,7 @@ const submitEditMemberRole = () => {
 };
 
 const removeMember = (id: number) => {
-    router.delete(route('buildings.members.delete', { building: building.id, user: id }), {
+    router.delete(route('buildings.members.delete', { building: building.value.id, user: id }), {
         onSuccess: () => {
             success('Membro rimosso con successo');
             router.reload({ only: ['users', 'building'] });

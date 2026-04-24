@@ -21,6 +21,7 @@ const classes = computed(() => ({
     'bg-gray-100 border-gray-300 text-gray-700': !props.status || props.status === 'draft',
     '!bg-amber-100 border-amber-400 !text-amber-700': props.status === 'sent',
     '!bg-green-100 border-green-500 !text-green-700': props.status === 'paid',
+    '!bg-red-100 border-red-400 !text-red-700': props.status === 'canceled',
 }));
 
 const text = computed(() => {
@@ -31,6 +32,8 @@ const text = computed(() => {
             return t('Inviata');
         case 'paid':
             return t('Pagata');
+        case 'canceled':
+            return t('Annullata');
         default:
             return '--';
     }

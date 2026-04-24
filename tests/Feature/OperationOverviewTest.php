@@ -156,9 +156,16 @@ test('admin show payload include il blocco overview con attori e riepilogo forni
         ->where('overview.actors.supplier.email', 'fornitore@test.it')
         ->has('overview.summary.suppliers')
         ->where('overview.summary.suppliers.empty', false)
+        ->has('overview.summary.suppliers.selected')
+        ->where('overview.summary.suppliers.selected.name', 'Fornitore Selezionato')
         ->where('overview.summary.quotes.count', 2)
         ->where('overview.summary.quotes.empty', false)
+        ->where('overview.summary.quotes.rejected_count', 0)
+        ->where('overview.summary.quotes.canceled_count', 0)
+        ->has('overview.summary.quotes.sent_ids', 1)
         ->where('overview.summary.prescription.empty', false)
+        ->has('overview.summary.prescription.sent_at')
+        ->where('overview.summary.prescription.confirmed_at', null)
     );
 });
 
@@ -217,6 +224,7 @@ test('workspace show payload oscura fornitori e agente per il customer', functio
         ->missing('overview.summary.suppliers')
         ->where('overview.summary.quotes.count', 1)
         ->where('overview.summary.quotes.empty', false)
+        ->has('overview.summary.quotes.sent_ids', 1)
     );
 });
 
@@ -268,7 +276,89 @@ test('customer non vede le fatture non ancora inviate nel riepilogo', function (
 
     $response->assertStatus(200);
     $response->assertInertia(fn ($page) => $page
-        ->where('overview.summary.invoices.count', 1)
         ->where('overview.summary.invoices.empty', false)
+        ->has('overview.summary.invoices.sent_ids', 1)
+        ->where('overview.summary.invoices.canceled_count', 0)
+    );
+});
+
+test('admin overview riporta counter dei preventivi rifiutati e annullati separati', function () {
+    $building = buildOverviewScenarioBuilding('admin-overview-quote-counters');
+    $operation = Operation::create([
+        'building_id' => $building->id,
+        'typology' => PrescriptionTypologyEnum::LYBRA_ALIGNER->value,
+        'status' => OperationStatusEnum::IN_PROGRESS->value,
+        'batch_number' => 'BATCH-OV-QC',
+    ]);
+
+    Quote::create(['operation_id' => $operation->id, 'status' => QuoteStatusEnum::REJECTED->value, 'notes' => 'r1']);
+    Quote::create(['operation_id' => $operation->id, 'status' => QuoteStatusEnum::REJECTED->value, 'notes' => 'r2']);
+    Quote::create(['operation_id' => $operation->id, 'status' => QuoteStatusEnum::CANCELED->value, 'notes' => 'c1']);
+    $accepted = Quote::create(['operation_id' => $operation->id, 'status' => QuoteStatusEnum::ACCEPTED->value, 'notes' => 'acc', 'accepted_at' => now()]);
+
+    $this->actingAs(makeAdminForOverview());
+
+    $response = $this->get(route('operations.show', ['operation' => $operation->id]));
+
+    $response->assertStatus(200);
+    $response->assertInertia(fn ($page) => $page
+        ->where('overview.summary.quotes.rejected_count', 2)
+        ->where('overview.summary.quotes.canceled_count', 1)
+        ->where('overview.summary.quotes.accepted.id', $accepted->id)
+        ->has('overview.summary.quotes.sent_ids', 0)
+    );
+});
+
+test('customer vede fatture annullate solo se erano gia state inviate', function () {
+    $building = buildOverviewScenarioBuilding('ws-overview-canceled-invoices');
+    $customer = makeCustomerForOverview($building);
+
+    $operation = Operation::create([
+        'building_id' => $building->id,
+        'typology' => PrescriptionTypologyEnum::LYBRA_ALIGNER->value,
+        'status' => OperationStatusEnum::IN_PROGRESS->value,
+        'batch_number' => 'BATCH-OV-WS-CAN',
+    ]);
+
+    Prescription::create([
+        'operation_id' => $operation->id,
+        'building_id' => $building->id,
+        'user_id' => $customer->id,
+        'status' => PrescriptionStatusEnum::SENT->value,
+        'typology' => PrescriptionTypologyEnum::LYBRA_ALIGNER->value,
+        'ref' => 'WS-CAN-REF',
+        'name' => 'X',
+        'surname' => 'Y',
+        'send_at' => now(),
+    ]);
+
+    $sentThenCanceled = Invoice::create([
+        'operation_id' => $operation->id,
+        'status' => InvoiceStatusEnum::SENT->value,
+        'code' => 'CAN-SENT',
+        'amount' => 10,
+        'description' => 'sent then canceled',
+    ]);
+    $sentThenCanceled->update(['status' => InvoiceStatusEnum::CANCELED->value]);
+
+    Invoice::create([
+        'operation_id' => $operation->id,
+        'status' => InvoiceStatusEnum::CANCELED->value,
+        'code' => 'CAN-DRAFT',
+        'amount' => 5,
+        'description' => 'canceled while draft',
+    ]);
+
+    $this->actingAs($customer);
+
+    $response = $this->get(route('workspace.operations.show', [
+        'building' => $building->slug,
+        'operation' => $operation->id,
+    ]));
+
+    $response->assertStatus(200);
+    $response->assertInertia(fn ($page) => $page
+        ->where('overview.summary.invoices.canceled_count', 1)
+        ->has('overview.summary.invoices.sent_ids', 0)
     );
 });

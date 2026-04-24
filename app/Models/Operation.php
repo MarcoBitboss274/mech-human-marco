@@ -182,7 +182,7 @@ class Operation extends Model
     public function suppliers(): BelongsToMany
     {
         return $this->belongsToMany(Supplier::class)
-            ->withPivot(['status', 'selected'])
+            ->withPivot(['status', 'selected', 'selected_at'])
             ->withTimestamps();
     }
 
@@ -192,7 +192,7 @@ class Operation extends Model
     public function selectedSupplier(): BelongsToMany
     {
         return $this->belongsToMany(Supplier::class)
-            ->withPivot(['status', 'selected'])
+            ->withPivot(['status', 'selected', 'selected_at'])
             ->wherePivot('selected', true)
             ->withTimestamps();
     }

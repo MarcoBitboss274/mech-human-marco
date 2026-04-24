@@ -9,6 +9,7 @@ enum InvoiceStatusEnum: string
     case DRAFT = 'draft';
     case SENT = 'sent';
     case PAID = 'paid';
+    case CANCELED = 'canceled';
 
     public function label(): string
     {
@@ -16,6 +17,7 @@ enum InvoiceStatusEnum: string
             self::DRAFT => 'Bozza',
             self::SENT => 'Inviata',
             self::PAID => 'Pagata',
+            self::CANCELED => 'Annullata',
         };
     }
 }

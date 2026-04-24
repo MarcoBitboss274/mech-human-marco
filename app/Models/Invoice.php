@@ -46,11 +46,15 @@ class Invoice extends Model implements HasMedia
         return [
             'amount' => 'float',
             'sent_at' => 'datetime',
+            'canceled_at' => 'datetime',
         ];
     }
 
     /**
-     * Sync sent_at when status changes (first transition to sent sets timestamp; leaving sent clears it).
+     * Sync sent_at and canceled_at when status changes.
+     *
+     * sent_at is preserved through paid and canceled transitions (the customer must
+     * still see fatture annullate-after-invio). draft is the only state that resets both.
      */
     protected static function booted(): void
     {
@@ -60,16 +64,36 @@ class Invoice extends Model implements HasMedia
             }
 
             $sentValue = InvoiceStatusEnum::SENT->value;
+            $canceledValue = InvoiceStatusEnum::CANCELED->value;
+            $draftValue = InvoiceStatusEnum::DRAFT->value;
 
             if ($invoice->status === $sentValue) {
-                if ($invoice->getOriginal('status') !== $sentValue) {
+                if ($invoice->sent_at === null) {
                     $invoice->sent_at = now();
+                }
+                if ($invoice->getOriginal('status') === $canceledValue) {
+                    $invoice->canceled_at = null;
                 }
 
                 return;
             }
 
-            $invoice->sent_at = null;
+            if ($invoice->status === $canceledValue) {
+                if ($invoice->getOriginal('status') !== $canceledValue) {
+                    $invoice->canceled_at = now();
+                }
+
+                return;
+            }
+
+            if ($invoice->status === $draftValue) {
+                $invoice->sent_at = null;
+                $invoice->canceled_at = null;
+
+                return;
+            }
+
+            $invoice->canceled_at = null;
         });
     }
 

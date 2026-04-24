@@ -1,47 +1,20 @@
 <script setup lang="ts">
 import InvoiceCard from '@/components/operations/InvoiceCard.vue';
-import OperationInvoiceStatusBadge from '@/components/operations/OperationInvoiceStatusBadge.vue';
-import OperationQuoteStatusBadge from '@/components/operations/OperationQuoteStatusBadge.vue';
-import OperationStatusBadge from '@/components/operations/OperationStatusBadge.vue';
-import OperationSupplierStatusBadge from '@/components/operations/OperationSupplierStatusBadge.vue';
 import QuoteCard from '@/components/operations/QuoteCard.vue';
 import ActorCard from '@/components/operations/overview/ActorCard.vue';
-import SummaryCard from '@/components/operations/overview/SummaryCard.vue';
+import OverviewSection from '@/components/operations/overview/OverviewSection.vue';
 import { useMainToast } from '@/composables/useMainToast';
 import { usePermissions } from '@/composables/usePermissions';
 import { useSelect } from '@/composables/useSelect';
 import type { Invoice } from '@/types/Invoice';
 import type { Operation } from '@/types/Operation';
+import type { OverviewPayload } from '@/types/Overview';
 import type { Quote } from '@/types/Quote';
+import { dateTime } from '@/utils/formatters/date';
 import { router, useForm } from '@inertiajs/vue3';
 import { BbButton, BbDialog, BbSelect, BbTextarea } from 'bitboss-ui';
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-
-type ActorPerson = { name: string | null; email: string | null } | null;
-type SummaryData = {
-    empty: boolean;
-    count: number;
-    status: string | null;
-    updated_at: string | null;
-    main_id: number | null;
-};
-
-type OverviewPayload = {
-    actors: {
-        requester: ActorPerson;
-        building: ActorPerson;
-        agent: ActorPerson;
-        supplier: ActorPerson;
-    };
-    summary: {
-        prescription: SummaryData;
-        suppliers?: SummaryData;
-        quotes: SummaryData;
-        production: SummaryData;
-        invoices: SummaryData;
-    };
-};
 
 type Props = {
     operation: Operation;
@@ -59,8 +32,19 @@ const { can } = usePermissions();
 const { success, error } = useMainToast();
 const { select: selectInvoiceStatuses } = useSelect('invoice-statuses');
 
-const sentQuotes = computed<Quote[]>(() => (props.operation.quotes ?? []).filter((q) => q.status === 'sent'));
-const sentInvoices = computed<Invoice[]>(() => (props.operation.invoices ?? []).filter((i) => i.status === 'sent'));
+const sentQuotes = computed<Quote[]>(() => {
+    const ids = new Set(props.overview.summary.quotes.sent_ids);
+    return (props.operation.quotes ?? []).filter((q) => q.id && ids.has(q.id));
+});
+const acceptedQuote = computed<Quote | null>(() => {
+    const acceptedId = props.overview.summary.quotes.accepted?.id;
+    if (!acceptedId) return null;
+    return (props.operation.quotes ?? []).find((q) => q.id === acceptedId) ?? null;
+});
+const sentInvoices = computed<Invoice[]>(() => {
+    const ids = new Set(props.overview.summary.invoices.sent_ids);
+    return (props.operation.invoices ?? []).filter((i) => i.id && ids.has(i.id));
+});
 
 const sendingQuoteId = ref<number | null>(null);
 const acceptingQuoteId = ref<number | null>(null);
@@ -241,109 +225,156 @@ const submitStatus = () => {
 };
 
 const goToTab = (key: string) => emit('change-tab', key);
+
+const productionEmptyLabel = computed(() => {
+    const p = props.overview.summary.production;
+    if (p.empty) return t('Nessuna produzione ancora');
+    if (!p.confirmed_at && !p.canceled_at) return t('Non ancora confermata');
+    return null;
+});
 </script>
 
 <template>
     <div class="operations-overview">
         <div class="operations-overview__grid">
-            <section class="operations-overview__summary-col">
+            <div class="operations-overview__summary-col">
                 <h2 class="operations-overview__section-title">{{ t('Riepilogo lavorazione') }}</h2>
 
-                <SummaryCard
+                <OverviewSection
+                    v-if="can('operations.prescription.view')"
                     :title="t('Prescrizione')"
-                    :empty="overview.summary.prescription.empty"
-                    :count="overview.summary.prescription.count"
-                    :updated-at="overview.summary.prescription.updated_at"
-                    @click="goToTab('prescription')"
+                    :go-to-label="t('Vai a Prescrizione')"
+                    @go-to="goToTab('prescription')"
                 >
-                    <template #status>
-                        <OperationStatusBadge v-if="overview.summary.prescription.status" :status="overview.summary.prescription.status" size="xs" />
+                    <template v-if="overview.summary.prescription.count > 1" #counters>
+                        <span>{{ overview.summary.prescription.count }} {{ t('prescrizioni') }}</span>
                     </template>
-                </SummaryCard>
 
-                <SummaryCard
+                    <template v-if="overview.summary.prescription.empty">
+                        <p class="operations-overview__empty">{{ t('Nessuna prescrizione ancora') }}</p>
+                    </template>
+                    <template v-else>
+                        <p v-if="overview.summary.prescription.sent_at">
+                            {{ t('Inviata il') }} <strong>{{ dateTime(overview.summary.prescription.sent_at) }}</strong>
+                        </p>
+                        <p v-if="overview.summary.prescription.confirmed_at">
+                            {{ t('Confermata il') }} <strong>{{ dateTime(overview.summary.prescription.confirmed_at) }}</strong>
+                        </p>
+                    </template>
+                </OverviewSection>
+
+                <OverviewSection
                     v-if="overview.summary.suppliers && can('operations.supplier.view')"
-                    :title="t('Fornitori')"
-                    :empty="overview.summary.suppliers.empty"
-                    :count="overview.summary.suppliers.count"
-                    :updated-at="overview.summary.suppliers.updated_at"
-                    @click="goToTab('supplier')"
+                    :title="t('Fornitore')"
+                    :go-to-label="t('Vai a Fornitori')"
+                    @go-to="goToTab('supplier')"
                 >
-                    <template #status>
-                        <OperationSupplierStatusBadge v-if="overview.summary.suppliers.status" :status="overview.summary.suppliers.status" size="xs" />
+                    <template v-if="overview.summary.suppliers.selected">
+                        <p>
+                            <strong>{{ overview.summary.suppliers.selected.name }}</strong>
+                            <span v-if="overview.summary.suppliers.selected.selected_at">
+                                — {{ t('Selezionato il') }} {{ dateTime(overview.summary.suppliers.selected.selected_at) }}
+                            </span>
+                        </p>
                     </template>
-                </SummaryCard>
+                    <template v-else>
+                        <p class="operations-overview__empty">{{ t('Nessun fornitore ancora selezionato') }}</p>
+                    </template>
+                </OverviewSection>
 
-                <SummaryCard
+                <OverviewSection
                     v-if="can('operations.quote.view')"
                     :title="t('Preventivi')"
-                    :empty="overview.summary.quotes.empty"
-                    :count="overview.summary.quotes.count"
-                    :updated-at="overview.summary.quotes.updated_at"
-                    @click="goToTab('quote')"
+                    :go-to-label="t('Vai a Preventivi')"
+                    @go-to="goToTab('quote')"
                 >
-                    <template #status>
-                        <OperationQuoteStatusBadge v-if="overview.summary.quotes.status" :status="overview.summary.quotes.status" size="xs" />
+                    <template v-if="overview.summary.quotes.rejected_count || overview.summary.quotes.canceled_count" #counters>
+                        <span v-if="overview.summary.quotes.rejected_count">{{ overview.summary.quotes.rejected_count }} {{ t('rifiutati') }}</span>
+                        <span v-if="overview.summary.quotes.rejected_count && overview.summary.quotes.canceled_count">·</span>
+                        <span v-if="overview.summary.quotes.canceled_count">{{ overview.summary.quotes.canceled_count }} {{ t('annullati') }}</span>
                     </template>
-                </SummaryCard>
 
-                <div v-if="sentQuotes.length" class="operations-overview__inline">
-                    <QuoteCard
-                        v-for="quote in sentQuotes"
-                        :key="quote.id"
-                        :quote="quote"
-                        mode="admin"
-                        :sending-id="sendingQuoteId"
-                        :accepting-id="acceptingQuoteId"
-                        @edit="() => goToTab('quote')"
-                        @send="sendQuote"
-                        @accept="acceptQuote"
-                        @reject="openRejectModal"
-                        @cancel="openCancelModal"
-                        @delete="removeQuote"
-                    />
-                </div>
+                    <template v-if="overview.summary.quotes.empty">
+                        <p class="operations-overview__empty">{{ t('Nessun preventivo ancora') }}</p>
+                    </template>
+                    <template v-else-if="sentQuotes.length">
+                        <QuoteCard
+                            v-for="quote in sentQuotes"
+                            :key="quote.id"
+                            :quote="quote"
+                            mode="admin"
+                            :sending-id="sendingQuoteId"
+                            :accepting-id="acceptingQuoteId"
+                            @edit="() => goToTab('quote')"
+                            @send="sendQuote"
+                            @accept="acceptQuote"
+                            @reject="openRejectModal"
+                            @cancel="openCancelModal"
+                            @delete="removeQuote"
+                        />
+                    </template>
+                    <template v-else-if="acceptedQuote">
+                        <QuoteCard :quote="acceptedQuote" mode="admin" readonly />
+                    </template>
+                    <template v-else>
+                        <p class="operations-overview__empty">{{ t('Nessun preventivo attivo') }}</p>
+                    </template>
+                </OverviewSection>
 
-                <SummaryCard
+                <OverviewSection
                     v-if="can('operations.production.view')"
                     :title="t('Produzione')"
-                    :empty="overview.summary.production.empty"
-                    :count="overview.summary.production.count"
-                    :updated-at="overview.summary.production.updated_at"
-                    @click="goToTab('production')"
+                    :go-to-label="t('Vai a Produzione')"
+                    @go-to="goToTab('production')"
                 >
-                    <template #status>
-                        <OperationStatusBadge v-if="overview.summary.production.status" :status="overview.summary.production.status" size="xs" />
+                    <template v-if="overview.summary.production.count > 1" #counters>
+                        <span>{{ overview.summary.production.count }} {{ t('produzioni') }}</span>
                     </template>
-                </SummaryCard>
 
-                <SummaryCard
+                    <template v-if="productionEmptyLabel">
+                        <p class="operations-overview__empty">{{ productionEmptyLabel }}</p>
+                    </template>
+                    <template v-else>
+                        <p v-if="overview.summary.production.confirmed_at">
+                            {{ t('Confermata il') }} <strong>{{ dateTime(overview.summary.production.confirmed_at) }}</strong>
+                        </p>
+                        <p v-if="overview.summary.production.canceled_at">
+                            {{ t('Annullata il') }} <strong>{{ dateTime(overview.summary.production.canceled_at) }}</strong>
+                        </p>
+                    </template>
+                </OverviewSection>
+
+                <OverviewSection
                     v-if="can('operations.invoice.view')"
                     :title="t('Fatture')"
-                    :empty="overview.summary.invoices.empty"
-                    :count="overview.summary.invoices.count"
-                    :updated-at="overview.summary.invoices.updated_at"
-                    @click="goToTab('invoice')"
+                    :go-to-label="t('Vai a Fatture')"
+                    @go-to="goToTab('invoice')"
                 >
-                    <template #status>
-                        <OperationInvoiceStatusBadge v-if="overview.summary.invoices.status" :status="overview.summary.invoices.status" size="xs" />
+                    <template v-if="overview.summary.invoices.canceled_count" #counters>
+                        <span>{{ overview.summary.invoices.canceled_count }} {{ t('annullate') }}</span>
                     </template>
-                </SummaryCard>
 
-                <div v-if="sentInvoices.length" class="operations-overview__inline">
-                    <InvoiceCard
-                        v-for="invoice in sentInvoices"
-                        :key="invoice.id"
-                        :invoice="invoice"
-                        mode="admin"
-                        :sending-id="sendingInvoiceId"
-                        @edit="() => goToTab('invoice')"
-                        @send="sendInvoice"
-                        @delete="removeInvoice"
-                        @status-click="openStatusModal"
-                    />
-                </div>
-            </section>
+                    <template v-if="overview.summary.invoices.empty">
+                        <p class="operations-overview__empty">{{ t('Nessuna fattura ancora') }}</p>
+                    </template>
+                    <template v-else-if="sentInvoices.length">
+                        <InvoiceCard
+                            v-for="invoice in sentInvoices"
+                            :key="invoice.id"
+                            :invoice="invoice"
+                            mode="admin"
+                            :sending-id="sendingInvoiceId"
+                            @edit="() => goToTab('invoice')"
+                            @send="sendInvoice"
+                            @delete="removeInvoice"
+                            @status-click="openStatusModal"
+                        />
+                    </template>
+                    <template v-else>
+                        <p class="operations-overview__empty">{{ t('Nessuna fattura attiva') }}</p>
+                    </template>
+                </OverviewSection>
+            </div>
 
             <aside class="operations-overview__actors-col">
                 <h2 class="operations-overview__section-title">{{ t('Attori coinvolti') }}</h2>
@@ -404,7 +435,10 @@ const goToTab = (key: string) => emit('change-tab', key);
     @apply grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px];
 }
 
-.operations-overview__summary-col,
+.operations-overview__summary-col {
+    @apply flex flex-col;
+}
+
 .operations-overview__actors-col {
     @apply flex flex-col gap-4;
 }
@@ -413,8 +447,8 @@ const goToTab = (key: string) => emit('change-tab', key);
     @apply text-sm font-semibold uppercase tracking-wide text-gray-500;
 }
 
-.operations-overview__inline {
-    @apply flex flex-col gap-4;
+.operations-overview__empty {
+    @apply text-sm italic text-gray-400;
 }
 
 .operations-overview__dialog {
