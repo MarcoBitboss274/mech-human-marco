@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import OperationInvoiceStatusBadge from '@/components/operations/OperationInvoiceStatusBadge.vue';
+import InvoiceCard from '@/components/operations/InvoiceCard.vue';
 import { useMainToast } from '@/composables/useMainToast';
 import { usePermissions } from '@/composables/usePermissions';
 import { useSelect } from '@/composables/useSelect';
 import type { Invoice } from '@/types/Invoice';
 import type { Operation } from '@/types/Operation';
 import { router, useForm } from '@inertiajs/vue3';
-import { BbButton, BbDialog, BbDropzone, BbPopover, BbSelect, BbTextInput } from 'bitboss-ui';
+import { BbButton, BbDialog, BbDropzone, BbSelect, BbTextInput } from 'bitboss-ui';
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -208,78 +208,17 @@ const saveStatus = () => {
         </div>
 
         <div v-else class="operation-invoices__list">
-            <article v-for="invoice in invoices" :key="invoice.id" class="operation-invoices__card">
-                <div class="operation-invoices__card-header">
-                    <h3 class="operation-invoices__card-title">{{ t('Fattura') }} {{ invoice.code ?? `#${invoice.id}` }}</h3>
-                    <div class="operation-invoices__actions">
-                        <BbButton v-if="can('operations.invoice.manage')" size="xs" icon="pencil" @click="openModal(invoice)">
-                            {{ t('Modifica') }}
-                        </BbButton>
-                        <BbButton
-                            v-if="can('operations.invoice.manage') && invoice.status === 'draft'"
-                            size="xs"
-                            append:icon="play"
-                            :disabled="sendingInvoiceId === invoice.id"
-                            @click="sendInvoice(invoice)"
-                        >
-                            {{ t('Invia') }}
-                        </BbButton>
-                        <BbPopover v-if="can('operations.invoice.manage')">
-                            <template #activator="{ props }">
-                                <BbButton size="xs" variant="danger" v-bind="props">
-                                    {{ t('Elimina') }}
-                                </BbButton>
-                            </template>
-                            <template #default="{ close }">
-                                <p class="mb-2 max-w-[250px]">
-                                    {{ t('Sei sicuro di voler eliminare') }}
-                                    <strong> {{ t('Fattura') }} {{ invoice.code ?? `#${invoice.id}` }}?</strong>
-                                </p>
-                                <div class="text-right">
-                                    <BbButton
-                                        variant="danger"
-                                        size="xs"
-                                        @click="
-                                            () => {
-                                                removeInvoice(invoice.id);
-                                                close();
-                                            }
-                                        "
-                                    >
-                                        {{ t('Elimina') }}
-                                    </BbButton>
-                                </div>
-                            </template>
-                        </BbPopover>
-                    </div>
-                </div>
-
-                <div class="operation-invoices__status">
-                    <button
-                        v-if="can('operations.invoice.manage')"
-                        type="button"
-                        class="operation-invoices__status-button"
-                        @click="openStatusModal(invoice)"
-                    >
-                        <OperationInvoiceStatusBadge :status="invoice.status" size="xs" />
-                    </button>
-                    <OperationInvoiceStatusBadge v-else :status="invoice.status" size="xs" />
-                </div>
-
-                <div class="operation-invoices__meta">
-                    <div class="operation-invoices__meta-item">
-                        <span class="operation-invoices__meta-label">{{ t('Note') }}</span>
-                        <span>{{ invoice.description ?? '--' }}</span>
-                    </div>
-                    <div class="operation-invoices__meta-item">
-                        <span class="operation-invoices__meta-label">{{ t('File') }}</span>
-                        <a v-if="invoice.invoiceFile?.id" :href="route('media.index', { media: invoice.invoiceFile?.id })" target="_blank">{{
-                            invoice.invoiceFile?.name
-                        }}</a>
-                        <span v-else>--</span>
-                    </div>
-                </div>
-            </article>
+            <InvoiceCard
+                v-for="invoice in invoices"
+                :key="invoice.id"
+                :invoice="invoice"
+                mode="admin"
+                :sending-id="sendingInvoiceId"
+                @edit="openModal"
+                @send="sendInvoice"
+                @delete="(i) => removeInvoice(i.id)"
+                @status-click="openStatusModal"
+            />
         </div>
 
         <BbDialog v-model="modal" :title="selectedInvoice?.id ? t('Modifica fattura') : t('Aggiungi fattura')" size="md">
@@ -363,42 +302,6 @@ const saveStatus = () => {
 
 .operation-invoices__list {
     @apply space-y-4;
-}
-
-.operation-invoices__card {
-    @apply rounded-lg border border-gray-200 bg-white p-4;
-}
-
-.operation-invoices__card-header {
-    @apply flex items-start justify-between gap-3;
-}
-
-.operation-invoices__card-title {
-    @apply text-base font-semibold text-gray-900;
-}
-
-.operation-invoices__actions {
-    @apply flex items-center gap-2;
-}
-
-.operation-invoices__status {
-    @apply mt-3;
-}
-
-.operation-invoices__status-button {
-    @apply rounded-md;
-}
-
-.operation-invoices__meta {
-    @apply mt-3 space-y-2;
-}
-
-.operation-invoices__meta-item {
-    @apply flex flex-col gap-1 text-sm text-gray-700;
-}
-
-.operation-invoices__meta-label {
-    @apply text-xs text-gray-500;
 }
 
 .operation-invoices__dialog {
