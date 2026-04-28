@@ -107,7 +107,7 @@ class OperationController extends Controller
             'operations' => OperationService::search($request, true, [
                 'latestPrescription' => fn($q) => $q
                     ->select(['id', 'operation_id', 'user_id', 'typology', 'ref', 'created_at', 'expire_at', 'send_at'])
-                    ->with(['user:id,name,surname']),
+                    ->with(['user:id,name,surname', 'activeRevision:id,prescription_id,opened_at,closed_at']),
             ]),
         ]);
     }

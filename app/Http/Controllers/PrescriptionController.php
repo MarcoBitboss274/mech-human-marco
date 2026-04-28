@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\Prescription\RequestRevisionRequest;
+use App\Http\Requests\Prescription\AddRevisionReasonRequest;
+use App\Http\Requests\Prescription\CloseRevisionRequest;
+use App\Http\Requests\Prescription\OpenRevisionRequest;
 use App\Http\Requests\Prescription\StorePrescriptionRequest;
 use App\Models\Prescription;
 use App\Services\PrescriptionService;
@@ -87,15 +89,39 @@ class PrescriptionController extends Controller
     }
 
     /**
-     * Request a revision of a SENT / CONFIRMED / REVISED prescription.
+     * Open a new revision on a SENT or CONFIRMED prescription.
      */
-    public function requestRevision(RequestRevisionRequest $request, Prescription $prescription)
+    public function openRevision(OpenRevisionRequest $request, Prescription $prescription)
     {
-        PrescriptionService::requestRevision(
+        PrescriptionService::openRevision(
             $prescription,
             (string) $request->validated('reason'),
             $request->user(),
         );
+
+        return back();
+    }
+
+    /**
+     * Add a further reason to the currently open revision.
+     */
+    public function addRevisionReason(AddRevisionReasonRequest $request, Prescription $prescription)
+    {
+        PrescriptionService::addRevisionReason(
+            $prescription,
+            (string) $request->validated('reason'),
+            $request->user(),
+        );
+
+        return back();
+    }
+
+    /**
+     * Close the currently open revision.
+     */
+    public function closeRevision(CloseRevisionRequest $request, Prescription $prescription)
+    {
+        PrescriptionService::closeRevision($prescription, $request->user());
 
         return back();
     }

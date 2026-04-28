@@ -378,21 +378,19 @@ class OperationService extends ModelService
                 ]);
             }
 
-            $editableStatuses = [
-                PrescriptionStatusEnum::DRAFT->value,
-                PrescriptionStatusEnum::IN_REVIEW->value,
-            ];
+            $latestPrescription->loadMissing('activeRevision');
+            $hasActiveRevision = $latestPrescription->activeRevision !== null;
+            $isDraftPrescription = $latestPrescription->status === PrescriptionStatusEnum::DRAFT->value;
 
-            if (! in_array($latestPrescription->status, $editableStatuses, true)) {
+            if (! $isDraftPrescription && ! $hasActiveRevision) {
                 throw ValidationException::withMessages([
-                    'operation' => 'Only draft or in-review prescriptions can be edited from the wizard.',
+                    'operation' => 'Only draft prescriptions or prescriptions with an open revision can be edited from the wizard.',
                 ]);
             }
 
-            $isInReview = $latestPrescription->status === PrescriptionStatusEnum::IN_REVIEW->value;
             $building = Building::query()->select(['id', 'name'])->find($payload['building_id']);
 
-            if ($isInReview) {
+            if ($hasActiveRevision) {
                 $operation->fill([
                     'building_id' => $payload['building_id'],
                     'typology' => $payload['typology'],
@@ -493,14 +491,13 @@ class OperationService extends ModelService
             ]);
         }
 
-        $editableStatuses = [
-            PrescriptionStatusEnum::DRAFT->value,
-            PrescriptionStatusEnum::IN_REVIEW->value,
-        ];
+        $latestPrescription->loadMissing('activeRevision');
+        $hasActiveRevision = $latestPrescription->activeRevision !== null;
+        $isDraftPrescription = $latestPrescription->status === PrescriptionStatusEnum::DRAFT->value;
 
-        if (! in_array($latestPrescription->status, $editableStatuses, true)) {
+        if (! $isDraftPrescription && ! $hasActiveRevision) {
             throw ValidationException::withMessages([
-                'operation' => 'Only draft or in-review prescriptions can be edited from the wizard.',
+                'operation' => 'Only draft prescriptions or prescriptions with an open revision can be edited from the wizard.',
             ]);
         }
 
@@ -577,6 +574,7 @@ class OperationService extends ModelService
             'operationId' => $operation->id,
             'prescriptionId' => $latestPrescription->id,
             'prescriptionStatus' => $latestPrescription->status,
+            'hasActiveRevision' => $hasActiveRevision,
             'initialForm' => $form,
             'buildings' => static::getWizardBuildingsPayload(),
         ];
@@ -599,6 +597,7 @@ class OperationService extends ModelService
                 'threeDMeshDetails',
                 'prosthesisDetails',
                 'semiFinishedProsthesisDetails',
+                'activeRevision.reasons',
             ]),
             'quotes' => fn($q) => $q->latest(),
             'orders' => fn($q) => $q->latest(),
@@ -606,7 +605,7 @@ class OperationService extends ModelService
             'invoices' => fn($q) => $q->latest()->with(['media']),
             'suppliers:id,name,vat,mail,phone,address,cap,city,province,status',
             'selectedSupplier:id,name,vat,mail,phone,address,cap,city,province,status',
-            'latestPrescription',
+            'latestPrescription' => fn($q) => $q->with('activeRevision:id,prescription_id,opened_at,closed_at'),
         ]);
 
         $selectedSupplier = $operation->selectedSupplier->first();
@@ -759,7 +758,9 @@ class OperationService extends ModelService
             'orders' => fn($q) => $q->select(['id', 'operation_id', 'status'])->latest(),
             'productions' => fn($q) => $q->select(['id', 'operation_id', 'status', 'confirmed_at', 'canceled_at'])->oldest(),
             'invoices' => fn($q) => $q->select(['id', 'operation_id', 'status'])->latest(),
-            'latestPrescription:id,operation_id,user_id,typology,ref,created_at',
+            'latestPrescription' => fn($q) => $q
+                ->select(['id', 'operation_id', 'user_id', 'typology', 'ref', 'created_at'])
+                ->with('activeRevision:id,prescription_id,opened_at,closed_at'),
         ]);
 
         $operationData = $operation->toArray();

@@ -5,6 +5,12 @@
                 <div class="flex flex-wrap items-center gap-4">
                     <h1 class="page__title">{{ t(props.operation.latest_prescription?.typology ?? '') }}</h1>
                     <OperationStatusBadge :id="isAdmin ? props.operation.id : null" :status="props.operation.status" size="sm" />
+                    <div
+                        v-if="activeRevisionOpenedAt"
+                        class="flex w-fit items-center justify-center whitespace-nowrap rounded-md border !border-orange-500 !bg-orange-200 px-3 py-1 !text-sm leading-none !text-orange-700"
+                    >
+                        {{ t('In revisione dal') }}: {{ activeRevisionOpenedAt }}
+                    </div>
                     <OperationCanceledBadge :canceled_at="props.operation.canceled_at" />
                     <OperationArchivedBadge :archived_at="props.operation.archived_at" />
                 </div>
@@ -149,6 +155,11 @@ const props = defineProps<Props>();
 
 const { enableSuppliersTab, enableQuotesTab, enableOrdersTab, enableInvoicesTab } = useOperationStatus(() => props.operation);
 const { can, isAdmin } = usePermissions();
+
+const activeRevisionOpenedAt = computed(() => {
+    const openedAt = props.operation.latest_prescription?.active_revision?.opened_at;
+    return openedAt ? new Date(openedAt).toLocaleDateString('it-IT') : null;
+});
 
 const canShowCancel = computed(() => can('operations.cancel') && !!props.operation.can_be_canceled && !props.operation.canceled_at);
 const canShowReactivate = computed(() => can('operations.cancel') && !!props.operation.can_be_canceled && !!props.operation.canceled_at);

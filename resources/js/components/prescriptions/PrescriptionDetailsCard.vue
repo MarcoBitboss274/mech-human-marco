@@ -58,7 +58,7 @@ const v = (value: unknown): string => {
                 <h3 class="prescription-details-card__title">
                     {{ `${t('Lavorazione')} ${typologyLabel}` }}
                 </h3>
-                <PrescriptionStatusBadge :status="prescription.status" />
+                <PrescriptionStatusBadge :status="prescription.status" :in-revision="!!prescription.active_revision" />
             </div>
 
             <div class="prescription-details-card__fields">

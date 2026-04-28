@@ -6,6 +6,7 @@ const { t } = useI18n();
 
 type Props = {
     status: string | null | undefined;
+    inRevision?: boolean;
     size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | undefined;
 };
 
@@ -18,23 +19,21 @@ const classes = computed(() => ({
     '!text-base': props.size === 'md',
     '!text-lg': props.size === 'lg',
     '!text-xl': props.size === 'xl',
-    '!bg-gray-200 border-gray-500 !text-gray-700': props.status === 'draft',
-    '!bg-blue-200 border-blue-500 !text-blue-700': props.status === 'sent',
-    '!bg-orange-200 border-orange-500 !text-orange-700': props.status === 'in_review',
-    '!bg-sky-200 border-sky-500 !text-sky-700': props.status === 'revised',
-    '!bg-green-200 border-green-500 !text-green-700': props.status === 'confirmed',
+    '!bg-orange-200 border-orange-500 !text-orange-700': props.inRevision,
+    '!bg-gray-200 border-gray-500 !text-gray-700': !props.inRevision && props.status === 'draft',
+    '!bg-blue-200 border-blue-500 !text-blue-700': !props.inRevision && props.status === 'sent',
+    '!bg-green-200 border-green-500 !text-green-700': !props.inRevision && props.status === 'confirmed',
 }));
 
 const text = computed(() => {
+    if (props.inRevision) {
+        return t('In revisione');
+    }
     switch (props.status) {
         case 'draft':
             return t('Bozza');
         case 'sent':
             return t('Inviata');
-        case 'in_review':
-            return t('In revisione');
-        case 'revised':
-            return t('Revisionata');
         case 'confirmed':
             return t('Confermata');
         default:

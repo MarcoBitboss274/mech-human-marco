@@ -5,6 +5,12 @@
                 <div class="flex flex-wrap items-center gap-4">
                     <h1 class="workspace-view__title">{{ t(operation.latest_prescription?.typology ?? '') }}</h1>
                     <OperationStatusBadge :status="operation.status" size="sm" />
+                    <div
+                        v-if="activeRevisionOpenedAt"
+                        class="flex w-fit items-center justify-center whitespace-nowrap rounded-md border !border-orange-500 !bg-orange-200 px-3 py-1 !text-sm leading-none !text-orange-700"
+                    >
+                        {{ t('In revisione dal') }}: {{ activeRevisionOpenedAt }}
+                    </div>
                 </div>
                 <div class="mt-2 flex flex-wrap items-center gap-4">
                     <span class="text-sm text-gray-600"
@@ -109,6 +115,11 @@ type Props = {
 };
 
 const props = defineProps<Props>();
+
+const activeRevisionOpenedAt = computed(() => {
+    const openedAt = props.operation.latest_prescription?.active_revision?.opened_at;
+    return openedAt ? new Date(openedAt).toLocaleDateString('it-IT') : null;
+});
 
 const backToIndex = () => {
     router.get(route('workspace.operations.index', { building: workspace.value?.slug }));

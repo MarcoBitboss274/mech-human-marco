@@ -7,18 +7,18 @@ use App\Enums\PrescriptionStatusEnum;
 use App\Enums\PrescriptionTypologyEnum;
 use App\Models\Operation;
 use App\Models\Prescription;
+use App\Models\Revision;
 use App\Models\User;
 use App\Notifications\Admin\ResubmittedPrescriptionForAdmin;
 use App\Notifications\Admin\SendPrescriptionForAdmin;
 use App\Notifications\Agent\SendPrescriptionForAgent;
+use App\Notifications\User\ClosedPrescriptionRevisionForUser;
 use App\Notifications\User\RequestPrescriptionRevisionForUser;
 use App\Notifications\User\SendPrescriptionForUser;
-use App\Services\NotificationService;
-use App\Services\OperationService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
-use Spatie\Activitylog\Models\Activity;
 
 class PrescriptionService extends ModelService
 {
@@ -73,6 +73,7 @@ class PrescriptionService extends ModelService
             'user:id,name,surname',
             'protrusorDetails',
             'lybraAlignerDetails',
+            'activeRevision.reasons',
         ]);
 
         return [
@@ -81,7 +82,7 @@ class PrescriptionService extends ModelService
     }
 
     /**
-     * Mark prescription as sent (from DRAFT) or as revised (resubmit from IN_REVIEW).
+     * Initial send (DRAFT -> SENT) or resubmit within an open revision.
      */
     public static function sendPrescription(Prescription $prescription, ?User $causer = null): void
     {
@@ -91,15 +92,15 @@ class PrescriptionService extends ModelService
             ]);
         }
 
-        $currentStatus = $prescription->status;
+        $prescription->loadMissing('activeRevision');
 
-        if ($currentStatus === PrescriptionStatusEnum::IN_REVIEW->value) {
+        if ($prescription->activeRevision !== null) {
             static::resubmitRevision($prescription, $causer);
 
             return;
         }
 
-        if ($currentStatus !== PrescriptionStatusEnum::DRAFT->value) {
+        if ($prescription->status !== PrescriptionStatusEnum::DRAFT->value) {
             throw ValidationException::withMessages([
                 'prescription' => 'Stato della prescrizione non valido per l\'invio',
             ]);
@@ -121,16 +122,11 @@ class PrescriptionService extends ModelService
     }
 
     /**
-     * Mark prescription as confirmed (only from SENT or REVISED).
+     * Mark prescription as confirmed (only from SENT).
      */
     public static function confirmPrescription(Prescription $prescription, ?User $causer = null): void
     {
-        $allowed = [
-            PrescriptionStatusEnum::SENT->value,
-            PrescriptionStatusEnum::REVISED->value,
-        ];
-
-        if (! in_array($prescription->status, $allowed, true)) {
+        if ($prescription->status !== PrescriptionStatusEnum::SENT->value) {
             throw ValidationException::withMessages([
                 'prescription' => 'Impossibile confermare: la prescrizione non è in uno stato conferma-abile',
             ]);
@@ -152,37 +148,93 @@ class PrescriptionService extends ModelService
     }
 
     /**
-     * Request a revision (from SENT / CONFIRMED / REVISED).
+     * Open a new revision on a prescription that is SENT or CONFIRMED.
      */
-    public static function requestRevision(Prescription $prescription, string $reason, ?User $causer = null): void
+    public static function openRevision(Prescription $prescription, string $reason, ?User $causer = null): Revision
     {
-        $allowed = [
-            PrescriptionStatusEnum::SENT->value,
-            PrescriptionStatusEnum::CONFIRMED->value,
-            PrescriptionStatusEnum::REVISED->value,
-        ];
-
-        if (! in_array($prescription->status, $allowed, true)) {
+        if ($prescription->status === PrescriptionStatusEnum::DRAFT->value) {
             throw ValidationException::withMessages([
-                'prescription' => 'La prescrizione non è in uno stato che consente la richiesta di revisione',
+                'prescription' => 'Non è possibile aprire una revisione su una prescrizione in bozza',
             ]);
         }
 
-        $fromStatus = $prescription->status;
+        return DB::transaction(function () use ($prescription, $reason, $causer) {
+            $locked = Prescription::query()
+                ->whereKey($prescription->id)
+                ->lockForUpdate()
+                ->first();
 
-        $prescription->update([
-            'status' => PrescriptionStatusEnum::IN_REVIEW->value,
+            $existing = Revision::query()
+                ->where('prescription_id', $prescription->id)
+                ->whereNull('closed_at')
+                ->lockForUpdate()
+                ->exists();
+
+            if ($existing) {
+                throw ValidationException::withMessages([
+                    'prescription' => 'Esiste già una revisione aperta per questa prescrizione',
+                ]);
+            }
+
+            $revision = Revision::create([
+                'prescription_id' => $prescription->id,
+                'opened_at' => now(),
+                'opened_by' => $causer?->id,
+            ]);
+
+            $revision->reasons()->create([
+                'content' => $reason,
+                'created_by' => $causer?->id,
+            ]);
+
+            static::logOnOperation(
+                $prescription,
+                'prescription_revision_opened',
+                [
+                    'prescription_id' => $prescription->id,
+                    'revision_id' => $revision->id,
+                    'reason' => $reason,
+                ],
+                static::causerName($causer) . ' ha aperto una revisione: ' . $reason,
+                $causer,
+            );
+
+            NotificationService::sendToUser(
+                $prescription->user,
+                new RequestPrescriptionRevisionForUser($prescription, $reason),
+            );
+
+            return $revision->refresh();
+        });
+    }
+
+    /**
+     * Add a further reason to the currently open revision.
+     */
+    public static function addRevisionReason(Prescription $prescription, string $reason, ?User $causer = null): void
+    {
+        $revision = $prescription->activeRevision()->first();
+
+        if ($revision === null) {
+            throw ValidationException::withMessages([
+                'prescription' => 'Non esiste una revisione aperta per questa prescrizione',
+            ]);
+        }
+
+        $revision->reasons()->create([
+            'content' => $reason,
+            'created_by' => $causer?->id,
         ]);
 
         static::logOnOperation(
             $prescription,
-            'prescription_revision_requested',
+            'prescription_revision_reason_added',
             [
                 'prescription_id' => $prescription->id,
+                'revision_id' => $revision->id,
                 'reason' => $reason,
-                'from_status' => $fromStatus,
             ],
-            static::causerName($causer) . ' ha richiesto una revisione: ' . $reason,
+            static::causerName($causer) . ' ha richiesto nuove modifiche: ' . $reason,
             $causer,
         );
 
@@ -193,25 +245,66 @@ class PrescriptionService extends ModelService
     }
 
     /**
-     * Resubmit a revised prescription (IN_REVIEW -> REVISED). Internal.
+     * Close the currently open revision. Does not change prescription status.
      */
-    protected static function resubmitRevision(Prescription $prescription, ?User $causer = null): void
+    public static function closeRevision(Prescription $prescription, ?User $causer = null): void
     {
-        $prescription->update([
-            'status' => PrescriptionStatusEnum::REVISED->value,
-            'send_at' => now(),
-        ]);
+        $revision = $prescription->activeRevision()->first();
 
-        $revisionNumber = static::countRevisionRequests($prescription);
+        if ($revision === null) {
+            throw ValidationException::withMessages([
+                'prescription' => 'Non esiste una revisione aperta da chiudere',
+            ]);
+        }
+
+        $revision->update([
+            'closed_at' => now(),
+            'closed_by' => $causer?->id,
+        ]);
 
         static::logOnOperation(
             $prescription,
-            'prescription_resubmitted',
+            'prescription_revision_closed',
             [
                 'prescription_id' => $prescription->id,
+                'revision_id' => $revision->id,
+            ],
+            static::causerName($causer) . ' ha chiuso la revisione',
+            $causer,
+        );
+
+        NotificationService::sendToUser(
+            $prescription->user,
+            new ClosedPrescriptionRevisionForUser($prescription),
+        );
+    }
+
+    /**
+     * Customer resubmits the prescription while a revision is open.
+     */
+    protected static function resubmitRevision(Prescription $prescription, ?User $causer = null): void
+    {
+        $revision = $prescription->activeRevision()->first();
+
+        if ($revision === null) {
+            throw ValidationException::withMessages([
+                'prescription' => 'La revisione è stata chiusa, non è più possibile inviare modifiche',
+            ]);
+        }
+
+        $revision->update(['last_submitted_at' => now()]);
+
+        $revisionNumber = $prescription->revisions()->count();
+
+        static::logOnOperation(
+            $prescription,
+            'prescription_revision_resubmitted',
+            [
+                'prescription_id' => $prescription->id,
+                'revision_id' => $revision->id,
                 'revision_number' => $revisionNumber,
             ],
-            static::causerName($causer) . ' ha reinviato la prescrizione revisionata (revisione #' . $revisionNumber . ')',
+            static::causerName($causer) . ' ha inviato modifiche alla revisione #' . $revisionNumber,
             $causer,
         );
 
@@ -246,23 +339,6 @@ class PrescriptionService extends ModelService
         }
 
         $logger->log($description);
-    }
-
-    /**
-     * Count revision requests logged so far for this prescription.
-     */
-    protected static function countRevisionRequests(Prescription $prescription): int
-    {
-        if ($prescription->operation_id === null) {
-            return 0;
-        }
-
-        return (int) Activity::query()
-            ->where('subject_type', Operation::class)
-            ->where('subject_id', $prescription->operation_id)
-            ->where('event', 'prescription_revision_requested')
-            ->where('properties->prescription_id', $prescription->id)
-            ->count();
     }
 
     /**

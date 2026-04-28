@@ -5,7 +5,7 @@ namespace App\Http\Requests\Prescription;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
 
-class RequestRevisionRequest extends FormRequest
+class AddRevisionReasonRequest extends FormRequest
 {
     public function authorize(): bool
     {

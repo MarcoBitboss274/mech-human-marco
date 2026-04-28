@@ -15,6 +15,7 @@ use Spatie\Activitylog\Support\LogOptions;
 
 class Operation extends Model
 {
+    use \Illuminate\Database\Eloquent\Factories\HasFactory;
     use SoftDeletes;
     use LogsActivity;
 

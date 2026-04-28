@@ -5,45 +5,33 @@
                 {{ t('Modifica') }}
             </BbButton>
             <BbButton
-                v-if="latestPrescription.status === 'draft'"
+                v-if="canSubmit"
                 append:icon="play"
                 size="xs"
                 :disabled="processing"
                 @click="openSubmitConfirmation"
             >
-                {{ t('Invia prescrizione') }}
-            </BbButton>
-            <BbButton
-                v-if="latestPrescription.status === 'in_review'"
-                append:icon="play"
-                size="xs"
-                :disabled="processing"
-                @click="openSubmitConfirmation"
-            >
-                {{ t('Invia revisione') }}
+                {{ submitLabel }}
             </BbButton>
         </div>
 
-        <div
-            v-if="latestPrescription.status === 'in_review' && latestPrescription.latest_revision_reason"
-            class="operations-show__revision-banner"
-        >
+        <div v-if="hasActiveRevision" class="operations-show__revision-banner">
             <p class="operations-show__revision-banner-title">
                 {{ t('Revisione richiesta dall\'amministrazione') }}
             </p>
-            <p class="operations-show__revision-banner-text">
-                {{ latestPrescription.latest_revision_reason }}
-            </p>
+            <ul class="operations-show__revision-banner-list">
+                <li
+                    v-for="reason in activeRevisionReasons"
+                    :key="reason.id"
+                    class="operations-show__revision-banner-item"
+                >
+                    <p class="operations-show__revision-banner-date">{{ formatDate(reason.created_at) }}</p>
+                    <p class="operations-show__revision-banner-text">{{ reason.content }}</p>
+                </li>
+            </ul>
             <p class="operations-show__revision-banner-hint">
                 {{ t('Applica le modifiche richieste e reinvia la prescrizione.') }}
             </p>
-        </div>
-
-        <div
-            v-if="latestPrescription.status === 'revised'"
-            class="operations-show__revision-info"
-        >
-            {{ t('Prescrizione revisionata inviata, in attesa di conferma.') }}
         </div>
 
         <div class="operations-show__details-grid">
@@ -90,7 +78,7 @@ import PrescriptionDetailsCard from '@/components/prescriptions/PrescriptionDeta
 import { useMainToast } from '@/composables/useMainToast';
 import { useWorkspace } from '@/composables/useWorkspace';
 import type { Operation } from '@/types/Operation';
-import type { Prescription } from '@/types/Prescription';
+import type { Prescription, PrescriptionRevisionReason } from '@/types/Prescription';
 import { router } from '@inertiajs/vue3';
 import { BbButton, BbCheckbox, BbDialog } from 'bitboss-ui';
 import { computed, ref, watch } from 'vue';
@@ -114,10 +102,34 @@ const processing = ref(false);
 const confirmSubmitModal = ref(false);
 const legalConsentChecked = ref(false);
 
+const activeRevision = computed(() => latestPrescription.value?.active_revision ?? null);
+const hasActiveRevision = computed(() => !!activeRevision.value);
+const activeRevisionReasons = computed<PrescriptionRevisionReason[]>(() => activeRevision.value?.reasons ?? []);
+
 const canEdit = computed(() => {
     const status = latestPrescription.value?.status;
-    return status === 'draft' || status === 'in_review';
+    return status === 'draft' || hasActiveRevision.value;
 });
+
+const canSubmit = computed(() => {
+    const status = latestPrescription.value?.status;
+    return status === 'draft' || hasActiveRevision.value;
+});
+
+const submitLabel = computed(() =>
+    hasActiveRevision.value ? t('Invia modifiche') : t('Invia prescrizione'),
+);
+
+const formatDate = (value: string | null | undefined): string => {
+    if (!value) return '--';
+    return new Date(value).toLocaleString('it-IT', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+    });
+};
 
 const openSubmitConfirmation = () => {
     if (processing.value) return;
@@ -155,7 +167,7 @@ const confirmAndSendPrescription = () => {
 
     closeSubmitConfirmation();
     processing.value = true;
-    const isRevision = latestPrescription.value.status === 'in_review';
+    const isRevision = hasActiveRevision.value;
     router.post(
         route('workspace.prescriptions.send', {
             building: workspace.value?.slug,
@@ -165,7 +177,7 @@ const confirmAndSendPrescription = () => {
         {
             preserveScroll: true,
             onSuccess: () => {
-                success(isRevision ? 'Prescrizione revisionata inviata correttamente' : 'Prescrizione inviata con successo');
+                success(isRevision ? 'Modifiche inviate' : 'Prescrizione inviata con successo');
                 emit('updated');
             },
             onError: (errors: Record<string, string>) => {
@@ -218,15 +230,23 @@ const confirmAndSendPrescription = () => {
     @apply text-sm font-semibold text-orange-800;
 }
 
+.operations-show__revision-banner-list {
+    @apply mt-2 flex flex-col gap-2;
+}
+
+.operations-show__revision-banner-item {
+    @apply rounded-md border border-orange-200 bg-white px-4 py-2;
+}
+
+.operations-show__revision-banner-date {
+    @apply text-xs text-orange-700;
+}
+
 .operations-show__revision-banner-text {
-    @apply mt-2 whitespace-pre-line text-sm text-orange-900;
+    @apply whitespace-pre-line text-sm text-orange-900;
 }
 
 .operations-show__revision-banner-hint {
     @apply mt-2 text-xs text-orange-700;
-}
-
-.operations-show__revision-info {
-    @apply mb-4 rounded-md border border-sky-400 bg-sky-50 p-4 text-sm text-sky-800;
 }
 </style>

@@ -13,7 +13,6 @@ export type Prescription = {
     send_at: string | null;
     expire_at: string | null;
     confirmed_at: string | null;
-    latest_revision_reason: string | null;
     company_name: string | null;
     address: string | null;
     city: string | null;
@@ -80,6 +79,22 @@ export type Prescription = {
         name: string | null;
         surname: string | null;
     } | null;
+    active_revision?: PrescriptionRevision | null;
+};
+
+export type PrescriptionRevisionReason = {
+    id: number;
+    content: string;
+    created_at: string;
+};
+
+export type PrescriptionRevision = {
+    id: number;
+    prescription_id: number;
+    opened_at: string;
+    last_submitted_at: string | null;
+    closed_at: string | null;
+    reasons: PrescriptionRevisionReason[];
 };
 
 export type PrescriptionForm = {

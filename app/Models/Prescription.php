@@ -5,15 +5,17 @@ namespace App\Models;
 use App\Enums\PrescriptionStatusEnum;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Crypt;
-use Spatie\Activitylog\Models\Activity;
 
 class Prescription extends Model
 {
+    use HasFactory;
     use SoftDeletes;
 
     /**
@@ -42,13 +44,6 @@ class Prescription extends Model
         'province',
         'cap',
         'notes',
-    ];
-
-    /**
-     * @var list<string>
-     */
-    protected $appends = [
-        'latest_revision_reason',
     ];
 
     /**
@@ -210,26 +205,18 @@ class Prescription extends Model
     }
 
     /**
-     * Reason of the most recent revision request (null if none).
+     * All revisions ever opened on this prescription (most recent first).
      */
-    protected function latestRevisionReason(): Attribute
+    public function revisions(): HasMany
     {
-        return Attribute::make(
-            get: function (): ?string {
-                if ($this->operation_id === null) {
-                    return null;
-                }
+        return $this->hasMany(Revision::class)->orderByDesc('opened_at');
+    }
 
-                $activity = Activity::query()
-                    ->where('subject_type', Operation::class)
-                    ->where('subject_id', $this->operation_id)
-                    ->where('event', 'prescription_revision_requested')
-                    ->where('properties->prescription_id', $this->id)
-                    ->orderByDesc('id')
-                    ->first();
-
-                return $activity?->properties?->get('reason');
-            },
-        );
+    /**
+     * The currently open revision, if any.
+     */
+    public function activeRevision(): HasOne
+    {
+        return $this->hasOne(Revision::class)->whereNull('closed_at');
     }
 }

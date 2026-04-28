@@ -121,13 +121,12 @@ class UpdateOperationWithPrescriptionRequest extends FormRequest
                 return;
             }
 
-            $editableStatuses = [
-                PrescriptionStatusEnum::DRAFT->value,
-                PrescriptionStatusEnum::IN_REVIEW->value,
-            ];
+            $latestPrescription->loadMissing('activeRevision');
+            $hasActiveRevision = $latestPrescription->activeRevision !== null;
+            $isDraftPrescription = $latestPrescription->status === PrescriptionStatusEnum::DRAFT->value;
 
-            if (! in_array($latestPrescription->status, $editableStatuses, true)) {
-                $validator->errors()->add('operation', 'Only draft or in-review prescriptions can be edited from the wizard.');
+            if (! $isDraftPrescription && ! $hasActiveRevision) {
+                $validator->errors()->add('operation', 'Only draft prescriptions or prescriptions with an open revision can be edited from the wizard.');
             }
         });
     }

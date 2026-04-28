@@ -121,7 +121,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Prescriptions
         Route::post('/prescriptions/{prescription}/send', [PrescriptionController::class, 'send'])->name('prescriptions.send');
         Route::post('/prescriptions/{prescription}/confirm', [PrescriptionController::class, 'confirm'])->name('prescriptions.confirm');
-        Route::post('/prescriptions/{prescription}/request-revision', [PrescriptionController::class, 'requestRevision'])->name('prescriptions.request-revision');
+        Route::post('/prescriptions/{prescription}/revisions', [PrescriptionController::class, 'openRevision'])->name('prescriptions.revisions.open');
+        Route::post('/prescriptions/{prescription}/revisions/reasons', [PrescriptionController::class, 'addRevisionReason'])->name('prescriptions.revisions.add-reason');
+        Route::post('/prescriptions/{prescription}/revisions/close', [PrescriptionController::class, 'closeRevision'])->name('prescriptions.revisions.close');
         Route::resource('prescriptions', PrescriptionController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
 
         // Quotes

@@ -24,7 +24,7 @@
                         <PrescriptionTypologyBadge :typology="item.typology" size="xs" />
                     </template>
                     <template #status="{ item }">
-                        <PrescriptionStatusBadge :status="item.status" size="xs" />
+                        <PrescriptionStatusBadge :status="item.status" :in-revision="!!item.active_revision" size="xs" />
                     </template>
                     <template #actions="{ item }">
                         <div class="flex gap-x-2">

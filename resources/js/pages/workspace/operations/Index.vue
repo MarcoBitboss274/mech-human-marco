@@ -83,7 +83,20 @@
                         <PrescriptionTypologyBadge :typology="item.latest_prescription?.typology" size="xs" />
                     </template>
                     <template #status="{ item }">
-                        <OperationStatusBadge :status="item.status" size="xs" />
+                        <div class="flex items-center gap-1">
+                            <OperationStatusBadge :status="item.status" size="xs" />
+                            <BbTooltip v-if="item.latest_prescription?.active_revision">
+                                <template #activator="{ props: tooltipProps }">
+                                    <span
+                                        v-bind="tooltipProps"
+                                        class="text-base leading-none"
+                                        role="img"
+                                        :aria-label="t('Prescrizione in revisione')"
+                                    >🔄</span>
+                                </template>
+                                {{ t('Prescrizione in revisione') }}
+                            </BbTooltip>
+                        </div>
                     </template>
                     <template #latest_quote_status="{ item }">
                         <OperationQuoteStatusBadge v-if="item.latest_quote_status" :status="item.latest_quote_status" size="xs" />
@@ -123,7 +136,7 @@ import type { Operation } from '@/types/Operation';
 import { Pagination } from '@/types/Pagination';
 import { router, usePage } from '@inertiajs/vue3';
 import type { BbTableColumn } from 'bitboss-ui';
-import { BbButton, BbDatePickerInput, BbSelect, BbTable, BbTextInput } from 'bitboss-ui';
+import { BbButton, BbDatePickerInput, BbSelect, BbTable, BbTextInput, BbTooltip } from 'bitboss-ui';
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 

@@ -1,5 +1,8 @@
 # Revisione Prescrizione
 
+> **Superata da [specifiche-revisione_aggiornamento.md](specifiche-revisione_aggiornamento.md).**
+> Questo documento descrive il primo design in cui la revisione modificava lo stato della prescrizione (`IN_REVIEW`, `REVISED`). Il modello attuale separa revisione e stato: fare riferimento al nuovo documento.
+
 ## Contesto
 
 Oggi la prescrizione compilata dal customer segue il ciclo `DRAFT → SENT → CONFIRMED`, con un'azione `reset` lato admin che la riporta a `DRAFT` senza obbligo di motivazione. Questo flusso non copre uno scenario reale e frequente: dopo aver "preso in carico" la prescrizione, l'admin (o il fornitore a cui la mostra) individua errori o dati mancanti e deve richiedere al customer di correggere la prescrizione, potenzialmente più volte, prima di procedere effettivamente con la lavorazione.

@@ -379,7 +379,7 @@ class WorkspaceService
         $query->with([
             'latestPrescription' => fn($q) => $q
                 ->select(['id', 'operation_id', 'user_id', 'typology', 'ref', 'created_at', 'expire_at', 'send_at'])
-                ->with(['user:id,name,surname']),
+                ->with(['user:id,name,surname', 'activeRevision:id,prescription_id,opened_at,closed_at']),
         ]);
 
         if (! $canViewAll && $requesterUserId) {
@@ -419,7 +419,7 @@ class WorkspaceService
 
         $operation->load([
             'building:id,name',
-            'prescriptions' => fn($q) => $q->latest()->with(['user:id,name,surname,email', 'building:id,name']),
+            'prescriptions' => fn($q) => $q->latest()->with(['user:id,name,surname,email', 'building:id,name', 'activeRevision.reasons']),
             'quotes' => fn($q) => $q->latest()->whereNotIn('status', [QuoteStatusEnum::DRAFT->value]),
             'orders' => fn($q) => $q->latest()->whereIn('status', [OrderStatusEnum::CONFIRMED->value]),
             'productions' => fn($q) => $q->oldest(),
@@ -427,7 +427,7 @@ class WorkspaceService
                 InvoiceStatusEnum::SENT->value,
                 InvoiceStatusEnum::CANCELED->value,
             ]),
-            'latestPrescription',
+            'latestPrescription' => fn($q) => $q->with('activeRevision:id,prescription_id,opened_at,closed_at'),
         ]);
 
         return [

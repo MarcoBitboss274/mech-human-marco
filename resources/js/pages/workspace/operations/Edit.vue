@@ -321,6 +321,7 @@ type Props = {
         operationId: number | null;
         prescriptionId: number | null;
         prescriptionStatus?: string | null;
+        hasActiveRevision?: boolean;
         initialForm: OperationCreateWizardForm | null;
         buildings: WizardBuilding[];
     };
@@ -352,13 +353,13 @@ const leaveConfirmModalOpen = ref(false);
 const allowNavigation = ref(false);
 const pendingNavigation = ref<null | (() => void)>(null);
 const isEditMode = computed(() => props.wizard.mode === 'edit' && props.wizard.operationId !== null);
-const isRevisionMode = computed(() => isEditMode.value && props.wizard.prescriptionStatus === 'in_review');
+const isRevisionMode = computed(() => isEditMode.value && !!props.wizard.hasActiveRevision);
 const pageTitle = computed(() => {
     if (isRevisionMode.value) return t('Revisiona prescrizione');
     return isEditMode.value ? t('Modifica lavorazione') : t('Nuova lavorazione');
 });
 const submitButtonLabel = computed(() => {
-    if (isRevisionMode.value) return t('Invia revisione');
+    if (isRevisionMode.value) return t('Invia modifiche');
     return isEditMode.value ? t('Salva lavorazione e prescrizione') : t('Crea lavorazione e prescrizione');
 });
 

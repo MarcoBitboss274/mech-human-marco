@@ -18,7 +18,7 @@
                     </div>
                     <div class="prescriptions-show__details-item">
                         <span class="prescriptions-show__label">{{ t('Stato') }}</span>
-                        <PrescriptionStatusBadge :status="prescription.status" />
+                        <PrescriptionStatusBadge :status="prescription.status" :in-revision="!!prescription.active_revision" />
                     </div>
                     <div class="prescriptions-show__details-item">
                         <span class="prescriptions-show__label">{{ t('Nome') }}</span>

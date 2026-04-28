@@ -5,22 +5,22 @@
                 {{ t('Modifica') }}
             </BbButton>
             <BbButton
-                v-if="latestPrescription.status === 'draft'"
+                v-if="hasActiveRevision"
+                append:icon="play"
+                size="xs"
+                :disabled="processing"
+                @click="submitRevision"
+            >
+                {{ t('Invia modifiche') }}
+            </BbButton>
+            <BbButton
+                v-if="canSubmitDraft"
                 append:icon="play"
                 size="xs"
                 :disabled="processing"
                 @click="openSubmitConfirmation"
             >
                 {{ t('Invia prescrizione') }}
-            </BbButton>
-            <BbButton
-                v-if="latestPrescription.status === 'in_review'"
-                append:icon="play"
-                size="xs"
-                :disabled="processing"
-                @click="submitRevision"
-            >
-                {{ t('Invia revisione') }}
             </BbButton>
             <BbButton
                 v-if="canConfirm"
@@ -36,21 +36,48 @@
                 variant="outline"
                 size="xs"
                 :disabled="processing"
-                @click="openRevisionDialog"
+                @click="openRevisionDialog('open')"
             >
                 {{ t('Richiedi revisione') }}
             </BbButton>
+            <BbButton
+                v-if="canAddReason"
+                variant="outline"
+                size="xs"
+                :disabled="processing"
+                @click="openRevisionDialog('add')"
+            >
+                {{ t('Chiedi nuove modifiche') }}
+            </BbButton>
+            <BbButton
+                v-if="hasActiveRevision"
+                size="xs"
+                :disabled="processing"
+                @click="openCloseRevisionDialog"
+            >
+                {{ t('Chiudi revisione') }}
+            </BbButton>
         </div>
-        <div
-            v-if="latestPrescription.latest_revision_reason && revisionReasonVisible"
-            class="operations-show__revision-card"
-        >
+        <div v-if="showNewChangesBadge" class="operations-show__new-changes-banner">
+            <span class="operations-show__new-changes-banner-title">{{ t('Nuove modifiche dal customer') }}</span>
+            <span class="operations-show__new-changes-banner-date">
+                {{ t('Inviate il') }} {{ formatDate(activeRevision?.last_submitted_at) }}
+            </span>
+        </div>
+        <div v-if="hasActiveRevision" class="operations-show__revision-card">
             <p class="operations-show__revision-card-title">
-                {{ t('Motivo della revisione') }}
+                {{ t('Storico motivi revisione') }}
             </p>
-            <p class="operations-show__revision-card-text">
-                {{ latestPrescription.latest_revision_reason }}
-            </p>
+            <ul class="operations-show__revision-card-list">
+                <li
+                    v-for="reason in activeRevisionReasons"
+                    :key="reason.id"
+                    class="operations-show__revision-card-item"
+                >
+                    <p class="operations-show__revision-card-date">{{ formatDate(reason.created_at) }}</p>
+                    <p class="operations-show__revision-card-text">{{ reason.content }}</p>
+                </li>
+            </ul>
         </div>
         <div class="operations-show__details-grid">
             <div class="operations-show__details-main">
@@ -90,7 +117,7 @@
         </div>
     </BbDialog>
 
-    <BbDialog v-model="revisionDialog" size="md" :title="t('Richiedi revisione al customer')">
+    <BbDialog v-model="revisionDialog" size="md" :title="revisionDialogTitle">
         <div class="operations-show__revision-dialog">
             <BbTextarea
                 v-model="revisionReason"
@@ -116,13 +143,27 @@
             </div>
         </div>
     </BbDialog>
+
+    <BbDialog v-model="closeRevisionDialog" size="md" :title="t('Chiudi revisione')">
+        <div class="operations-show__revision-dialog">
+            <p>{{ t('Vuoi chiudere la revisione? Lo stato della prescrizione non verrà modificato.') }}</p>
+            <div class="operations-show__revision-dialog-actions">
+                <BbButton type="button" variant="outline" :disabled="processing" @click="closeRevisionDialog = false">
+                    {{ t('Annulla') }}
+                </BbButton>
+                <BbButton type="button" :disabled="processing" @click="submitCloseRevision">
+                    {{ t('Chiudi revisione') }}
+                </BbButton>
+            </div>
+        </div>
+    </BbDialog>
 </template>
 
 <script setup lang="ts">
 import PrescriptionDetailsCard from '@/components/prescriptions/PrescriptionDetailsCard.vue';
 import { useMainToast } from '@/composables/useMainToast';
 import type { Operation } from '@/types/Operation';
-import type { Prescription } from '@/types/Prescription';
+import type { Prescription, PrescriptionRevisionReason } from '@/types/Prescription';
 import { router } from '@inertiajs/vue3';
 import { BbButton, BbCheckbox, BbDialog, BbTextarea } from 'bitboss-ui';
 import { computed, ref, watch } from 'vue';
@@ -146,33 +187,61 @@ const confirmSubmitModal = ref(false);
 const legalConsentChecked = ref(false);
 
 const revisionDialog = ref(false);
+const revisionDialogMode = ref<'open' | 'add'>('open');
 const revisionReason = ref('');
 const revisionReasonErrors = ref<string[]>([]);
+const closeRevisionDialog = ref(false);
+
+const activeRevision = computed(() => latestPrescription.value?.active_revision ?? null);
+const hasActiveRevision = computed(() => !!activeRevision.value);
+const activeRevisionReasons = computed<PrescriptionRevisionReason[]>(() => activeRevision.value?.reasons ?? []);
 
 const canEdit = computed(() => {
     const status = latestPrescription.value?.status;
-    return status === 'draft' || status === 'in_review';
+    return status === 'draft' || hasActiveRevision.value;
 });
 
-const canConfirm = computed(() => {
-    const status = latestPrescription.value?.status;
-    return status === 'sent' || status === 'revised';
-});
+const canSubmitDraft = computed(() => latestPrescription.value?.status === 'draft' && !hasActiveRevision.value);
+
+const canConfirm = computed(() => latestPrescription.value?.status === 'sent' && !hasActiveRevision.value);
 
 const canRequestRevision = computed(() => {
     const status = latestPrescription.value?.status;
-    return status === 'sent' || status === 'revised' || status === 'confirmed';
+    if (hasActiveRevision.value) return false;
+    return status === 'sent' || status === 'confirmed';
 });
 
-const revisionReasonVisible = computed(() => {
-    const status = latestPrescription.value?.status;
-    return status === 'in_review' || status === 'revised';
+const canAddReason = computed(() => hasActiveRevision.value);
+
+const showNewChangesBadge = computed(() => {
+    const rev = activeRevision.value;
+    if (!rev?.last_submitted_at) return false;
+    const lastReason = rev.reasons[rev.reasons.length - 1];
+    const acknowledgement = lastReason?.created_at ?? rev.opened_at;
+    return new Date(rev.last_submitted_at).getTime() > new Date(acknowledgement).getTime();
 });
+
+const revisionDialogTitle = computed(() =>
+    revisionDialogMode.value === 'open'
+        ? t('Richiedi revisione al customer')
+        : t('Chiedi nuove modifiche al customer'),
+);
 
 const revisionReasonValid = computed(() => {
     const length = revisionReason.value.trim().length;
     return length >= 5 && length <= 2000;
 });
+
+const formatDate = (value: string | null | undefined): string => {
+    if (!value) return '--';
+    return new Date(value).toLocaleString('it-IT', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+    });
+};
 
 const openSubmitConfirmation = () => {
     if (processing.value) return;
@@ -190,15 +259,16 @@ watch(confirmSubmitModal, (isOpen) => {
     }
 });
 
-const openRevisionDialog = () => {
+const openRevisionDialog = (mode: 'open' | 'add') => {
     if (processing.value) return;
 
+    revisionDialogMode.value = mode;
     revisionReason.value = '';
     revisionReasonErrors.value = [];
     revisionDialog.value = true;
 };
 
-const closeRevisionDialog = () => {
+const closeRevisionDialogFn = () => {
     revisionDialog.value = false;
 };
 
@@ -208,6 +278,11 @@ watch(revisionDialog, (isOpen) => {
         revisionReasonErrors.value = [];
     }
 });
+
+const openCloseRevisionDialog = () => {
+    if (processing.value) return;
+    closeRevisionDialog.value = true;
+};
 
 const openEditWizard = () => {
     if (processing.value) {
@@ -235,31 +310,6 @@ const confirmAndSendPrescription = () => {
             preserveScroll: true,
             onSuccess: () => {
                 success('Prescrizione inviata con successo');
-                emit('updated');
-            },
-            onError: (errors: Record<string, string>) => {
-                error(errors?.prescription ?? 'Si è verificato un errore');
-            },
-            onFinish: () => {
-                processing.value = false;
-            },
-        },
-    );
-};
-
-const submitRevision = () => {
-    if (!latestPrescription.value?.id || processing.value) {
-        return;
-    }
-
-    processing.value = true;
-    router.post(
-        route('prescriptions.send', { prescription: latestPrescription.value.id }),
-        {},
-        {
-            preserveScroll: true,
-            onSuccess: () => {
-                success('Prescrizione revisionata inviata correttamente');
                 emit('updated');
             },
             onError: (errors: Record<string, string>) => {
@@ -306,16 +356,25 @@ const submitRevisionRequest = () => {
         return;
     }
 
+    const routeName =
+        revisionDialogMode.value === 'open'
+            ? 'prescriptions.revisions.open'
+            : 'prescriptions.revisions.add-reason';
+
     processing.value = true;
     revisionReasonErrors.value = [];
     router.post(
-        route('prescriptions.request-revision', { prescription: latestPrescription.value.id }),
+        route(routeName, { prescription: latestPrescription.value.id }),
         { reason: revisionReason.value.trim() },
         {
             preserveScroll: true,
             onSuccess: () => {
-                success('Richiesta di revisione inviata al customer');
-                closeRevisionDialog();
+                success(
+                    revisionDialogMode.value === 'open'
+                        ? 'Revisione aperta e notificata al customer'
+                        : 'Nuove modifiche richieste al customer',
+                );
+                closeRevisionDialogFn();
                 emit('updated');
             },
             onError: (errors: Record<string, string>) => {
@@ -323,6 +382,57 @@ const submitRevisionRequest = () => {
                     revisionReasonErrors.value = [errors.reason];
                     return;
                 }
+                error(errors?.prescription ?? 'Si è verificato un errore');
+            },
+            onFinish: () => {
+                processing.value = false;
+            },
+        },
+    );
+};
+
+const submitRevision = () => {
+    if (!latestPrescription.value?.id || processing.value) {
+        return;
+    }
+
+    processing.value = true;
+    router.post(
+        route('prescriptions.send', { prescription: latestPrescription.value.id }),
+        {},
+        {
+            preserveScroll: true,
+            onSuccess: () => {
+                success('Revisione inviata');
+                emit('updated');
+            },
+            onError: (errors: Record<string, string>) => {
+                error(errors?.prescription ?? 'Si è verificato un errore');
+            },
+            onFinish: () => {
+                processing.value = false;
+            },
+        },
+    );
+};
+
+const submitCloseRevision = () => {
+    if (!latestPrescription.value?.id || processing.value) {
+        return;
+    }
+
+    processing.value = true;
+    router.post(
+        route('prescriptions.revisions.close', { prescription: latestPrescription.value.id }),
+        {},
+        {
+            preserveScroll: true,
+            onSuccess: () => {
+                success('Revisione chiusa');
+                closeRevisionDialog.value = false;
+                emit('updated');
+            },
+            onError: (errors: Record<string, string>) => {
                 error(errors?.prescription ?? 'Si è verificato un errore');
             },
             onFinish: () => {
@@ -376,6 +486,18 @@ const submitRevisionRequest = () => {
     @apply text-lg font-semibold text-gray-900;
 }
 
+.operations-show__new-changes-banner {
+    @apply mb-4 flex w-full items-center justify-between rounded-md border border-amber-500 bg-amber-100 px-4 py-2 text-sm text-amber-800;
+}
+
+.operations-show__new-changes-banner-title {
+    @apply font-semibold;
+}
+
+.operations-show__new-changes-banner-date {
+    @apply text-xs text-amber-700;
+}
+
 .operations-show__revision-card {
     @apply mb-4 rounded-md border border-orange-400 bg-orange-50 p-4;
 }
@@ -384,8 +506,20 @@ const submitRevisionRequest = () => {
     @apply text-sm font-semibold text-orange-800;
 }
 
+.operations-show__revision-card-list {
+    @apply mt-2 flex flex-col gap-2;
+}
+
+.operations-show__revision-card-item {
+    @apply rounded-md border border-orange-200 bg-white px-4 py-2;
+}
+
+.operations-show__revision-card-date {
+    @apply text-xs text-orange-700;
+}
+
 .operations-show__revision-card-text {
-    @apply mt-2 whitespace-pre-line text-sm text-orange-900;
+    @apply whitespace-pre-line text-sm text-orange-900;
 }
 
 .operations-show__revision-dialog {
