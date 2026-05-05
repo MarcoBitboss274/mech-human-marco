@@ -1,0 +1,1224 @@
+/* ============================================================
+   MAIN OVERRIDE
+   Override e aggiunte rispetto a main.css.
+   Non modificare main.css direttamente — usare questo file.
+   Gestito dalla skill Gestione_UI — registro: docs/ui/UI_ACTIVITY_LOG.md
+   ============================================================ */
+
+body {
+    font-family:
+        'Overpass',
+        -apple-system,
+        BlinkMacSystemFont,
+        'Segoe UI',
+        Roboto,
+        'Helvetica Neue',
+        sans-serif;
+    font-size: 14px !important;
+}
+
+/* ── Rimozione ombra + bordo sottile su sidebar e navbar ─────────────────── */
+.layout-sidebar,
+.layout-topbar,
+.topbar-no-sidebar {
+    box-shadow: none !important;
+}
+
+.layout-sidebar {
+    border-right: 1px solid var(--bb-border-light);
+}
+
+.layout-topbar,
+.topbar-no-sidebar {
+    border-bottom: 1px solid var(--bb-border-light);
+}
+
+/* ── Allineamento verticale elementi navbar ───────────────────────────────── */
+.layout-topbar .bb-dropdown--user-dropdown .base-btn {
+    display: inline-flex !important;
+    align-items: center;
+}
+
+.layout-topbar .bb-popover__wrapper {
+    display: inline-flex !important;
+    align-items: center;
+    height: var(--topbar-h);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   PAGINE AUTH — Gradient left-panel basato su --bb-primary
+   Sostituisce il gradient hardcoded nero/blu-petrolio di AuthContainer.vue:51
+   con una versione animata che alterna --bb-primary e una versione scura (30%
+   primary + 70% nero). !important necessario perché lo <style> del SFC ha
+   stessa specificità e l'ordine di caricamento Vite non è deterministico.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.auth-container .left-panel {
+    background: linear-gradient(
+        60deg,
+        color-mix(in sRGB, var(--bb-primary) 30%, #000),
+        var(--bb-primary),
+        color-mix(in sRGB, var(--bb-primary) 30%, #000),
+        var(--bb-primary),
+        color-mix(in sRGB, var(--bb-primary) 30%, #000)
+    ) !important;
+    background-size: 1000% 1000% !important;
+    animation: gradientAnimationOverride 20s linear infinite !important;
+}
+
+/* Keyframes ridichiarati qui: quelli della SFC vengono referenziati per nome
+   da `animation:` e i nomi delle keyframes sono globali, ma avere la rule
+   completa nell'override garantisce che l'animazione funzioni anche se
+   l'ordine di caricamento Vite ritarda lo <style> SFC. */
+@keyframes gradientAnimationOverride {
+    0%,
+    100% {
+        background-position: left bottom;
+    }
+    50% {
+        background-position: right top;
+    }
+}
+
+/* Logo auth: wordmark orizzontale, più largo dello stacked di prima (ratio 6.25:1 → serve più width).
+   Override sia per left-panel (desktop) che right-panel (mobile).
+   !important per vincere su `.app-logo { @apply w-40 }` dell'SFC (stessa specificità, ordine cascata non deterministico con Vite). */
+.auth-container .left-panel .home-btn .app-logo--auth {
+    width: 320px !important;
+}
+
+.auth-container .right-panel .home-btn .app-logo--auth {
+    width: 240px !important;
+}
+
+/* ── Pagine auth: button primary (Login, Registrati, Invia, Imposta password)
+   sempre blu primario. Override difensivo: il BbButton di default userebbe già
+   --bb-primary, ma questa regola esclude esplicitamente i secondary e assicura
+   il colore corretto indipendentemente da override o stati runtime.
+   -------------------------------------------------------------------------- */
+.auth-container
+    .bb-button:not(.bb-button--icon):not(.bb-button--secondary):not([variant='secondary']):not(.bb-button--primary-outline):not(.base-btn--disabled) {
+    --color: var(--bb-primary);
+    --border-color: var(--bb-primary);
+    --text-color: var(--bb-contrasting);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   LAYOUT VARS — sidebar più stretta + topbar più basso.
+   NOTA sulla cascade: `main.css` ridefinisce `:root { --topbar-h: 60px }` DOPO
+   l'import di questo file, quindi un `:root {…}` qui verrebbe sovrascritto.
+   Definisco le var direttamente sugli elementi (`.layout-topbar`, `.layout-sidebar`)
+   con specificità pari al `:root` ma che vince per proximity (più vicino al
+   target). Aggiungo `height !important` su topbar come belt-and-suspenders.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+:root {
+    --topbar-h: 50px;
+    --sidebar-min-w: 56px;
+    --sidebar-max-w: 180px;
+}
+
+.layout-topbar {
+    --topbar-h: 50px;
+    height: 50px !important;
+    min-height: 50px !important;
+}
+
+.layout-sidebar,
+.default-layout {
+    --sidebar-min-w: 56px;
+    --sidebar-max-w: 180px;
+}
+
+/* Sposta logo + toggle un pizzico più in alto: riduco --py della sidebar.
+   Il toggle è posizionato a `top: calc(var(--py) + var(--logo-h)/2)` (SFC),
+   quindi --py più piccolo = toggle + logo più in alto. */
+.layout-sidebar {
+    --py: 1px;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   SIDEBAR — Toggle con sfondo bianco + icone più piccole centrate col testo.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* Toggle sidebar: bg stesso della sidebar (grigio molto chiaro), quadrato */
+.layout-sidebar .sidebar-toggle {
+    background-color: color-mix(in sRGB, var(--bb-panel) 96%, var(--bb-text)) !important;
+    border: none !important;
+    border-radius: 0 !important;
+}
+
+.layout-sidebar .sidebar-toggle:hover:not(:disabled) {
+    background-color: color-mix(in sRGB, var(--bb-panel) 96%, var(--bb-text)) !important;
+    color: var(--bb-text);
+}
+
+/* Sidebar: sfondo grigio molto chiaro (più chiaro di --color-mix-100).
+   96% panel (bianco) + 4% text (scuro) = grigio molto delicato. */
+.layout-sidebar {
+    background-color: color-mix(in sRGB, var(--bb-panel) 96%, var(--bb-text)) !important;
+}
+
+/* Sidebar collapsed: nessuna voce evidenziata come "active".
+   Normalmente `.sidebar-link--active` ha bg `--color-mix-200` (theming_override).
+   Quando la sidebar è chiusa non ha senso mostrare la voce attiva — è invisibile. */
+.layout-sidebar:not(.layout-sidebar--expanded) .sidebar-link.sidebar-link--active {
+    background-color: transparent !important;
+    color: var(--bb-text) !important;
+}
+
+.layout-sidebar:not(.layout-sidebar--expanded) .sidebar-link.sidebar-link--active .bb-icon {
+    color: var(--bb-text) !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   FILTRI INDEX — 5 per riga, vanno a capo se sono di più.
+   Pattern comune: `<div class="my-4 flex flex-wrap items-end justify-start gap-3">
+   ...filters...</div>` figlia diretta di `.admin-view`. Ogni filtro ha
+   flex-basis FISSO di 1/5 (meno la quota di gap) così entrano esattamente 5
+   per riga e restano della stessa dimensione anche se ce ne sono meno (1, 2,
+   3 filtri occupano ciascuno 1/5, lasciando spazio vuoto a destra).
+   Calcolo: 5 item + 4 gap da 8px = 32px di gap totale. Ogni item larghezza
+   = (100% - 32px) / 5.
+   Icon button (Pulisci) mantiene dimensione naturale.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.admin-view > .flex.flex-wrap.items-end,
+.workspace-view > .flex.flex-wrap.items-end {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+}
+
+.admin-view > .flex.flex-wrap.items-end > .bb-base-input-outer-container,
+.workspace-view > .flex.flex-wrap.items-end > .bb-base-input-outer-container {
+    flex: 0 0 calc((100% - 32px) / 5) !important;
+    min-width: 0 !important;
+    width: auto !important;
+    max-width: none !important;
+}
+
+.admin-view > .flex.flex-wrap.items-end > .bb-button,
+.workspace-view > .flex.flex-wrap.items-end > .bb-button {
+    flex: 0 0 auto !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   PAGE TITLE + SPACING VERTICALE PAGINE
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* Page title: 22px (h1 principale delle pagine) */
+.page__title {
+    font-size: 22px !important;
+    line-height: 28px !important;
+}
+
+/* Page subtitle: 14px (era text-base = 16px) */
+.page__subtitle {
+    font-size: 14px !important;
+    line-height: 20px !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   PAGINA DETTAGLIO LAVORAZIONE (/operations/…)
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* Status badge-edit: outer narrower.
+   Uso `html body` come prefisso per avere specificità (0,2,2) che batte
+   qualsiasi cascade ordering di SFC vs main.css. */
+html body .operation-status-badge-edit.operation-status-badge-edit {
+    width: 180px !important;
+    max-width: 180px !important;
+    min-width: 0 !important;
+    font-size: 12px !important;
+}
+
+/* Font-size 12px su tutti i figli del badge-edit (input, span, label, svg text, ecc.) */
+html body .operation-status-badge-edit,
+html body .operation-status-badge-edit * {
+    font-size: 12px !important;
+}
+
+/* Forzo anche i wrapper bb-select interni a non eccedere il parent 110px */
+html body .operation-status-badge-edit .operation-status-badge-edit__select,
+html body .operation-status-badge-edit .bb-base-input-outer-container,
+html body .operation-status-badge-edit .bb-base-input-container,
+html body .operation-status-badge-edit .bb-base-input-container__input,
+html body .operation-status-badge-edit .bb-common-input-outer-container,
+html body .operation-status-badge-edit .bb-common-input-inner-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+}
+
+/* Input testuale interno: bb-ui setta `min-width: min(100%, calc(var(--characters)*12px))`
+   e con `--characters: 10` (inline) forza 120px min-width. Azzero `--characters`
+   per far collassare l'input (lo style inline viene sovrascritto da !important
+   via CSS custom prop). */
+html body .operation-status-badge-edit .bb-base-select__text-input {
+    --characters: 0 !important;
+    min-width: 0 !important;
+    width: auto !important;
+    flex: 1 1 0 !important;
+}
+
+/* Status badge-edit select: matcha il badge "Produzione" (py-1 + text-xs
+   + leading-none + border 1px = ~22px). La SFC ha regole con stessa
+   specificità caricate DOPO main.css (via Vite), quindi serve specificità
+   più alta. Prefisso con la classe outer `.operation-status-badge-edit` per
+   passare da 2 a 3 classi. */
+.operation-status-badge-edit .operation-status-badge-edit__select .bb-base-input-container__input {
+    padding: 4px 12px !important;
+    height: auto !important;
+    min-height: 0 !important;
+}
+
+.operation-status-badge-edit .operation-status-badge-edit__select .bb-common-input-outer-container,
+.operation-status-badge-edit .operation-status-badge-edit__select .bb-common-input-inner-container,
+.operation-status-badge-edit .operation-status-badge-edit__select .bb-base-select__input-container {
+    padding: 0 !important;
+    height: 14px !important;
+    min-height: 14px !important;
+    max-height: 14px !important;
+    line-height: 14px !important;
+    overflow: visible !important;
+}
+
+.operation-status-badge-edit .operation-status-badge-edit__select .bb-base-select__text-input {
+    height: 14px !important;
+    min-height: 0 !important;
+    line-height: 14px !important;
+    padding: 0 !important;
+}
+
+/* Also allow visible overflow su bb-smooth-height (il wrapper JS-inline con height: 18px)
+   per non tagliare gli ascender delle lettere maiuscole. */
+.operation-status-badge-edit .operation-status-badge-edit__select .bb-smooth-height,
+.operation-status-badge-edit .operation-status-badge-edit__select .bb-smooth-height > .content {
+    overflow: visible !important;
+}
+
+/* Forza 12px su TUTTO il contenuto testuale del select (input, overlay span
+   del valore selezionato, placeholder, tag) — il testo "Produzione" viene
+   renderizzato in un elemento diverso dall'input, quindi cast a wider net. */
+/* Border del select del badge: meno opaco (tono light invece del border std). */
+html body .bb-base-input-outer-container.bb-select.operation-status-badge-edit__select .bb-base-input-container__input,
+html body .bb-base-input-outer-container.bb-select.operation-status-badge-edit__select .bb-common-input-outer-container,
+html body .bb-base-input-outer-container.bb-select.operation-status-badge-edit__select .bb-common-input-inner-container {
+    border-color: var(--bb-border-light) !important;
+}
+
+.operation-status-badge-edit__select .bb-common-input-inner-container,
+.operation-status-badge-edit__select .bb-common-input-inner-container *,
+.operation-status-badge-edit__select .bb-base-select__text-input,
+.operation-status-badge-edit__select .bb-base-select__selected-value,
+.operation-status-badge-edit__select .bb-base-select__placeholder,
+.operation-status-badge-edit__select .bb-base-select__tag,
+.operation-status-badge-edit__select input {
+    font-size: 12px !important;
+    line-height: 1 !important;
+}
+
+.operation-status-badge-edit__select .bb-base-select__chevron {
+    width: 14px !important;
+    height: 14px !important;
+}
+
+/* Gap tra h1 e status badge/canceled/archived ridotto (era gap-4 = 16px) */
+.admin-view__header .flex.flex-wrap.items-center.gap-4,
+.workspace-view__header .flex.flex-wrap.items-center.gap-4 {
+    gap: 8px !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   FLUSSO /operations/create — allinea page__title al max-w-7xl sotto e
+   restringe il contenuto a 1040px (invece di 1280px) per maggiori margin
+   laterali e una pagina più leggibile.
+   Pattern: `.admin-view > .admin-view__header` + `.admin-view > .mx-auto.max-w-7xl`
+   come sibling. Applico `max-width: 1040px + mx-auto` a ENTRAMBI SOLO quando
+   esiste il sibling centrato (via :has), così le altre admin-view non sono
+   toccate. 1040 è pari (rispetta il design system).
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.admin-view:has(> .mx-auto.max-w-7xl),
+.workspace-view:has(> .mx-auto.max-w-7xl) {
+    margin-top: 32px !important;
+}
+
+.admin-view:has(> .mx-auto.max-w-7xl) > .admin-view__header,
+.admin-view:has(> .mx-auto.max-w-7xl) > .mx-auto.max-w-7xl,
+.workspace-view:has(> .mx-auto.max-w-7xl) > .workspace-view__header,
+.workspace-view:has(> .mx-auto.max-w-7xl) > .mx-auto.max-w-7xl {
+    width: 100% !important;
+    max-width: 880px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+/* Linea di separazione sotto l'header (page__title + back button) per staccare
+   visivamente dal wizard sotto. padding-bottom per aria tra titolo e linea. */
+.admin-view:has(> .mx-auto.max-w-7xl) > .admin-view__header,
+.workspace-view:has(> .mx-auto.max-w-7xl) > .workspace-view__header {
+    padding-bottom: 16px !important;
+    border-bottom: 1px solid var(--bb-border-light) !important;
+}
+
+/* Separazione verticale dei field nel wizard: fieldset / bb-base-input /
+   bb-select / bb-textarea ottengono margin verticale aggiuntivo per non
+   sembrare appiccicati. I field sono in admin-form__grid con gap-4 (16px):
+   +8px top +8px bottom = 32px effettivi fra righe (16 margin + 16 gap). */
+.admin-view:has(> .mx-auto.max-w-7xl) :is(fieldset, .bb-base-input-outer-container, .bb-select, .bb-textarea),
+.workspace-view:has(> .mx-auto.max-w-7xl) :is(fieldset, .bb-base-input-outer-container, .bb-select, .bb-textarea) {
+    margin-top: 8px !important;
+    margin-bottom: 8px !important;
+}
+
+/* Forza 2 colonne sempre su admin-form__grid e sui `<p class="my-2">` con
+   inputs inline del wizard (es. ProtrusorStep).
+   BUG ROOT CAUSE: `theming.css:356` applica `grid md:grid-cols-2` SOLO se
+   c'è un antenato `.admin-form` (regola nested Tailwind). I componenti step
+   (ProtrusorStep, LybraAlignerStep, …) hanno `<div class="admin-form__grid">`
+   senza wrapper `.admin-form` → la rule non matcha → niente display:grid →
+   fallback block flow (1 colonna).
+   FIX: forzo `display: grid` + 2 colonne + gap direttamente sull'elemento,
+   a prescindere dal wrapper. */
+.admin-view:has(> .mx-auto.max-w-7xl) .admin-form__grid,
+.workspace-view:has(> .mx-auto.max-w-7xl) .admin-form__grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 16px !important;
+}
+
+/* `<p class="my-2">` con 2 sezioni testo+input inline (ProtrusorStep):
+   prende l'intera riga del parent grid e si divide in 2 colonne interne via
+   `grid-auto-flow: column` + `grid-template-rows: auto auto`. I 4 figli
+   (text1, input1, text2, input2) si dispongono column-first:
+   col 1 = text1 / input1 ; col 2 = text2 / input2 → le 2 sezioni stanno
+   finalmente sulla stessa riga del parent. */
+.admin-view:has(> .mx-auto.max-w-7xl) .admin-form__grid > .my-2,
+.workspace-view:has(> .mx-auto.max-w-7xl) .admin-form__grid > .my-2 {
+    grid-column: 1 / -1 !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-template-rows: auto auto !important;
+    grid-auto-flow: column !important;
+    column-gap: 16px !important;
+    row-gap: 8px !important;
+    align-items: center !important;
+}
+
+/* BbTextarea (es. campo Note) + OdontogramInput nel wizard: sempre full-width,
+   1 riga intera del grid. */
+.admin-view:has(> .mx-auto.max-w-7xl) .admin-form__grid > .bb-textarea,
+.admin-view:has(> .mx-auto.max-w-7xl) .admin-form__grid > .odontogram-input,
+.workspace-view:has(> .mx-auto.max-w-7xl) .admin-form__grid > .bb-textarea,
+.workspace-view:has(> .mx-auto.max-w-7xl) .admin-form__grid > .odontogram-input {
+    grid-column: 1 / -1 !important;
+}
+
+/* Pagina dettaglio lavorazione (/operations/{id} — Show.vue) usa `.admin-view.boxed`:
+   margin-top per stacco dal topbar + restringo il max-width da 1280 a 1120 per
+   margin laterali più generosi (contenuto più leggibile). Valori pari. */
+.admin-view.boxed {
+    margin-top: 32px !important;
+    max-width: 1120px !important;
+}
+
+/* Stesso trattamento per le altre pagine di dettaglio (buildings/Show,
+   prescriptions/Show, quotes/Show, productions/Show, invoices/Show). Non
+   usano `.admin-view.boxed` ma ognuna ha un wrapper interno dedicato
+   (`.{resource}-show__content`): uso `:has()` per matcharlo e applico anche
+   `margin-left/right: auto` (che `.boxed` prende via `mx-auto` di theming,
+   qui invece manca). */
+/* Pagine Show (Prescrizione, Struttura, Preventivo, Produzione, Fattura):
+   margin-top + width fisso 80% del viewport (nessun max-width), centrate. */
+.admin-view:has(> .buildings-show__content),
+.admin-view:has(> .prescriptions-show__content),
+.admin-view:has(> .quotes-show__content),
+.admin-view:has(> .productions-show__content),
+.admin-view:has(> .invoices-show__content),
+.workspace-view:has(> .buildings-show__content),
+.workspace-view:has(> .prescriptions-show__content),
+.workspace-view:has(> .quotes-show__content),
+.workspace-view:has(> .invoices-show__content) {
+    margin-top: 32px !important;
+    width: 80% !important;
+    max-width: none !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    box-sizing: border-box !important;
+}
+
+/* Workspace operations Show (/workspace/{slug}/operations/{id}): usa solo
+   `.workspace-view` senza marker `.boxed` come la controparte admin. Lo
+   identifico via `:has(.operation-progress)` — il componente OperationProgress
+   è renderizzato SOLO nella pagina Show (confermato: grep su workspace/operations/).
+   Marco ha detto che 1120px era "ristretto troppo" rispetto ad admin: passo a
+   1280px (Tailwind `max-w-7xl` — default di `.workspace-view.boxed` in
+   theming.css:398). `width: 100%` esplicito per parità con `.admin-view.boxed`
+   che ha `w-full` dal theming. */
+.workspace-view:has(.operation-progress) {
+    margin-top: 32px !important;
+    width: 100% !important;
+    max-width: 1280px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+/* Detail show pages (buildings/prescriptions/quotes/productions/invoices):
+   label compatta (12px) + gap label/value ridotto (da 4 a 2). Classi
+   specifiche per-risorsa (non condivise) quindi enumero tutte. */
+.buildings-show__label,
+.prescriptions-show__label,
+.quotes-show__label,
+.productions-show__label,
+.invoices-show__label {
+    font-size: 12px !important;
+    line-height: 16px !important;
+}
+
+.buildings-show__details-item,
+.prescriptions-show__details-item,
+.quotes-show__details-item,
+.productions-show__details-item,
+.invoices-show__details-item {
+    gap: 2px !important;
+}
+
+/* Buildings Show: i 3 tab ("Dettagli", "Membri", "Indirizzi di spedizione")
+   devono avere la stessa larghezza sempre. Di default bb-tab usa `li` inline-block
+   larghi quanto il testo, quindi i tab hanno larghezze diverse. Rendo il
+   container un grid con `grid-auto-columns: 1fr` per equi-distribuire i `li`,
+   azzero il `margin-left: 40px` tra li (altrimenti sballa il grid) e forzo il
+   bottone interno a riempire la cella. */
+.buildings-show__content .bb-tab--horizontal > .bb-tab__label-boundary .bb-tab__label-container {
+    display: grid !important;
+    grid-auto-flow: column !important;
+    grid-auto-columns: 1fr !important;
+}
+
+.buildings-show__content .bb-tab--horizontal > .bb-tab__label-boundary .bb-tab__label-container > li + li {
+    margin-left: 0 !important;
+}
+
+.buildings-show__content .bb-tab--horizontal > .bb-tab__label-boundary .bb-tab__label-container > li > .bb-tab__btn {
+    width: 100% !important;
+}
+
+/* Tab Prescrizione: più aria orizzontale tra main (card) e aside (fatturazione/
+   spedizione/info). Il grid padre ha `gap-4` (16px) → passo a 32px solo sulle
+   colonne (row-gap invariato). */
+.operations-show__details-grid {
+    column-gap: 32px !important;
+}
+
+/* Prescription details card: padding delle section leggermente più generoso
+   (20 → 24) e gap label/value ridotto (da 4 a 2) per avvicinare testo e valore.
+   Il `border-b` della SFC tocca i bordi della card; lo rimpiazzo con uno
+   ::after absolute che ha padding laterale di 24px (= padding section), così
+   la linea divisoria resta "rientrata" rispetto ai lati. */
+.prescription-details-card__section {
+    padding: 24px !important;
+    border-bottom: none !important;
+    position: relative !important;
+}
+
+.prescription-details-card__section:not(.prescription-details-card__section--last)::after {
+    content: '';
+    position: absolute;
+    left: 24px;
+    right: 24px;
+    bottom: 0;
+    height: 1px;
+    background-color: rgb(229 231 235);
+}
+
+.prescription-details-card__field {
+    gap: 2px !important;
+}
+
+/* Header flex (title "Lavorazione …" + StatusBadge) della prima section:
+   linea di separazione inferiore per staccarlo dal grid dei field sottostante.
+   Stesso colore della linea inter-section (gray-200). */
+.prescription-details-card__section .flex.items-baseline.justify-start.gap-2 {
+    padding-bottom: 4px !important;
+    margin-bottom: 20px !important;
+    border-bottom: 1px solid rgb(229 231 235) !important;
+}
+
+/* Fieldset del wizard (radio group tipo "Tipologia protrusore", "Cut line",
+   "Dettaglio Corone e Ponti", ecc.): occupa sempre l'intera riga del grid
+   padre invece di 1 sola colonna. I radio interni stanno in colonna singola
+   (stack verticale) — sovrascrivo anche `grid-template-columns` per i casi
+   in cui la SFC è avvolta in `.admin-form` (che in theming.css:360 imposta
+   `grid-template-columns: inherit` → 2 cols ereditate dal padre). */
+.admin-view:has(> .mx-auto.max-w-7xl) .admin-form__grid > fieldset,
+.workspace-view:has(> .mx-auto.max-w-7xl) .admin-form__grid > fieldset {
+    grid-column: 1 / -1 !important;
+    grid-template-columns: 1fr !important;
+}
+
+/* Prescription details card — rimuovi l'ombra (`shadow-sm` applicato dalla SFC
+   in PrescriptionDetailsCard.vue:293). Tailwind v4 mette le utility in `@layer
+   utilities` e l'ordine può far vincere la regola SFC nonostante il !important;
+   uso selettore `html body …` (specificità 0,1,2) + reset di tutte le custom
+   property `--tw-shadow*`. Copro anche la card interna `__section` per sicurezza. */
+html body .prescription-details-card,
+html body .prescription-details-card * {
+    box-shadow: 0 0 transparent !important;
+    --tw-shadow: 0 0 transparent !important;
+    --tw-shadow-color: transparent !important;
+    --tw-shadow-colored: 0 0 transparent !important;
+    --tw-ring-shadow: 0 0 transparent !important;
+    --tw-ring-offset-shadow: 0 0 transparent !important;
+    --tw-inset-shadow: 0 0 transparent !important;
+    --tw-inset-ring-shadow: 0 0 transparent !important;
+}
+
+html body .prescription-details-card {
+    filter: none !important;
+}
+
+/* Value del card: font-size 14px. Il default (body) era 15px pre-fix; ora 14
+   globale + override difensivo qui con massima specificità. */
+html body .prescription-details-card__value,
+html body .prescription-details-card__value * {
+    font-size: 14px !important;
+    line-height: 20px !important;
+}
+
+/* Label del card: più piccolo del value (12px) per gerarchia visiva. */
+html body .prescription-details-card__label,
+html body .prescription-details-card__label * {
+    font-size: 12px !important;
+    line-height: 16px !important;
+}
+
+/* Badge custom (Status/Gender/Typology/OperationStatus) dentro il card:
+   font-size 12px invece di 14 (text-sm della SFC) per non dominare il value.
+   Padding ridotto proporzionalmente (12/4 → 8/2). Pattern del badge:
+   rounded-md + border + whitespace-nowrap. */
+html body .prescription-details-card .rounded-md.border.whitespace-nowrap {
+    font-size: 12px !important;
+    line-height: 16px !important;
+    padding: 2px 8px !important;
+}
+
+/* Tab Lavorazioni: label dei production-content → font-size 12px. */
+.operation-production__content .operation-production__label {
+    font-size: 12px !important;
+    line-height: 16px !important;
+}
+
+/* Tab Fornitore: la card del fornitore selezionato deve restare bianca con
+   bordo grigio (come le altre, nessun highlight verde). La SFC applica
+   `border-emerald-200 bg-emerald-50` su `.operation-suppliers__card--selected`
+   (SuppliersTab.vue:290); li annullo con i valori dello state di default. */
+.operation-suppliers__card--selected {
+    background-color: #fff !important;
+    border-color: rgb(229 231 235) !important;
+}
+
+/* Alert di errore degli input (bb-base-input): piccolo padding-top per staccarli
+   dall'input sopra. Applicato all'item singolo dell'errore. */
+.bb-base-input-container__error {
+    padding-top: 4px !important;
+}
+
+/* Badge: border meno opachi. Pattern condiviso da StatusBadge, GenderBadge,
+   TypologyBadge, OperationStatusBadge, ecc.: div con
+   `rounded-md border whitespace-nowrap` + `border-{color}-500` + `!text-{color}-700`.
+   Derivo il border-color da `currentColor` (il testo del badge, già tintato)
+   con 30% opacità → bordo faded ma con la stessa tinta del testo,
+   coerente visivamente con la fill del badge. */
+.rounded-md.border.whitespace-nowrap {
+    border-color: color-mix(in srgb, currentColor 30%, transparent) !important;
+}
+
+/* OperationNotice — rimuovi margin-top dall'hint-message (era mt-1 = 4px) */
+.operation-notice__hint-message {
+    margin-top: 0 !important;
+}
+
+/* OperationNotice HINT — card grigio-scuro (stesso tono dei title, --bb-text-light)
+   con testo bianco + button bianco testo nero. Sovrascrive il
+   bg-sky-50/border-sky-300/text-sky-* della SFC. */
+.operation-notice__item--hint {
+    background-color: #24282a !important;
+    border-color: #24282a !important;
+    color: #fff !important;
+}
+
+.operation-notice__item--hint .operation-notice__hint-title,
+.operation-notice__item--hint .operation-notice__hint-message,
+.operation-notice__item--hint .operation-notice__hint-icon {
+    color: #fff !important;
+}
+
+.operation-notice__item--hint .operation-notice__hint-button {
+    background-color: #fff !important;
+    border-color: #fff !important;
+    color: #000 !important;
+}
+
+.operation-notice__item--hint .operation-notice__hint-button:hover {
+    background-color: #fff !important;
+    border-color: #fff !important;
+    color: #000 !important;
+}
+
+/* Hint: compattare spazio verticale title↔message (i `<p>` ricevono residui
+   di margin dall'UA/preflight). Message in grigio chiaro invece che bianco
+   per gerarchia visiva (title resta bianco pieno). */
+.operation-notice__item--hint .operation-notice__hint-title,
+.operation-notice__item--hint .operation-notice__hint-message {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+.operation-notice__item--hint .operation-notice__hint-message {
+    color: #b8bdc1 !important;
+}
+
+/* Meno padding verticale all'inizio delle pagine (24→16px top, 40→24px bottom) */
+.default-layout__page-container > * {
+    padding-top: 16px !important;
+    padding-bottom: 24px !important;
+}
+
+/* Fix scroll fantasma ~50px: la SFC (DefaultLayout.vue:54-55) mette
+   `min-height: 100dvh` sul page-container, ma il container è già una riga
+   `1fr` dentro `.default-layout` (grid auto+1fr) sotto la topbar da 50px.
+   Totale: 50px topbar + 100dvh container = 100dvh+50px → scroll inutile.
+   Sottraggo l'altezza della topbar così il container si ferma al viewport. */
+.default-layout__page-container {
+    min-height: calc(100dvh - var(--topbar-h)) !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   TAB BAR — meno spazio verticale tra label/linea e sopra la tab bar
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* Gap interno bb-tab (tra label-container e contenuto) ridotto: 24px → 8px */
+.bb-tab {
+    gap: 8px !important;
+}
+
+/* Padding bottom del label-container (spazio sotto il testo della tab, sopra
+   la linea indicatore): 12px → 0 (label attaccato alla riga indicatore) */
+.bb-tab--horizontal > .bb-tab__label-boundary .bb-tab__label-container {
+    padding-bottom: 0 !important;
+}
+
+/* Font size tab label: 14px (consistente con input, select, filtri) */
+.bb-tab .bb-tab__btn {
+    font-size: 14px !important;
+}
+
+/* Tab bar attaccate all'elemento sopra: `.admin-view > .mt-4` (wrapper della
+   BbTab) di default ha margin-top 16px. Riduco a 4px. */
+.admin-view > .mt-4:has(> .bb-tab),
+.workspace-view > .mt-4:has(> .bb-tab) {
+    margin-top: 4px !important;
+}
+
+/* Indicatore del tab selezionato: linea molto più sottile (5 → 2px).
+   Horizontal: `height`; vertical: `width`. La SFC bitboss-ui usa ::before
+   sul `.bb-tab__label-container` per disegnare la linea animata. */
+.bb-tab--horizontal > .bb-tab__label-boundary .bb-tab__label-container::before {
+    height: 2px !important;
+}
+
+.bb-tab--vertical > .bb-tab__label-boundary .bb-tab__label-container::before {
+    width: 2px !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   EMPTY STATE — tabelle senza dati: padding verticale per non sembrare
+   appiccicate alla riga sopra/sotto.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* Empty state tabella: "Nessuna ... trovata" e simili.
+   bb-table è `display: grid`, quindi il no-data viene renderizzato come figlio
+   diretto di `.bb-table` FUORI dal <table> HTML. Target SOLO segnali specifici
+   di empty-state (colspan, classi esplicite, figli non-table) — evito
+   `:only-child` che catturerebbe anche tabelle con una sola riga legittima. */
+
+/* Direct child di .bb-table che NON è un elemento tabella:
+   è qui che bb-table mette lo slot no-data nel layout grid. */
+.bb-table > :not(table):not(thead):not(tbody):not(tfoot):not(colgroup):not(caption) {
+    padding-top: 48px !important;
+    padding-bottom: 48px !important;
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+    text-align: center !important;
+    color: var(--color-mix-600) !important;
+    font-size: 14px !important;
+}
+
+/* No-data dentro riga tabella: serve SEMPRE il colspan (bb-table lo mette su
+   cella unica che attraversa tutte le colonne). Niente `:only-child` qui. */
+.bb-table tbody > tr > td[colspan],
+.bb-table [class*='no-data'],
+.bb-table [class*='empty-state'],
+.bb-table__empty,
+.bb-table__no-data {
+    padding-top: 48px !important;
+    padding-bottom: 48px !important;
+    text-align: center !important;
+    color: var(--color-mix-600) !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   PAGINATION — cerchio perfetto (width = height, niente ovali per cifre doppie)
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.bb-pagination .bb-pagination__pages li .bb-pagination__page {
+    width: var(--size) !important;
+    height: var(--size) !important;
+    min-width: var(--size) !important;
+    min-height: var(--size) !important;
+    padding: 0 !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   DIALOG — solo l'ULTIMO button del footer resta primary, tutti gli altri
+   vengono downgradati a secondary. Così qualsiasi dialog con 2+ button ha
+   un solo primary anche senza variant="secondary" esplicito.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.bb-dialog .bb-button:not(:last-child):not(.bb-button--icon):not(.base-btn--disabled) {
+    --color: transparent !important;
+    --border-color: var(--color-mix-200) !important;
+    --text-color: var(--bb-text) !important;
+}
+
+.bb-dialog .bb-button:not(:last-child):not(.bb-button--icon):not(.base-btn--disabled):hover {
+    background-color: var(--color-mix-200) !important;
+    color: var(--bb-text) !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   WIZARD CREATE OPERATION — Upload file e Spedizione/Fatturazione.
+   I pulsanti "mode-option" sono div con role=button, non BbButton. Li
+   rendo visivamente coerenti con il design system: secondary (outline) a
+   riposo, primary (blu) quando selezionati.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.attachments-step__mode-option,
+.create-wizard__address-mode-option {
+    background-color: transparent !important;
+    border: 1px solid var(--color-mix-200) !important;
+    color: var(--bb-text) !important;
+    font-weight: 500 !important;
+    border-radius: var(--bb-radius) !important;
+    min-height: 30px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 4px 12px !important;
+}
+
+.attachments-step__mode-option:hover,
+.create-wizard__address-mode-option:hover {
+    background-color: var(--color-mix-200) !important;
+    border-color: var(--color-mix-200) !important;
+    color: var(--bb-text) !important;
+}
+
+.attachments-step__mode-option.selected,
+.create-wizard__address-mode-option.selected {
+    background-color: var(--bb-primary) !important;
+    border-color: var(--bb-primary) !important;
+    color: var(--bb-contrasting) !important;
+}
+
+.attachments-step__mode-option.selected:hover,
+.create-wizard__address-mode-option.selected:hover {
+    background-color: var(--bb-primary) !important;
+    border-color: var(--bb-primary) !important;
+    color: var(--bb-contrasting) !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   OPERATION PROGRESS — cerchi molto ridotti (da 28px a 14px) e dot proporzionale.
+   Tutti gli stati (completed + current) sono forzati al primary --bb-primary;
+   la SFC usa `amber-400` per completed e `blue-500` di Tailwind per current,
+   entrambi non legati al tema. Qui uniformiamo al primary del brand.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.operation-progress__circle {
+    width: 14px !important;
+    height: 14px !important;
+    border-width: 1px !important;
+}
+
+.operation-progress__dot {
+    width: 6px !important;
+    height: 6px !important;
+}
+
+.operation-progress__circle--completed {
+    border-color: var(--bb-primary) !important;
+}
+
+.operation-progress__dot--completed {
+    background-color: var(--bb-primary) !important;
+}
+
+.operation-progress__line--completed {
+    background-color: var(--bb-primary) !important;
+}
+
+.operation-progress__circle--current {
+    border-color: var(--bb-primary) !important;
+}
+
+.operation-progress__dot--current {
+    background-color: var(--bb-primary) !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   BB-SELECT — font 14px allineato al resto degli input/filtri/tab label
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.bb-select {
+    --bb-input-font-size: 14px;
+}
+
+.bb-select .bb-common-input-inner-container input,
+.bb-select .bb-base-select__selected-value,
+.bb-select .bb-base-select__placeholder,
+.bb-select .bb-base-select__tag {
+    font-size: 14px !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   ICONE — uniforma stroke-width a 1.5 su tutte le icone SVG con stroke.
+   Applica a icone renderizzate da BbIcon (classe `.bb-icon`). I file SVG
+   nell'asset set hanno stroke-width che variano (1.125 / 1.5 / 2 / 3 / 4);
+   questo override normalizza tutto a 1.5. Le icone filled (senza stroke) non
+   sono toccate — se vuoi anche quelle outline serve sostituire i file SVG.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.bb-icon svg,
+.bb-icon svg *,
+.sidebar-toggle svg,
+.sidebar-toggle svg * {
+    stroke-width: 1.5 !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   TOPBAR grigio come sidebar + SIDEBAR-LINK trasparente (eredita il grigio
+   del parent invece di avere bg bianco proprio) + BADGE testo giù 1px
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.layout-topbar {
+    background-color: color-mix(in sRGB, var(--bb-panel) 96%, var(--bb-text)) !important;
+}
+
+.layout-sidebar .sidebar-link {
+    background-color: transparent !important;
+}
+
+/* Badge: testo spostato più in basso (2px totali dal default: +1 via padding-top
+   e +1 via transform). Il line-height: 0 del bb-badge teneva il testo
+   "matematicamente" centrato; correggiamo il rendering ottico. */
+.bb-badge__content-container {
+    padding-top: 4px !important;
+    transform: translateY(1px);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   FALLBACK AVATAR — bg nero (era --bb-primary blu)
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.layout-topbar .bb-dropdown--user-dropdown .base-btn .fallback-avatar,
+.fallback-avatar {
+    background-color: #000 !important;
+    color: #fff !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   INDEX PAGES — stile uniforme su tutte le 8 Index:
+   • Label filtri e header colonne: stesso color + weight + size
+   • Contenuto righe tabella: stesso color + weight + size
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* Label filtri + header colonne: grigio scuro, weight regular, 14px, padding coerente */
+.admin-view > .flex.flex-wrap.items-end .bb-base-input-container__label,
+.workspace-view > .flex.flex-wrap.items-end .bb-base-input-container__label,
+.bb-table .bb-table-header,
+.bb-table thead > tr > th {
+    color: var(--color-mix-700) !important;
+    font-weight: 400 !important;
+    font-size: 14px !important;
+}
+
+/* Forzatura padding uniforme su ogni tabella: reset --padding-x/--padding-y
+   così ogni pagina Index usa gli stessi valori indipendentemente da cosa
+   ha nel content delle righe (badge, div inline, text, ecc). */
+.bb-table {
+    --padding-x: 16px !important;
+    --padding-y: 8px !important;
+}
+
+/* Contenuto righe tabella: testo scuro, weight regular, 13px, padding uniforme.
+   Forza anche sul tr figlio diretto perché alcune pagine (buildings) con
+   formatter che ritornano testo raw e slot #approved custom possono ereditare
+   color da regole più generiche. */
+.bb-table tbody tr td,
+.bb-table tbody > tr > td {
+    color: var(--bb-text) !important;
+    font-weight: 400 !important;
+    font-size: 13px !important;
+    padding: 8px 16px !important;
+    height: var(--bb-table-cell-h) !important;
+}
+
+/* Reset color su tutti i discendenti diretti delle celle (catch-all per
+   slot templates che inseriscono div/span con text-gray Tailwind hardcoded) */
+.bb-table tbody > tr > td > *:not(.bb-button):not(.bb-badge):not(.bb-popover):not([class*='-badge']):not([class*='bb-icon']) {
+    color: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+}
+
+/* Sidebar icone: ridotte 20→16px, mantengono flex centering verticale col testo */
+.layout-sidebar .sidebar-link .sidebar-link__icon,
+.layout-sidebar .sidebar-link .sidebar-link__icon-chevron {
+    width: 16px !important;
+    height: 16px !important;
+}
+
+/* Lo spacer (per voci senza icona) deve matchare la nuova width icona per
+   allineare il testo come le voci con icona */
+.layout-sidebar .sidebar-link .sidebar-link__icon-spacer {
+    width: 16px !important;
+}
+
+/* Sidebar collapsed: tolgo padding orizzontale sul sidebar-link (px-4 dell'SFC
+   sarebbe 32px totali, più della larghezza interna della sidebar stretta) e
+   rimuovo il testo dal flex (opacity-0 lo nasconde ma occupa ancora spazio,
+   spingendo fuori l'icona). Così l'icona è visibile e centrata. */
+.layout-sidebar:not(.layout-sidebar--expanded) .sidebar-link {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    justify-content: center !important;
+}
+
+.layout-sidebar:not(.layout-sidebar--expanded) .sidebar-link .sidebar-link__text {
+    display: none !important;
+}
+
+/* Logo sidebar: override difensivo contro la rule `&.app-logo{opacity-0}` dell'SFC
+   (selettore compound buggato nel codice originale che in certi build di Tailwind
+   potrebbe venire interpretato come descendant e nascondere il logo).
+   Più: max-width 100% per farlo scalare nella sidebar più stretta.
+   Il `w-40` nel template darebbe 160px che overflowerebbe il container (padding). */
+.layout-sidebar .logo-container .app-logo {
+    opacity: 1 !important;
+    position: relative !important;
+    left: auto !important;
+    transform: none !important;
+    visibility: visible !important;
+    max-width: 100% !important;
+    height: auto !important;
+}
+
+/* Logo-container: padding verticale 0 (così il centro del logo coincide con il
+   centro del toggle a Y = --py + --logo-h/2) + padding orizzontale per staccare
+   il logo dai bordi della sidebar. Altezza fissa = --logo-h. */
+.layout-sidebar .logo-container {
+    padding: 0 !important;
+    height: var(--logo-h) !important;
+}
+
+.layout-sidebar.layout-sidebar--expanded .logo-container {
+    padding: 0 12px !important;
+    height: var(--logo-h) !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   PAGINA /profile — Rimuovi border e ombre dalle card (CardContainer di default
+   applica `border border-[var(--bb-border)]` + `shadow-md` via @apply).
+   Margin-top 32px allineato alle admin-view delle pagine dettaglio lavorazione
+   (`.admin-view:has(> .mx-auto.max-w-7xl)` e `.admin-view.boxed`).
+   La pagina /profile usa `.profile-view` come wrapper (non `.admin-view`).
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.profile-view {
+    margin-top: 32px !important;
+    max-width: 480px !important;
+}
+
+.profile-view .card {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+/* 1 campo per riga: sovrascrive `md:grid-cols-2` del `.form-grid` scoped dentro
+   .profile-view (SFC profile/Index.vue:172). */
+.profile-view .form-grid {
+    grid-template-columns: 1fr !important;
+}
+
+/* Allineamento verticale sull'asse sinistro: il propic-container di default è
+   `flex items-center justify-center` → spostato a flex-start per allineare con
+   il titolo/cards. */
+.profile-view .propic-container {
+    justify-content: flex-start !important;
+    margin-bottom: 0 !important;
+}
+
+/* Dropzone (foto profilo): ridotta da 160×160 a 96×96 (valori pari).
+   `border-4` (4px) → 2px per proporzionare la cornice alla dimensione ridotta. */
+.profile-view .propic-container .bb-dropzone {
+    border-width: 2px !important;
+}
+
+.profile-view .dropzone__inner-container {
+    width: 96px !important;
+    height: 96px !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   DIALOG /users — fieldset "Relazioni strutture" (Form.vue del dialog
+   Aggiungi/Modifica utente).
+   - `.space-y-3` full-width sulle 2 colonne del dialog (il fieldset eredita
+     `grid-template-columns` dal parent `.admin-form__grid` via theming.css:361,
+     quindi senza `grid-column: 1 / -1` `.space-y-3` occuperebbe solo 1 colonna).
+   - Linea orizzontale sopra il contenuto (`legend::after`) RIPRISTINATA: non
+     sovrascritta qui — usa il default theming.css:368.
+   - Linea inferiore (`border-t` sull'ultimo figlio, riga "Aggiungi struttura")
+     rimossa: `border-top: 0` + `padding-top: 0`.
+   - Layout righe: col 1 = primo input, col 2 = Ruolo select + button. Scopato
+     alle righe con 3+ figli via `:has(> :nth-child(3))` per NON toccare il
+     fieldset gemello "Strutture gestite" (che ha righe a 2 figli).
+   ════════════════════════════════════════════════════════════════════════════ */
+.bb-dialog fieldset > .space-y-3 {
+    grid-column: 1 / -1 !important;
+}
+
+.bb-dialog fieldset > .space-y-3 > div:last-child {
+    border-top: 0 !important;
+    padding-top: 0 !important;
+}
+
+/* Riga 3-colonne (Struttura input + Ruolo select + button) → layout 2 colonne
+   allineate al grid del dialog: item1 riempie col 1, item2+item3 si dividono
+   col 2 (item2 flex-grow, item3 natural width). `:has(> :nth-child(3))`
+   esclude le righe a 2 figli del fieldset "Strutture gestite". */
+.bb-dialog fieldset > .space-y-3 > div.flex.flex-wrap.items-end.gap-2:has(> :nth-child(3)) {
+    flex-wrap: nowrap !important;
+    gap: 16px !important;
+}
+
+.bb-dialog fieldset > .space-y-3 > div.flex.flex-wrap.items-end.gap-2:has(> :nth-child(3)) > *:first-child {
+    flex: 0 0 calc(50% - 8px) !important;
+    min-width: 0 !important;
+    width: auto !important;
+    max-width: none !important;
+}
+
+.bb-dialog fieldset > .space-y-3 > div.flex.flex-wrap.items-end.gap-2:has(> :nth-child(3)) > *:nth-child(2) {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    width: auto !important;
+    max-width: none !important;
+}
+
+.bb-dialog fieldset > .space-y-3 > div.flex.flex-wrap.items-end.gap-2:has(> :nth-child(3)) > *:nth-child(3) {
+    flex: 0 0 auto !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   DIALOG "Modifica utente" — Password + Conferma password affiancate in 2 col.
+   Il fieldset "Cambio password" contiene un `<form>` nested con i 2 BbTextInput
+   impilati verticalmente. Forzo il `<form>` a spanning 2 col del fieldset
+   (grid-column: 1 / -1) e a sua volta a grid 2-col, così i 2 input vanno sulla
+   stessa riga. Scopato a `.bb-dialog fieldset > form` — in Form.vue è l'unico
+   fieldset che annida un `<form>` (gli altri hanno div o campi diretti).
+   ════════════════════════════════════════════════════════════════════════════ */
+.bb-dialog fieldset > form {
+    grid-column: 1 / -1 !important;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 16px !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   DIALOG "Aggiungi indirizzo" — allinea BbSwitch "Default" al BbTextInput
+   "Paese" (stessa riga del grid). Il switch ha container più corto del text
+   input (label inline vs stacked), quindi senza align-self verrebbe posizionato
+   in alto. Con `align-self: end` scende a filo col bordo inferiore dell'input.
+   Scopato a `.bb-dialog .admin-form__grid > .bb-switch`: si applica anche ad
+   altri dialog con switch in admin-form__grid (es. Form.vue utenti), ma gli
+   switch lì sono in righe solo-switch, quindi end/start sono equivalenti.
+   ════════════════════════════════════════════════════════════════════════════ */
+.bb-dialog .admin-form__grid > .bb-switch {
+    align-self: end !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   DIALOGS — larghezza ridotta del 10% (applicata a tutti i BbDialog).
+   BbDialog imposta `max-width` inline su `.bb-base-dialog__panel` in base al
+   prop `size` (sm=384, md=652, lg=896 — vedi bitboss-ui/dist/index25.js:134).
+   Override via attribute selector su `[style*="…px"]` per ciascun size; il
+   valore è il 90% arrotondato al pari più vicino (design system).
+   - sm: 384 → 346 (384*0.9 = 345.6 → pari sup 346)
+   - md: 652 → 586 (652*0.9 = 586.8 → pari inf 586)
+   - lg: 896 → 806 (896*0.9 = 806.4 → pari inf 806)
+   ════════════════════════════════════════════════════════════════════════════ */
+.bb-base-dialog__panel[style*="384px"] {
+    max-width: 346px !important;
+}
+
+.bb-base-dialog__panel[style*="652px"] {
+    max-width: 586px !important;
+}
+
+.bb-base-dialog__panel[style*="896px"] {
+    max-width: 806px !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   PAGINA /create-building (workspace) — margin-top sul contenuto.
+   La SFC workspace/CreateBuilding.vue ha un wrapper <div> senza classi con
+   al suo interno <h1> + `<div class="mx-auto max-w-2xl"><form class="admin-form">`.
+   Aggancio via :has() sul figlio diretto di `.default-layout__page-container`
+   per evitare di toccare la Vue (stile puro → solo CSS). Selettore unico alla
+   pagina (nessun'altra pagina ha `.mx-auto.max-w-2xl > form.admin-form`).
+   32px coerente con le altre pagine che usano margin-top (`.profile-view`,
+   `.admin-view.boxed`, `.admin-view:has(> .mx-auto.max-w-7xl)`).
+   ════════════════════════════════════════════════════════════════════════════ */
+.default-layout__page-container > div:has(> .mx-auto.max-w-2xl > form.admin-form) {
+    margin-top: 32px !important;
+}
+
+/* Titolo della pagina allineato a sinistra (la SFC ha `text-center` sull'h1). */
+.default-layout__page-container > div:has(> .mx-auto.max-w-2xl > form.admin-form) > h1.text-center {
+    text-align: left !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   INVOICES LIST — trigger "Elimina" riportato a stile secondary.
+   La SFC usa `variant="danger"` (rosso) sul trigger del BbPopover; qui lo
+   forziamo a secondary (transparent + outline grigio) SENZA toccare la Vue,
+   per rispettare la regola "solo file _override". Il button di conferma
+   dentro il popover viene teleportato a body (fuori da .operation-invoices),
+   quindi non è colpito — resta danger per segnalare l'azione distruttiva.
+   ════════════════════════════════════════════════════════════════════════════ */
+.operation-invoices__actions .bb-button.bb-button--danger:not(.base-btn--disabled) {
+    --color: transparent !important;
+    --border-color: var(--color-mix-200) !important;
+    --text-color: var(--bb-text) !important;
+}
+
+.operation-invoices__actions .bb-button.bb-button--danger:not(.base-btn--disabled):hover {
+    background-color: var(--color-mix-200) !important;
+    color: var(--bb-text) !important;
+}
