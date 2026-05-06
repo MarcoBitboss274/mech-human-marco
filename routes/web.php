@@ -77,6 +77,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/buildings/{building}/members/{user}', [BuildingController::class, 'removeMember'])->name('buildings.members.delete');
 
         // Operations
+        Route::get('/operations/export', [OperationController::class, 'export'])
+            ->middleware('can:operations.export')
+            ->name('operations.export');
+        Route::get('/operations/export-all', [OperationController::class, 'exportAll'])
+            ->middleware('can:operations.export')
+            ->name('operations.export-all');
         Route::get('/operations/create', [OperationController::class, 'create'])->name('operations.create');
         Route::get('/operations/{operation}/edit-wizard', [OperationController::class, 'editWithPrescription'])->name('operations.edit-wizard');
         Route::post('/operations/store-wizard', [OperationController::class, 'storeWithPrescription'])->name('operations.store-wizard');
@@ -145,7 +151,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('invoices', InvoiceController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
 
         // Suppliers
-        Route::resource('suppliers', SupplierController::class)->only(['index', 'store', 'update', 'destroy']);
+        Route::resource('suppliers', SupplierController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
+        Route::post('/suppliers/{supplier}/members', [SupplierController::class, 'attachMember'])
+            ->middleware('can:suppliers.members.manage')
+            ->name('suppliers.members.store');
+        Route::put('/suppliers/{supplier}/members/{user}', [SupplierController::class, 'updateMember'])
+            ->middleware('can:suppliers.members.manage')
+            ->name('suppliers.members.update');
+        Route::delete('/suppliers/{supplier}/members/{user}', [SupplierController::class, 'detachMember'])
+            ->middleware('can:suppliers.members.manage')
+            ->name('suppliers.members.destroy');
 
         // Addresses
         Route::post('/addresses/{address}/set-default', [AddressController::class, 'setDefault'])->name('addresses.set-default');
@@ -156,6 +171,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/roles', [SelectController::class, 'roles'])->name('roles');
             Route::get('/operations', [SelectController::class, 'operations'])->name('operations');
             Route::get('/building-user-roles', [SelectController::class, 'buildingUserRoles'])->name('building-user-roles');
+            Route::get('/supplier-user-roles', [SelectController::class, 'supplierUserRoles'])->name('supplier-user-roles');
             Route::get('/prescription-statuses', [SelectController::class, 'prescriptionStatuses'])->name('prescription-statuses');
             Route::get('/operation-statuses', [SelectController::class, 'operationStatuses'])->name('operation-statuses');
             Route::get('/operation-supplier-statuses', [SelectController::class, 'operationSupplierStatuses'])->name('operation-supplier-statuses');
@@ -214,6 +230,29 @@ Route::middleware(['auth', 'verified'])->group(function () {
                     Route::get('/operations/{operation}/edit-wizard', [WorkspaceController::class, 'operationsEditWizard'])->name('operations.edit-wizard');
                     Route::post('/operations/store-wizard', [WorkspaceController::class, 'operationsStoreWizard'])->name('operations.store-wizard');
                     Route::put('/operations/{operation}/update-wizard', [WorkspaceController::class, 'operationsUpdateWizard'])->name('operations.update-wizard');
+                });
+        });
+
+    // Workspace Supplier
+    Route::middleware(['role:supplier'])
+        ->prefix('/workspace/supplier')
+        ->name('workspace.supplier.')
+        ->group(function () {
+
+            // Orphan landing — accessible without the supplier-team check (otherwise infinite redirect).
+            Route::get('/orphan', [\App\Http\Controllers\WorkspaceSupplierController::class, 'orphan'])->name('orphan');
+
+            Route::middleware(['workspace.supplier'])
+                ->group(function () {
+                    Route::get('/', [\App\Http\Controllers\WorkspaceSupplierController::class, 'index'])->name('index');
+                    Route::get('/dashboard', [\App\Http\Controllers\WorkspaceSupplierController::class, 'dashboard'])->name('dashboard');
+                    Route::get('/profile', [\App\Http\Controllers\WorkspaceSupplierController::class, 'profile'])->name('profile.index');
+                    Route::post('/profile', [\App\Http\Controllers\WorkspaceSupplierController::class, 'updateProfile'])->name('profile.update');
+                    Route::get('/settings', [\App\Http\Controllers\WorkspaceSupplierController::class, 'settings'])->name('settings.index');
+                    Route::put('/settings', [\App\Http\Controllers\WorkspaceSupplierController::class, 'updateSettings'])->name('settings.update');
+                    Route::get('/team', [\App\Http\Controllers\WorkspaceSupplierController::class, 'team'])->name('team.index');
+                    Route::put('/team/{user}', [\App\Http\Controllers\WorkspaceSupplierController::class, 'updateTeamMember'])->name('team.update');
+                    Route::delete('/team/{user}', [\App\Http\Controllers\WorkspaceSupplierController::class, 'removeTeamMember'])->name('team.destroy');
                 });
         });
 });

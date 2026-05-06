@@ -3,6 +3,7 @@
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\OnBoarding;
 use App\Http\Middleware\Workspace;
+use App\Http\Middleware\WorkspaceSupplier;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -30,6 +31,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => RoleMiddleware::class,
             'workspace' => Workspace::class,
+            'workspace.supplier' => WorkspaceSupplier::class,
             'onboarding' => OnBoarding::class,
         ]);
     })

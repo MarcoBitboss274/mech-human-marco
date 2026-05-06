@@ -1,5 +1,6 @@
 import 'bitboss-ui/styles.css';
 import '../css/main.css';
+import '../css/admin_view_override.css';
 import './echo';
 
 import en from '@/langs/en.json';

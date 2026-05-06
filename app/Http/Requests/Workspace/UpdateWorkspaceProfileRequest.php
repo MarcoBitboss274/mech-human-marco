@@ -13,7 +13,11 @@ class UpdateWorkspaceProfileRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user() !== null && $this->user()->isCustomer();
+        $user = $this->user();
+        if ($user === null) {
+            return false;
+        }
+        return $user->isCustomer() || $user->isSupplier();
     }
 
     /**

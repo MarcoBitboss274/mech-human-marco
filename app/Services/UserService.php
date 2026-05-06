@@ -92,6 +92,22 @@ class UserService extends ModelService
             $model->buildings()->sync($sync);
         }
 
+        if (($data['role'] ?? null) === 'supplier' && array_key_exists('supplier_relation', $data)) {
+            $rel = $data['supplier_relation'] ?? null;
+            $supplierId = is_array($rel) ? ($rel['supplier_id'] ?? null) : null;
+            $supplierRole = is_array($rel) ? ($rel['role'] ?? null) : null;
+
+            if ($supplierId && $supplierRole) {
+                $supplier = \App\Models\Supplier::query()->find((int) $supplierId);
+                if ($supplier) {
+                    SupplierService::attachUser($supplier, $model, (string) $supplierRole);
+                }
+            }
+        } elseif ($previousRole === 'supplier' && ($data['role'] ?? null) !== 'supplier') {
+            // Role changed away from supplier: detach from any team membership.
+            $model->suppliers()->detach();
+        }
+
         if (array_key_exists('managed_building_ids', $data) || (($data['role'] ?? null) !== 'agent' && $previousRole === 'agent')) {
             $managedBuildingIds = array_values(array_unique(array_filter(array_map(
                 fn ($id) => is_numeric($id) ? (int) $id : null,

@@ -15,6 +15,7 @@ use App\Enums\QuoteStatusEnum;
 use App\Enums\OperationSupplierStatusEnum;
 use App\Enums\SupplierStatusEnum;
 use App\Enums\BuildingUserRoleEnum;
+use App\Enums\SupplierUserRoleEnum;
 use App\Enums\PrescriptionGenderEnum;
 use App\Enums\PrescriptionStatusEnum;
 use App\Enums\PrescriptionTypologyEnum;
@@ -185,6 +186,14 @@ class SelectController extends Controller
     public function buildingUserRoles()
     {
         return $this->buildResponse(BuildingUserRoleEnum::toArrayWithLabels());
+    }
+
+    /**
+     * Get the supplier user roles
+     */
+    public function supplierUserRoles()
+    {
+        return $this->buildResponse(SupplierUserRoleEnum::toArrayWithLabels());
     }
 
     /**

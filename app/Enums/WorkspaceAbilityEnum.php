@@ -28,4 +28,13 @@ enum WorkspaceAbilityEnum: string
 
     case ORDERS_VIEW = 'workspace.orders.view';
     case INVOICES_VIEW = 'workspace.invoices.view';
+
+    // Supplier workspace
+    case SUPPLIER_DASHBOARD_VIEW = 'workspace.supplier.dashboard.view';
+    case SUPPLIER_PROFILE_VIEW = 'workspace.supplier.profile.view';
+    case SUPPLIER_SETTINGS_VIEW = 'workspace.supplier.settings.view';
+    case SUPPLIER_SETTINGS_UPDATE = 'workspace.supplier.settings.update';
+    case SUPPLIER_TEAM_VIEW = 'workspace.supplier.team.view';
+    case SUPPLIER_TEAM_MANAGE = 'workspace.supplier.team.manage';
+    case SUPPLIER_OPERATIONS_VIEW = 'workspace.supplier.operations.view';
 }

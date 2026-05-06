@@ -1,11 +1,18 @@
 <template>
     <div class="admin-view">
         <div class="admin-view__header">
-            <div class="">
+            <div class="operations-header__left">
                 <h1 class="page__title">{{ t('Lavorazioni') }}</h1>
+                <ExportDropdown
+                    v-if="can('operations.export')"
+                    class="hidden lg:inline-flex"
+                    variant="link"
+                    :export-url="exportAllUrl"
+                    :label="t('Esporta tutte')"
+                />
             </div>
-            <div v-if="can('operations.create')" class="hidden lg:inline-flex">
-                <BbButton prepend:icon="plus" @click="router.get(route('operations.create'))">{{ t('Nuova lavorazione') }}</BbButton>
+            <div class="hidden lg:inline-flex lg:items-center lg:gap-2">
+                <BbButton v-if="can('operations.create')" prepend:icon="plus" @click="router.get(route('operations.create'))">{{ t('Nuova lavorazione') }}</BbButton>
             </div>
             <div class="lg:hidden">
                 <BbDropdown v-if="can('operations.create')" :items="dropdownItems">
@@ -26,7 +33,7 @@
             <BbTab v-model="modeTab" :items="modeTabs" />
         </div>
 
-        <div class="my-4 flex flex-wrap items-end justify-start gap-3">
+        <div class="operations-filters my-4 flex flex-wrap items-end justify-start gap-3">
             <BbTextInput
                 class="w-full sm:w-1/3 lg:w-1/5"
                 v-model="queryModel"
@@ -51,6 +58,16 @@
                 item-value="value"
                 :items="loadRequestersFilter"
                 :label="t('Richiedente')"
+                clearable
+            />
+            <BbSelect
+                v-if="isAdmin"
+                v-model="agentIdFilter"
+                class="w-full sm:w-1/3 lg:w-1/4"
+                item-text="label"
+                item-value="value"
+                :items="loadAgentsFilter"
+                :label="t('Agente')"
                 clearable
             />
             <BbSelect
@@ -95,7 +112,7 @@
                 class="w-full sm:w-1/2 lg:w-1/4"
                 range
                 clearable
-                :label="t('Data di scadenza')"
+                :label="t('Scadenza da: - a:')"
                 :allow-writing="'not-mobile'"
             />
             <BbDatePickerInput
@@ -103,11 +120,22 @@
                 class="w-full sm:w-1/2 lg:w-1/4"
                 range
                 clearable
-                :label="t('Data di invio')"
+                :label="t('Invio da: - a:')"
                 :allow-writing="'not-mobile'"
             />
             <BbButton icon="trash" @click="resetAllFilters">{{ t('Pulisci') }}</BbButton>
         </div>
+
+        <OperationsResultsBar :results-label="resultsLabel">
+            <template v-if="can('operations.export')" #actions>
+                <ExportDropdown
+                    variant="link"
+                    :export-url="exportUrl"
+                    :disabled="resultsTotal === 0"
+                    :disabled-reason="t('Nessun risultato da esportare')"
+                />
+            </template>
+        </OperationsResultsBar>
 
         <div class="mb-6">
             <ul class="space-y-4">
@@ -266,7 +294,9 @@
 
 <script setup lang="ts">
 import XPagination from '@/components/common/XPagination.vue';
+import ExportDropdown from '@/components/operations/ExportDropdown.vue';
 import OperationQuoteStatusBadge from '@/components/operations/OperationQuoteStatusBadge.vue';
+import OperationsResultsBar from '@/components/operations/OperationsResultsBar.vue';
 import OperationStatusBadge from '@/components/operations/OperationStatusBadge.vue';
 import PrescriptionTypologyBadge from '@/components/prescriptions/PrescriptionTypologyBadge.vue';
 import { useIndexPage } from '@/composables/useIndexPage';
@@ -305,12 +335,14 @@ defineOptions({
 
 type Props = {
     operations: Pagination<Operation>;
+    resultsLabel: string;
+    resultsTotal: number;
 };
 
 const props = defineProps<Props>();
 
 const { toast } = useToast();
-const { can } = usePermissions();
+const { can, isAdmin } = usePermissions();
 
 const parseIdParam = (param: unknown): string | null => {
     if (param == null || param === '') return null;
@@ -357,6 +389,7 @@ const filtersDefault = {
     mode: parseModeParam(queryParam('mode')),
     query: (queryParam('query') as string | undefined) ?? null,
     building_id: parseIdParam(queryParam('building_id')),
+    agent_id: parseIdParam(queryParam('agent_id')),
     requester_id: parseIdParam(queryParam('requester_id')),
     prescription_typology: parseStringParam(queryParam('prescription_typology')),
     status: parseStringParam(queryParam('status')),
@@ -419,6 +452,18 @@ const requesterIdFilter = computed<number | null>({
     },
 });
 
+const agentIdFilter = computed<number | null>({
+    get: () => {
+        const v = filters.agent_id;
+        if (v === null || v === undefined || v === '') return null;
+        const n = typeof v === 'number' ? v : Number(v);
+        return Number.isFinite(n) && n > 0 ? n : null;
+    },
+    set: (v: number | null) => {
+        filters.agent_id = v != null && Number.isFinite(v) ? String(v) : null;
+    },
+});
+
 const prescriptionTypologyFilter = computed<string | null>({
     get: () => (filters.prescription_typology != null && filters.prescription_typology !== '' ? String(filters.prescription_typology) : null),
     set: (v: string | null) => {
@@ -472,6 +517,29 @@ const expireAtRangeModel = computed<string[]>({
     },
 });
 
+const exportFilterParams = computed(() => {
+    const params = new URLSearchParams();
+    Object.entries(filters as Record<string, unknown>).forEach(([key, value]) => {
+        if (value === null || value === undefined || value === '') return;
+        if (Array.isArray(value)) {
+            value.forEach((v) => {
+                if (v !== null && v !== undefined && v !== '') params.append(key, String(v));
+            });
+            return;
+        }
+        params.set(key, String(value));
+    });
+    return params.toString();
+});
+
+const exportUrl = computed(() => {
+    const base = route('operations.export');
+    const qs = exportFilterParams.value;
+    return qs ? `${base}?${qs}` : base;
+});
+
+const exportAllUrl = computed(() => route('operations.export-all'));
+
 const sendAtRangeModel = computed<string[]>({
     get: () => {
         const from = filters.send_at_from != null && filters.send_at_from !== '' ? String(filters.send_at_from) : null;
@@ -494,6 +562,7 @@ const sendAtRangeModel = computed<string[]>({
 
 const { select: selectBuildings } = useSelect('buildings');
 const { select: selectUsers } = useSelect('users');
+const { select: selectAgents } = useSelect('agents');
 const { select: selectPrescriptionTypologies } = useSelect('prescription-typologies');
 const { select: selectOperationStatuses } = useSelect('operation-statuses');
 const { select: selectQuoteStatuses } = useSelect('quote-statuses');
@@ -508,6 +577,11 @@ const loadRequestersFilter = (query: string, prefill: boolean, modelValue: unkno
     const mv = (modelValue ?? requesterIdFilter.value) as number | string | string[] | number[] | null | undefined;
     const buildingId = buildingIdFilter.value;
     return selectUsers(query || null, prefill, mv ?? null, prefill ? null : buildingId ? { building_id: buildingId } : null);
+};
+
+const loadAgentsFilter = (query: string, prefill: boolean, modelValue: unknown) => {
+    const mv = (modelValue ?? agentIdFilter.value) as number | string | string[] | number[] | null | undefined;
+    return selectAgents(query || null, prefill, mv ?? null);
 };
 
 const loadPrescriptionTypologiesFilter = (query: string, prefill: boolean, modelValue: unknown) =>
@@ -674,3 +748,26 @@ const deleteItem = async (id: Operation['id']) => {
     });
 };
 </script>
+
+<style scoped>
+/* Riduce la larghezza dei filtri per fare in modo che 5 filtri + pulsante "Pulisci"
+   stiano sulla stessa riga.
+   Override della rule globale di main.css (.bb-base-input-outer-container con
+   flex 1/5 a tutta larghezza) tramite specificità maggiore (scoped data-attr +
+   classe .operations-filters + 3 classi del container).
+   Riserva ~136px in fondo a ogni riga: 1 gap interno verso il pulsante (8px) +
+   pulsante (~128px). I filtri sono 5 con flex-basis (100% - 32px gap interni - 136px) / 5. */
+@media (min-width: 1024px) {
+    .admin-view > :deep(.operations-filters.flex.flex-wrap.items-end > .bb-base-input-outer-container) {
+        flex: 0 0 calc((100% - 32px - 136px) / 5) !important;
+    }
+}
+
+/* Header sinistro: "Esporta tutte" a sinistra del titolo "Lavorazioni",
+   allineati orizzontalmente. */
+.operations-header__left {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+}
+</style>

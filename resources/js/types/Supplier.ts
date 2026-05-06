@@ -26,6 +26,16 @@ export type OperationSupplier = Supplier & {
     pivot: OperationSupplierPivot;
 };
 
+export type SupplierMember = {
+    id: number;
+    name: string | null;
+    surname: string | null;
+    full_name: string;
+    email: string | null;
+    role: string | null;
+    last_login_at: string | null;
+};
+
 export type SupplierForm = {
     name: string | null;
     vat: string | null;

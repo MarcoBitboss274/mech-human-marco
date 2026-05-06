@@ -53,6 +53,13 @@
                     <template #actions="{ item }">
                         <div class="flex gap-x-2">
                             <BbButton
+                                icon="eye"
+                                size="xs"
+                                @click="router.get(route('suppliers.show', { supplier: item.id }))"
+                            >
+                                {{ t('Visualizza') }}
+                            </BbButton>
+                            <BbButton
                                 v-if="can('suppliers.edit')"
                                 icon="pencil"
                                 size="xs"

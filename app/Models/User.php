@@ -321,6 +321,33 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
     }
 
     /**
+     * Suppliers the user belongs to as part of the team. Always 0 or 1 (DB unique on user_id).
+     */
+    public function suppliers(): BelongsToMany
+    {
+        return $this->belongsToMany(Supplier::class, 'supplier_user')
+            ->withPivot('role')
+            ->withTimestamps();
+    }
+
+    /**
+     * Convenience: the single supplier this user belongs to (or null).
+     */
+    public function supplier(): ?Supplier
+    {
+        return $this->suppliers()->first();
+    }
+
+    /**
+     * Role within the supplier team (admin/member) or null if not associated.
+     */
+    public function supplierRole(): ?string
+    {
+        $supplier = $this->supplier();
+        return $supplier?->pivot?->role;
+    }
+
+    /**
      * Prescriptions associated with the user.
      */
     public function prescriptions(): HasMany

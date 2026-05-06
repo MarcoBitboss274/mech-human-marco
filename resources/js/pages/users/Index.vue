@@ -171,10 +171,12 @@
         >
             <Form
                 :user="selectedUser"
+                :defaults="formDefaults"
                 @data:updated="
                     () => {
                         selectedUser = null;
                         modal = false;
+                        formDefaults = null;
                         execute();
                     }
                 "
@@ -208,7 +210,7 @@ import {
     BbTextInput,
     useToast,
 } from 'bitboss-ui';
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
@@ -390,6 +392,27 @@ const dropdownItems: BbDropdownItem[] = [
 
 const modal = ref(false);
 const selectedUser = ref<User | null>(null);
+const formDefaults = ref<{ role?: string | null; supplier_id?: number | null; locked?: boolean } | null>(null);
+
+onMounted(() => {
+    const url = inertiaPage.url;
+    const idx = url.indexOf('?');
+    if (idx === -1) return;
+    const params = new URLSearchParams(url.slice(idx + 1));
+    if (params.get('create') !== '1') return;
+
+    const role = params.get('role');
+    const supplierIdRaw = params.get('supplier_id');
+    const supplierId = supplierIdRaw ? Number(supplierIdRaw) : null;
+
+    formDefaults.value = {
+        role,
+        supplier_id: Number.isFinite(supplierId) && supplierId !== null && supplierId > 0 ? supplierId : null,
+        locked: true,
+    };
+    selectedUser.value = null;
+    modal.value = true;
+});
 
 const deleteItem = async (id: User['id']) => {
     await router.delete(route('users.destroy', { id }), {

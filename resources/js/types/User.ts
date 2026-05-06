@@ -30,12 +30,24 @@ export type User = {
     roll_province: string | null;
     buildings?: UserBuilding[];
     managed_buildings?: UserManagedBuilding[];
+    suppliers?: UserSupplier[];
+};
+
+export type UserSupplier = {
+    id: number;
+    name: string | null;
+    pivot?: { role: string };
 };
 
 export type BuildingRelation = {
     building_id: number;
     building_label: string;
     role: string;
+};
+
+export type SupplierRelation = {
+    supplier_id: number | null;
+    role: string | null;
 };
 
 export type UserForm = {
@@ -54,5 +66,6 @@ export type UserForm = {
     roll_province: string | null;
     building_relations: BuildingRelation[];
     managed_building_ids?: number[];
+    supplier_relation: SupplierRelation | null;
     verify_email: boolean;
 };

@@ -23,6 +23,7 @@ use App\Http\Requests\Operation\UpdateOperationQuoteStatusRequest;
 use App\Http\Requests\Operation\UpdateOperationStatusRequest;
 use App\Http\Requests\Operation\UpdateOperationSupplierStatusRequest;
 use App\Http\Requests\Operation\UpdateOperationWithPrescriptionRequest;
+use App\Exports\OperationsExport;
 use App\Models\Invoice;
 use App\Models\Operation;
 use App\Models\Order;
@@ -35,7 +36,10 @@ use App\Services\PrescriptionService;
 use App\Services\UserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
+use Maatwebsite\Excel\Excel as ExcelFormat;
+use Maatwebsite\Excel\Facades\Excel;
 
 class OperationController extends Controller
 {
@@ -103,13 +107,96 @@ class OperationController extends Controller
      */
     public function index(Request $request)
     {
-        return Inertia::render('operations/Index', [
-            'operations' => OperationService::search($request, true, [
-                'latestPrescription' => fn($q) => $q
-                    ->select(['id', 'operation_id', 'user_id', 'typology', 'ref', 'created_at', 'expire_at', 'send_at'])
-                    ->with(['user:id,name,surname', 'activeRevision:id,prescription_id,opened_at,closed_at']),
-            ]),
+        $operations = OperationService::search($request, true, [
+            'latestPrescription' => fn($q) => $q
+                ->select(['id', 'operation_id', 'user_id', 'typology', 'ref', 'created_at', 'expire_at', 'send_at'])
+                ->with(['user:id,name,surname', 'activeRevision:id,prescription_id,opened_at,closed_at']),
         ]);
+
+        $total = $operations->total();
+
+        return Inertia::render('operations/Index', [
+            'operations' => $operations,
+            'resultsLabel' => OperationService::buildResultsLabel($request, $total),
+            'resultsTotal' => $total,
+        ]);
+    }
+
+    /**
+     * Export the filtered operations (current tab + filters) to CSV or Excel.
+     */
+    public function export(Request $request)
+    {
+        $format = $this->resolveExportFormat($request);
+
+        $query = OperationService::fetch($request);
+        OperationService::applySearch($query, $request);
+        OperationService::applyFilters($query, $request);
+
+        $total = (clone $query)->toBase()->getCountForPagination();
+        $this->ensureExportSizeWithinLimit($total);
+
+        $tabSlug = $this->resolveTabSlug($request->input('mode'));
+        $filename = 'lavorazioni_' . $tabSlug . '_' . now()->format('Ymd_His') . '.' . $format['extension'];
+
+        return Excel::download(new OperationsExport($query, false), $filename, $format['writerType']);
+    }
+
+    /**
+     * Export every operation in the platform (all tabs, ignoring filters) to CSV or Excel.
+     */
+    public function exportAll(Request $request)
+    {
+        $format = $this->resolveExportFormat($request);
+
+        $query = Operation::query();
+
+        $total = (clone $query)->toBase()->getCountForPagination();
+        $this->ensureExportSizeWithinLimit($total);
+
+        $filename = 'lavorazioni_tutte_' . now()->format('Ymd_His') . '.' . $format['extension'];
+
+        return Excel::download(new OperationsExport($query, true), $filename, $format['writerType']);
+    }
+
+    /**
+     * Resolve the requested export format ("csv" or "xlsx") into Maatwebsite writer type + extension.
+     *
+     * @return array{writerType: string, extension: string}
+     */
+    private function resolveExportFormat(Request $request): array
+    {
+        $format = strtolower((string) $request->input('format', 'xlsx'));
+
+        return match ($format) {
+            'csv' => ['writerType' => ExcelFormat::CSV, 'extension' => 'csv'],
+            'xlsx' => ['writerType' => ExcelFormat::XLSX, 'extension' => 'xlsx'],
+            default => throw ValidationException::withMessages([
+                'format' => 'Formato non supportato. Usa csv o xlsx.',
+            ]),
+        };
+    }
+
+    /**
+     * Hard limit to keep sync exports manageable. Beyond this threshold the request is rejected.
+     */
+    private function ensureExportSizeWithinLimit(int $total): void
+    {
+        if ($total > 50000) {
+            throw ValidationException::withMessages([
+                'export' => 'Troppi risultati per l\'esportazione (limite 50.000). Restringi i filtri.',
+            ]);
+        }
+    }
+
+    private function resolveTabSlug(mixed $mode): string
+    {
+        $value = is_array($mode) ? ($mode[0] ?? null) : $mode;
+        return match ((string) $value) {
+            'active' => 'attive',
+            'archived' => 'archiviate',
+            default => 'bozze',
+        };
     }
 
     /**

@@ -9,18 +9,29 @@ import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
 
+type Defaults = {
+    role?: string | null;
+    supplier_id?: number | null;
+    locked?: boolean;
+};
+
 type Props = {
     user: User | null;
+    defaults?: Defaults | null;
 };
 
 const props = defineProps<Props>();
 const emit = defineEmits(['data:updated']);
 
 const isCreating = computed(() => !props.user?.id);
+const supplierLocked = computed(() => Boolean(isCreating.value && props.defaults?.locked && props.defaults?.supplier_id));
+const roleLocked = computed(() => Boolean(isCreating.value && props.defaults?.locked && props.defaults?.role));
 
 const { select: selectRoles } = useSelect('roles');
 const { select: selectBuildings } = useSelect('buildings');
 const { select: selectBuildingUserRoles } = useSelect('building-user-roles');
+const { select: selectSuppliers } = useSelect('suppliers');
+const { select: selectSupplierUserRoles } = useSelect('supplier-user-roles');
 
 const form = useForm<UserForm>({
     id: null,
@@ -38,6 +49,7 @@ const form = useForm<UserForm>({
     roll_province: null,
     building_relations: [],
     managed_building_ids: [],
+    supplier_relation: null,
     verify_email: false,
 });
 
@@ -58,12 +70,59 @@ const prefill = () => {
         role: b.pivot?.role ?? 'member',
     }));
     form.managed_building_ids = (props.user?.managed_buildings ?? []).map((b) => b.id);
+
+    const supplierAssoc = (props.user?.suppliers ?? [])[0] ?? null;
+    if (supplierAssoc) {
+        form.supplier_relation = {
+            supplier_id: supplierAssoc.id,
+            role: supplierAssoc.pivot?.role ?? 'member',
+        };
+    } else if (isCreating.value && props.defaults?.role === 'supplier' && props.defaults?.supplier_id) {
+        form.supplier_relation = {
+            supplier_id: props.defaults.supplier_id,
+            role: 'member',
+        };
+        form.role = 'supplier';
+    } else {
+        form.supplier_relation = null;
+    }
+
     form.verify_email = props.user?.email_verified_at ? true : false;
 };
 
 const needType = computed(() => form.role === 'customer');
+const needSupplier = computed(() => form.role === 'supplier');
 const needRoll = computed(() => form.odontoiatra);
 const needManagedBuildings = computed(() => form.role === 'agent');
+
+const supplierIdModel = computed<number | null>({
+    get: () => form.supplier_relation?.supplier_id ?? null,
+    set: (v) => {
+        const current = form.supplier_relation ?? { supplier_id: null, role: null };
+        form.supplier_relation = { ...current, supplier_id: v };
+    },
+});
+
+const supplierRoleModel = computed<string | null>({
+    get: () => form.supplier_relation?.role ?? null,
+    set: (v) => {
+        const current = form.supplier_relation ?? { supplier_id: null, role: null };
+        form.supplier_relation = { ...current, role: v };
+    },
+});
+
+watch(needSupplier, (val) => {
+    if (!val) {
+        form.supplier_relation = null;
+    } else if (form.supplier_relation === null) {
+        form.supplier_relation = { supplier_id: null, role: null };
+    }
+});
+
+const loadSuppliersFilter = (query: string, prefill: boolean, modelValue: unknown) => {
+    const mv = (modelValue ?? supplierIdModel.value) as number | string | string[] | number[] | null | undefined;
+    return selectSuppliers(query || null, prefill, mv ?? null);
+};
 
 const excludeBuildingIds = computed(() => form.building_relations.map((r) => r.building_id).filter(Boolean));
 
@@ -181,7 +240,7 @@ const { execute } = useAsyncFn(
             <BbTextInput v-model="form.name" autocomplete="off" :label="t('Nome')" required :errors="form.errors?.name" />
             <BbTextInput v-model="form.surname" autocomplete="off" :label="t('Cognome')" required :errors="form.errors?.surname" />
             <BbTextInput v-model="form.email" autocomplete="off" :label="t('Email')" required type="email" :errors="form.errors?.email" />
-            <BbSelect v-model="form.role" item-text="label" item-value="value" :items="selectRoles" :label="t('Ruolo')" :errors="form.errors?.role" />
+            <BbSelect v-model="form.role" item-text="label" item-value="value" :items="selectRoles" :label="t('Ruolo')" :disabled="roleLocked" :errors="form.errors?.role" />
             <BbSwitch v-model="form.active" :label="t('Attivo')" />
             <BbSwitch v-model="form.verify_email" :label="t('Email verificata')" />
             <BbCheckbox v-if="isCreating" :label="t('Invia email di benvenuto')" v-model="form.send_invite" />
@@ -248,6 +307,34 @@ const { execute } = useAsyncFn(
                 </div>
                 <p v-if="form.errors?.building_relations" class="mt-1 text-sm text-red-600">
                     {{ form.errors.building_relations }}
+                </p>
+            </fieldset>
+
+            <fieldset v-if="needSupplier" class="lg:col-span-2">
+                <legend>{{ t('Fornitore associato') }}</legend>
+                <div class="flex flex-wrap items-end gap-2">
+                    <BbSelect
+                        v-model="supplierIdModel"
+                        item-text="label"
+                        item-value="value"
+                        :items="loadSuppliersFilter"
+                        :label="t('Fornitore')"
+                        class="min-w-0 flex-1"
+                        :disabled="supplierLocked"
+                        :errors="form.errors?.['supplier_relation.supplier_id']"
+                    />
+                    <BbSelect
+                        v-model="supplierRoleModel"
+                        item-text="label"
+                        item-value="value"
+                        :items="selectSupplierUserRoles"
+                        :label="t('Ruolo nel team')"
+                        class="w-48"
+                        :errors="form.errors?.['supplier_relation.role']"
+                    />
+                </div>
+                <p v-if="form.errors?.supplier_relation" class="mt-1 text-sm text-red-600">
+                    {{ form.errors.supplier_relation }}
                 </p>
             </fieldset>
 

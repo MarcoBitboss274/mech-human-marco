@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\Building;
 use App\Models\User;
 use App\Policies\UserPolicy;
+use App\Services\SupplierWorkspaceAuthorizationService;
 use App\Services\WorkspaceAuthorizationService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Gate;
@@ -32,6 +33,10 @@ class AppServiceProvider extends ServiceProvider
 
         Gate::define('workspaceAbility', function (User $user, Building $building, string $ability): bool {
             return app(WorkspaceAuthorizationService::class)->canInBuilding($user, $building, $ability);
+        });
+
+        Gate::define('supplierWorkspaceAbility', function (User $user, string $ability): bool {
+            return app(SupplierWorkspaceAuthorizationService::class)->canForUser($user, $ability);
         });
 
         // Setup Carbon

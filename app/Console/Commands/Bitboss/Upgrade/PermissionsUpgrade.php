@@ -84,6 +84,7 @@ class PermissionsUpgrade extends Command
             'operations.activity.view',
             'operations.cancel',
             'operations.archive',
+            'operations.export',
 
             // Chat
             'chat.read',
@@ -115,9 +116,11 @@ class PermissionsUpgrade extends Command
 
             // Suppliers
             'suppliers.index',
+            'suppliers.show',
             'suppliers.create',
             'suppliers.edit',
             'suppliers.destroy',
+            'suppliers.members.manage',
 
             // Productions
             'productions.index',

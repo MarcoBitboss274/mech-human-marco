@@ -59,6 +59,20 @@ class HandleInertiaRequests extends Middleware
             $workspacePermissions = $role ? WorkspacePermissionMap::abilitiesFor($role) : [];
         }
 
+        $supplierWorkspacePermissions = null;
+        $supplierRole = null;
+        if ($user?->isSupplier()) {
+            $supplier = $user->suppliers()->first();
+            if ($supplier !== null) {
+                $authService = app(\App\Services\SupplierWorkspaceAuthorizationService::class);
+                $supplierEnumRole = $authService->roleForUser($user, $supplier);
+                if ($supplierEnumRole !== null) {
+                    $supplierRole = $supplierEnumRole->value;
+                    $supplierWorkspacePermissions = \App\Services\SupplierWorkspacePermissionMap::abilitiesFor($supplierEnumRole);
+                }
+            }
+        }
+
         return [
             ...parent::share($request),
             'name' => config('app.name'),
@@ -67,6 +81,8 @@ class HandleInertiaRequests extends Middleware
                 'permissions' => Arr::pluck($user?->getAllPermissions() ?? [], 'name'),
                 'workspacePermissions' => $workspacePermissions,
                 'workspaceRole' => $role ?? null,
+                'supplierWorkspacePermissions' => $supplierWorkspacePermissions,
+                'supplier_role' => $supplierRole,
                 'impersonating' => Session::has('impersonated_by'),
             ],
             'avatar' => $user?->getAvatarId() ?? null,

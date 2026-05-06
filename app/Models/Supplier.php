@@ -48,4 +48,22 @@ class Supplier extends Model
             ->withPivot(['status', 'selected'])
             ->withTimestamps();
     }
+
+    /**
+     * Users (utenti supplier) belonging to this supplier's team.
+     */
+    public function users(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'supplier_user')
+            ->withPivot('role')
+            ->withTimestamps();
+    }
+
+    /**
+     * Convenience: only admins of this supplier.
+     */
+    public function admins(): BelongsToMany
+    {
+        return $this->users()->wherePivot('role', \App\Enums\SupplierUserRoleEnum::ADMIN->value);
+    }
 }

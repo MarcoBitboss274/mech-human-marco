@@ -45,6 +45,9 @@ class StoreUserRequest extends FormRequest
             'building_relations.*.role' => 'required_with:building_relations.*.building_id|string|in:admin,member',
             'managed_building_ids' => 'nullable|array',
             'managed_building_ids.*' => 'nullable|integer|exists:buildings,id|distinct',
+            'supplier_relation' => 'required_if:role,supplier|nullable|array',
+            'supplier_relation.supplier_id' => 'required_if:role,supplier|nullable|integer|exists:suppliers,id',
+            'supplier_relation.role' => 'required_if:role,supplier|nullable|string|in:admin,member',
             'verify_email' => 'required|boolean',
         ];
     }

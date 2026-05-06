@@ -1,0 +1,68 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   admin_view_override.css
+
+   Override globali applicati alle pagine admin/workspace SENZA toccare i 3
+   file CSS base (main.css / theming.css / base.css). Caricato dopo main.css
+   da resources/js/app.ts.
+
+   Convenzione: ogni regola ha specificità sufficiente a battere la rule
+   corrispondente in main.css; usiamo `!important` solo dove main.css ne
+   imposta uno proprio.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+
+/* ── Spazio verticale fra titolo pagina e tab bar ─────────────────────────────
+   Pattern in tutte le Index admin/workspace: il titolo è il 1° figlio diretto
+   di `.admin-view`, la tab bar è in un `<div class="mt-4">` (o simile) che ha
+   come unico figlio un `.bb-tab`. Riduco il margin-top del wrapper a 4px così
+   le tab stanno più vicine al titolo.
+   `:has()` è disponibile in tutti i browser evergreen.
+   -------------------------------------------------------------------------- */
+.admin-view > div.mt-4:has(.bb-tab),
+.workspace-view > div.mt-4:has(.bb-tab) {
+    margin-top: 4px;
+}
+
+
+/* ── Spazio verticale fra label e input dei filtri ────────────────────────────
+   bitboss-ui usa `--bb-label-spacing-y` (default 6px) per lo spazio fra la
+   label e il control. Lo riduciamo a 2px solo all'interno dei container filtri
+   (.flex.flex-wrap.items-end), così resta invariato altrove (form, ecc.).
+   -------------------------------------------------------------------------- */
+.admin-view > .flex.flex-wrap.items-end .bb-base-input-outer-container,
+.workspace-view > .flex.flex-wrap.items-end .bb-base-input-outer-container {
+    --bb-label-spacing-y: 2px;
+}
+
+
+/* ── Pulsanti con icona + testo: spaziature compatte ──────────────────────────
+   bb-button espone `--gap` (spazio icona↔testo, default 8px) e padding orizz.
+   tramite `--px` (default 12px). Per i button con icona+testo (prepend o
+   append) ovunque nell'app, riduciamo lo spazio fra icona e testo a 4px e il
+   padding-left a 8px (lascia il padding-right invariato — Marco ha richiesto
+   solo "spazio a sinistra dell'icona").
+
+   I button icon-only (`.bb-button--icon`) sono esclusi tramite `:not()` perché
+   hanno comportamento dimensionale diverso (quadrato, --px = --py). */
+.bb-button:not(.bb-button--icon):has(.bb-button__prepend-icon),
+.bb-button:not(.bb-button--icon):has(.bb-button__append-icon) {
+    --gap: 4px;
+    padding-left: 8px;
+}
+
+
+/* ── Pagina dettaglio fornitore: stessa larghezza del dettaglio struttura ─────
+   main.css applica `width: 80%; max-width: none; mx: auto` alle pagine di
+   dettaglio buildings/prescriptions/quotes/productions/invoices via `:has()`
+   sui rispettivi wrapper `.{resource}-show__content`. Replico per `.suppliers-
+   show__content` (introdotto in suppliers/Show.vue) usando le stesse regole,
+   senza toccare main.css. */
+.admin-view:has(> .suppliers-show__content),
+.workspace-view:has(> .suppliers-show__content) {
+    margin-top: 32px;
+    width: 80%;
+    max-width: none;
+    margin-left: auto;
+    margin-right: auto;
+    box-sizing: border-box;
+}

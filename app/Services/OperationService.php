@@ -17,6 +17,7 @@ use App\Models\Prescription;
 use App\Models\Production;
 use App\Models\Quote;
 use App\Models\Supplier;
+use App\Models\User;
 use App\Notifications\Admin\SendPrescriptionForAdmin;
 use App\Services\UserService;
 use Illuminate\Database\Eloquent\Builder;
@@ -176,6 +177,16 @@ class OperationService extends ModelService
             }
         }
 
+        $agentId = $request?->input('agent_id');
+        if ($agentId !== null && $agentId !== '') {
+            $id = (int) $agentId;
+            if ($id > 0) {
+                $query->whereIn('building_id', Building::query()
+                    ->select('id')
+                    ->where('agent_id', $id));
+            }
+        }
+
         $requesterId = $request?->input('requester_id');
         if ($requesterId !== null && $requesterId !== '') {
             $id = (int) $requesterId;
@@ -306,6 +317,127 @@ class OperationService extends ModelService
     public static function applySorts(Builder $query, Request|null $request): Builder
     {
         return $query->latest();
+    }
+
+    /**
+     * Build a human-readable label that summarizes the current filters and the result count.
+     *
+     * Output examples:
+     *   "Lavorazioni Attive: 1.234"
+     *   "Lavorazioni Attive, struttura Studio Rossi, agente Mario Bianchi: 200"
+     */
+    public static function buildResultsLabel(Request|null $request, int $total): string
+    {
+        $mode = $request?->input('mode');
+        $modeValue = is_array($mode) ? ($mode[0] ?? null) : $mode;
+        $modeValue = ($modeValue !== null && $modeValue !== '') ? (string) $modeValue : 'draft';
+
+        $tabLabel = match ($modeValue) {
+            'active' => 'Attive',
+            'archived' => 'Archiviate',
+            default => 'Bozze',
+        };
+
+        $clauses = [];
+
+        $query = $request?->input('query');
+        if (is_string($query) && trim($query) !== '') {
+            $clauses[] = 'cerca "' . trim($query) . '"';
+        }
+
+        $buildingId = (int) ($request?->input('building_id') ?? 0);
+        if ($buildingId > 0) {
+            $name = Building::query()->whereKey($buildingId)->value('name');
+            $clauses[] = 'struttura ' . ($name ?: ('#' . $buildingId));
+        }
+
+        $requesterId = (int) ($request?->input('requester_id') ?? 0);
+        if ($requesterId > 0) {
+            $user = User::query()->whereKey($requesterId)->first(['id', 'name', 'surname']);
+            $label = $user ? trim(($user->name ?? '') . ' ' . ($user->surname ?? '')) : '';
+            $clauses[] = 'richiedente ' . ($label !== '' ? $label : ('#' . $requesterId));
+        }
+
+        $agentId = (int) ($request?->input('agent_id') ?? 0);
+        if ($agentId > 0) {
+            $user = User::query()->whereKey($agentId)->first(['id', 'name', 'surname']);
+            $label = $user ? trim(($user->name ?? '') . ' ' . ($user->surname ?? '')) : '';
+            $clauses[] = 'agente ' . ($label !== '' ? $label : ('#' . $agentId));
+        }
+
+        $typologyValue = $request?->input('prescription_typology');
+        $typologyValue = is_array($typologyValue) ? ($typologyValue[0] ?? null) : $typologyValue;
+        if ($typologyValue !== null && $typologyValue !== '') {
+            $enum = PrescriptionTypologyEnum::tryFrom((string) $typologyValue);
+            $clauses[] = 'tipologia ' . ($enum?->label() ?? (string) $typologyValue);
+        }
+
+        $statusValue = $request?->input('status');
+        $statusValue = is_array($statusValue) ? ($statusValue[0] ?? null) : $statusValue;
+        if ($statusValue !== null && $statusValue !== '') {
+            $enum = OperationStatusEnum::tryFrom((string) $statusValue);
+            $clauses[] = 'stato ' . ($enum?->label() ?? (string) $statusValue);
+        }
+
+        $quoteStatusValue = $request?->input('latest_quote_status');
+        $quoteStatusValue = is_array($quoteStatusValue) ? ($quoteStatusValue[0] ?? null) : $quoteStatusValue;
+        if ($quoteStatusValue !== null && $quoteStatusValue !== '') {
+            $enum = QuoteStatusEnum::tryFrom((string) $quoteStatusValue);
+            $clauses[] = 'preventivo ' . ($enum?->label() ?? (string) $quoteStatusValue);
+        }
+
+        $supplierId = (int) ($request?->input('supplier_id') ?? 0);
+        if ($supplierId > 0) {
+            $name = Supplier::query()->whereKey($supplierId)->value('name');
+            $clauses[] = 'fornitore ' . ($name ?: ('#' . $supplierId));
+        }
+
+        $expireFrom = self::parseDateForLabel($request?->input('expire_at_from'));
+        $expireTo = self::parseDateForLabel($request?->input('expire_at_to'));
+        $expireClause = self::formatRangeClause('scadenza', $expireFrom, $expireTo);
+        if ($expireClause !== null) {
+            $clauses[] = $expireClause;
+        }
+
+        $sendFrom = self::parseDateForLabel($request?->input('send_at_from'));
+        $sendTo = self::parseDateForLabel($request?->input('send_at_to'));
+        $sendClause = self::formatRangeClause('invio', $sendFrom, $sendTo);
+        if ($sendClause !== null) {
+            $clauses[] = $sendClause;
+        }
+
+        $prefix = 'Lavorazioni ' . $tabLabel;
+        if (! empty($clauses)) {
+            $prefix .= ', ' . implode(', ', $clauses);
+        }
+
+        return $prefix . ': ' . number_format($total, 0, ',', '.');
+    }
+
+    private static function parseDateForLabel(mixed $value): ?string
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+        try {
+            return Carbon::parse((string) $value)->format('d/m/Y');
+        } catch (\Throwable $e) {
+            return null;
+        }
+    }
+
+    private static function formatRangeClause(string $label, ?string $from, ?string $to): ?string
+    {
+        if ($from && $to) {
+            return $label . ' ' . $from . ' - ' . $to;
+        }
+        if ($from) {
+            return $label . ' dal ' . $from;
+        }
+        if ($to) {
+            return $label . ' fino al ' . $to;
+        }
+        return null;
     }
 
     /**
