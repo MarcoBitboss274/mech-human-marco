@@ -51,6 +51,44 @@
 }
 
 
+/* ── Tab bar dettaglio struttura: allineata alle altre Show ───────────────────
+   In main.css (riga ~585) le tab di `.buildings-show__content` hanno un layout
+   `display: grid; grid-auto-columns: 1fr` che le rende equi-distribuite a
+   tutta larghezza, mentre le altre pagine Show (suppliers, operations, ecc.)
+   usano il default bb-tab con tab di larghezza naturale + margin 40px fra
+   ogni `li`. Annullo l'override specifico ripristinando il default.
+   Anche il margin-top del wrapper viene allineato alle altre Show (4px).
+   -------------------------------------------------------------------------- */
+.admin-view .buildings-show__content .bb-tab--horizontal > .bb-tab__label-boundary .bb-tab__label-container {
+    display: revert !important;
+    grid-auto-flow: revert !important;
+    grid-auto-columns: revert !important;
+}
+
+.admin-view .buildings-show__content .bb-tab--horizontal > .bb-tab__label-boundary .bb-tab__label-container > li + li {
+    margin-left: 40px !important;
+}
+
+.admin-view .buildings-show__content .bb-tab--horizontal > .bb-tab__label-boundary .bb-tab__label-container > li > .bb-tab__btn {
+    width: auto !important;
+}
+
+.admin-view > .buildings-show__content,
+.workspace-view > .buildings-show__content {
+    margin-top: 4px;
+}
+
+/* Stesso effetto sul wrapper nidificato `<div class="mt-4">` che avvolge
+   `<BbTab>` in suppliers/Show.vue: senza questa regola lo spazio header↔tab
+   resta a 16px (Tailwind `mt-4`) mentre buildings ha 4px → disallineamento.
+   Le rule globali `mt-4:has(.bb-tab)` (sopra) richiedono il figlio diretto di
+   .admin-view; qui invece il `mt-4` è nested in `.suppliers-show__content`. */
+.admin-view > .suppliers-show__content > .mt-4:has(> .bb-tab),
+.workspace-view > .suppliers-show__content > .mt-4:has(> .bb-tab) {
+    margin-top: 4px;
+}
+
+
 /* ── Pagina dettaglio fornitore: stessa larghezza del dettaglio struttura ─────
    main.css applica `width: 80%; max-width: none; mx: auto` alle pagine di
    dettaglio buildings/prescriptions/quotes/productions/invoices via `:has()`

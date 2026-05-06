@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\RoleEnum;
 use App\Models\Supplier;
 use App\Models\User;
 use App\Services\SupplierService;
+use App\Services\UserService;
+use App\Http\Requests\Supplier\InviteSupplierMemberRequest;
 use App\Http\Requests\Supplier\StoreSupplierRequest;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
 class SupplierController extends Controller
@@ -78,6 +82,58 @@ class SupplierController extends Controller
         SupplierService::delete($supplier);
 
         return to_route('suppliers.index');
+    }
+
+    /**
+     * Invite a member by email: if a user with that email already exists it must be free
+     * (no other supplier team), otherwise we create a fresh supplier user on the fly with
+     * the chosen role and bind it to this supplier. Used by the "Invita membro" inline
+     * dialog in the supplier detail page.
+     */
+    public function inviteMember(InviteSupplierMemberRequest $request, Supplier $supplier)
+    {
+        $email = (string) $request->input('email');
+        $role = (string) $request->input('role');
+
+        $existing = User::query()->where('email', $email)->first();
+
+        if ($existing !== null) {
+            if ($existing->role !== RoleEnum::SUPPLIER->value) {
+                throw ValidationException::withMessages([
+                    'email' => 'Esiste già un utente con questa email ma con un ruolo diverso.',
+                ]);
+            }
+
+            $alreadyAttached = $supplier->users()->where('users.id', $existing->id)->exists();
+            if ($alreadyAttached) {
+                throw ValidationException::withMessages([
+                    'email' => 'Questo utente è già membro del team di questo fornitore.',
+                ]);
+            }
+
+            $otherSupplierId = \DB::table('supplier_user')->where('user_id', $existing->id)->value('supplier_id');
+            if ($otherSupplierId !== null && (int) $otherSupplierId !== $supplier->id) {
+                throw ValidationException::withMessages([
+                    'email' => 'Questo utente è già associato a un altro fornitore.',
+                ]);
+            }
+
+            SupplierService::attachUser($supplier, $existing, $role);
+
+            return back();
+        }
+
+        // Crea l'utente al volo: nome/cognome vuoti, M&H li popolerà in seguito se necessario.
+        $newUser = UserService::store(null, [
+            'name' => '',
+            'surname' => '',
+            'email' => $email,
+            'role' => RoleEnum::SUPPLIER->value,
+        ]);
+
+        SupplierService::attachUser($supplier, $newUser, $role);
+
+        return back();
     }
 
     /**

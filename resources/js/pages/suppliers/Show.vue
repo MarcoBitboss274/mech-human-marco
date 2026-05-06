@@ -24,7 +24,7 @@
             <div v-else-if="activeTab === 'members'" class="mt-4 space-y-4">
                 <div class="flex items-center justify-between">
                     <p class="text-sm text-gray-600">{{ t('Membri del team del fornitore') }}</p>
-                    <BbButton prepend:icon="plus" @click="goToInviteMember">{{ t('Invita membro') }}</BbButton>
+                    <BbButton prepend:icon="plus" @click="openInviteMember">{{ t('Invita membro') }}</BbButton>
                 </div>
 
                 <BbTable :columns="memberColumns" item-value="id" :items="members" :loading="false">
@@ -47,6 +47,23 @@
                 </BbTable>
             </div>
         </div>
+
+        <BbDialog v-model="inviteMemberModal" :title="t('Invita membro')" size="md">
+            <form class="flex flex-col gap-4" @submit.prevent="submitInviteMember">
+                <BbTextInput v-model="inviteMemberForm.email" type="email" :label="t('Email')" required :errors="inviteMemberForm.errors?.email" />
+                <BbSelect
+                    v-model="inviteMemberForm.role"
+                    item-text="label"
+                    item-value="value"
+                    :items="selectSupplierUserRoles"
+                    :label="t('Ruolo')"
+                    :errors="inviteMemberForm.errors?.role"
+                />
+                <BbButton type="submit" :disabled="inviteMemberForm.processing">
+                    {{ t('Invita') }}
+                </BbButton>
+            </form>
+        </BbDialog>
     </div>
 </template>
 
@@ -55,8 +72,8 @@ import SupplierForm from '@/pages/suppliers/partials/Form.vue';
 import { useSelect } from '@/composables/useSelect';
 import AppLayout from '@/layouts/AppLayout.vue';
 import type { Supplier, SupplierMember } from '@/types/Supplier';
-import { router } from '@inertiajs/vue3';
-import { BbButton, BbSelect, BbTab, type BbTabItem, BbTable, type BbTableColumn, useToast } from 'bitboss-ui';
+import { router, useForm } from '@inertiajs/vue3';
+import { BbButton, BbDialog, BbSelect, BbTab, type BbTabItem, BbTable, type BbTableColumn, BbTextInput, useToast } from 'bitboss-ui';
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -95,12 +112,28 @@ const onSupplierUpdated = () => {
     toast({ theme: 'success', text: t('Modifiche salvate') });
 };
 
-const goToInviteMember = () => {
-    router.get(route('users.index', {
-        create: 1,
-        role: 'supplier',
-        supplier_id: props.supplier.id,
-    }));
+const inviteMemberModal = ref(false);
+const inviteMemberForm = useForm({
+    email: '',
+    role: 'member' as 'admin' | 'member',
+});
+
+const openInviteMember = () => {
+    inviteMemberForm.reset();
+    inviteMemberForm.clearErrors();
+    inviteMemberModal.value = true;
+};
+
+const submitInviteMember = () => {
+    inviteMemberForm.post(route('suppliers.members.invite', { supplier: props.supplier.id }), {
+        preserveScroll: true,
+        onSuccess: () => {
+            inviteMemberModal.value = false;
+            inviteMemberForm.reset();
+            toast({ theme: 'success', text: t('Invito inviato') });
+            router.reload({ only: ['members'] });
+        },
+    });
 };
 
 const onRoleChange = (member: SupplierMember, newRole: string) => {

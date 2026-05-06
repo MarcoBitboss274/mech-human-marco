@@ -152,6 +152,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Suppliers
         Route::resource('suppliers', SupplierController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
+        Route::post('/suppliers/{supplier}/members/invite', [SupplierController::class, 'inviteMember'])
+            ->middleware('can:suppliers.members.manage')
+            ->name('suppliers.members.invite');
         Route::post('/suppliers/{supplier}/members', [SupplierController::class, 'attachMember'])
             ->middleware('can:suppliers.members.manage')
             ->name('suppliers.members.store');
