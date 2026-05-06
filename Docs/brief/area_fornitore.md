@@ -1,54 +1,46 @@
-Attualmente il fornitore non ha una utenza ed ha scopo puramente anagrafico. Devo invece fare in modo che il Fornitore disponga di un utente che possa avere una dashboard, un pagina del suo Profilo con cui gestire i dati e gli account del fornitore e una pagina Lavorazioni in cui potrà visualizzare tutte le Lavorazioni per cui è stato scelto.
-Quando il fornitore accede al dettaglio di una lavorazione per cui è stato scelto deve poter:
-Comunicare con M&H all'interno della lavorazione;
-Visualizzare documenti caricati da M&H relativi a quella lavorazione;
-Caricare dei documenti relativi alla lavorazione per renderli visibili a M&H;
-Dovrà anche essere possibile per M&H quando M&H deve compilare il preventivo da inviare al Customer, alcuni dei documenti che inserisce nel Preventivo devono poter essere direttamente copiati-incollati da quelli che ha caricato il fornitore. Altri verranno aggiunti direttamente da Mech;
-Quindi all'interno di una lavorazione, M&H e Fornitore devono avere alcuni punti di contatto e documenti condivisi.
+UTENTI ASSOCIABILI A UN FORNITORE:
 
-Il fornitore ha intresse di vedere e sapere solo:
-- Tipologia Lavorazione;
-- Codice di Lotto;
-- Riferimento;
-- Documenti condivisigli da M&H;
-- Documenti che lui ha inviato a M&H;
-- Se M&H ha confermato l'avvio produzione;
-- Se M&H ha annullato l'avvio produzione;
+Attualmente il fornitore non ha utenti associati, ed è presente solo a scopo puramente anagrafico, in quanto Azienda Fornitore. 
+Devo invece fare in modo di avere utenti supplier relazionati a una azienda Fornitore. L'utenza Supplier è già presente in piattaforma quindi usiamo quella. Per quanto riguarda il ruolo di un utente supplier in relazione a una azienda Fornitore questo può essere Admin supplier o Membro supplier. ATTENZIONE: non sono gli stessi Admin e Membro del Customer, ma il concetto è lo stesso. L'admin supplier può modificare dati Fornitore e invitare altri utenti nel team del fornitore mentre il membro no.
+
+ONBOARDING:
+
+- Gli utenti supplier vengano creati da M&H nella pagina utenti, M&H crea l'utente con Ruolo Fornitore, con una password finta che poi si andranno a modificare quando entreranno.
+- Quando nel create di un utente seleziono ruolo Supplier deve apparire una sezione "Fornitore associato" in cui devo poter selezionare SOLO UNA azienda Fornitore a cui associare l'utente e definire con quale ruolo lo associo (Admin/membro).
+- Un utente supplier può essere relazionato a slo 1 azienda fornitore.
+- Un utente supplier che non è associato a una azienda Fornitore, quando non può fare ninte.
 
 
-Il fornitore NON deve vedere o sapere:
-- Richiedente;
-- Struttura;
-- Stato lavorazione;
-- Preventivi;
-- Fatture;
-- Azioni nell'header;
+PAGINA FORNITORI AREA ADMIN:
 
-Il fornitore deve poter visualizzare i documenti caricati e condivisi solo se è stato scelto.
-Inoltre deve essere anche possibile cambiare il fornitore scelto senza dover ricaricare i documenti.
+Lato admin M&H, Nella attuale pagina Fornitori, bisogna creare il detaglio dell (Azienda) fornitore. 
+Nel dettaglio del fornitore devo avere 2 tab: 
+1. Dettagli fornitore, con le sue informazioni editabili;
+2. Memebri: con dentro gli user supplier associati al fornitore, editabili e "invitabili".
 
 
-Documenti che M&H deve caricare e rendere visibili a Fornitore:
-Per Lybra Aligner, Chirurgia Guidata:
+------
 
-1. Prescrizione cliente (da modulo online)
-2. Dati allegati da cliente (es. STL, scansioni, ecc.)
-3. PDF realizzato internamente di richiesta lavorazione
 
-Per 3D Mesh, Protrusor: 
+DESCRIZIONE GENERALE AREA FORNITORE:
 
-1. Prescrizione cliente (da modulo online)
-2. Dati allegati da cliente (es. STL, scansioni, ecc.)
-3. 3. PDF ODA Ordine di acquisto
+L'area di lavoro di un utente fornitore è composta da:
+- Dashboard; (sia admin che membro)
+- Pagina Lavorazioni per cui è stato scelto il fornitore azienda; (sia admin che membro)
+- pagina di dettaglio della lavorazione; (sia admin che membro)
+- Pagina Profilo (dell' account); (sia admin che membro)
+- Pagina Impostazioni del fornitore azienda in cui  possibil anche modificarle(Dati anagrafici dell'azienda fornitore); (solo admin)
+- Pagina Team, ovvero Utenti associati all'azienda fornitore, in cui è possibile aggiungere, modificare, rimuovere utenti; (solo admin)
 
-Per Protesi:
-1. Prescrizione cliente (da modulo online) 
-2. Dati allegati da cliente (es. STL, scansioni, ecc.) 
-3. PDF realizzato internamente di richiesta lavorazione 
+-----
 
-Per Semilavorato di protesi al momento non è prevista una Area di upload in Mech-Fornitore.
+GESTIONE NOTIFICHE FORNITORE:
 
-Documenti il Fornitore deve caricare e rendere visibili a M&H:
-Documenti relativi al caso (es. elenco articoli utilizzati).
+Oggi il Fornitore, inteso come azienda ha un campo email. Quando viene assegnata una Lavorazione, di base l'email parte a quell'email.
+Con l'introduzione di utenti supplir relazionati a una azienda fornitore, alcuni fornitori avranno utenti registrati che si autenticano nel sistema. Non è detto però che tutti i fornitori avranno utenti registrati: continueranno a esistere fornitori "solo anagrafica".
 
-Per concludere, quando M&H deve compilare il preventivo da inviare al Customer, alcuni dei documenti che inserisce nel Preventivo devono poter essere direttamente copiati-incollati da quelli che ha caricato il fornitore. Altri verranno aggiunti direttamente da Mech.
+Come gestire le email di notifica quando coesistono email anagrafica + N email di utenti registrati. Quante email partono e a chi?
+
+Dcisione -> Le notifiche operative arrivano a tutti gli indirizzi associati al fornitore**, ovvero:
+- l'email anagrafica del Supplier;
+- l'email di tutti gli utenti registrati e attivi del fornitore.
