@@ -2,9 +2,7 @@
 @variant dark (&:where(.dark, .dark *));
 
 @theme {
-    --font-sans:
-        'Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans',
-        'Helvetica Neue', 'sans-serif';
+    --font-sans: 'Overpass', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
 
     /* Mix Colors */
     --color-mix-100: color-mix(in sRGB, var(--bb-panel) 90%, var(--bb-text));
@@ -17,19 +15,37 @@
     --color-mix-800: color-mix(in sRGB, var(--bb-panel) 20%, var(--bb-text));
     --color-mix-900: color-mix(in sRGB, var(--bb-panel) 10%, var(--bb-text));
 
-    /* Primary Colors */
-    --color-primary-50: #ecf2ff;
-    --color-primary-100: #dde6ff;
-    --color-primary-200: #c2d1ff;
-    --color-primary-300: #9cb1ff;
-    --color-primary-400: #7586ff;
-    --color-primary-500: #4e57ff;
-    --color-primary: #4e57ff;
-    --color-primary-600: #3b36f5;
-    --color-primary-700: #322ad8;
-    --color-primary-800: #2925ae;
-    --color-primary-900: #262689;
-    --color-primary-950: #181650;
+    /* Primary Colors — brand: #1b6ec5 */
+    --color-primary-50:  #ebf3fc;
+    --color-primary-100: #d6e8f9;
+    --color-primary-200: #adcff3;
+    --color-primary-300: #7ab2e9;
+    --color-primary-400: #4a92da;
+    --color-primary-500: #1b6ec5;
+    --color-primary:     #1b6ec5;
+    --color-primary-600: #1560ad;
+    --color-primary-700: #104d8c;
+    --color-primary-800: #0c3a6b;
+    --color-primary-900: #08284a;
+    --color-primary-950: #041629;
+
+    /* Typography scale: text-lg → text-4xl ridotti di 2px su font-size e line-height.
+       Valori Tailwind di default arrotondati al pari successivo come da design-system.
+       - text-lg:  18/28 → 16/26
+       - text-xl:  20/28 → 18/26
+       - text-2xl: 24/32 → 22/30
+       - text-3xl: 30/36 → 28/34
+       - text-4xl: 36/40 → 34/38 */
+    --text-lg: 16px;
+    --text-lg--line-height: 26px;
+    --text-xl: 18px;
+    --text-xl--line-height: 26px;
+    --text-2xl: 22px;
+    --text-2xl--line-height: 30px;
+    --text-3xl: 28px;
+    --text-3xl--line-height: 34px;
+    --text-4xl: 34px;
+    --text-4xl--line-height: 38px;
 
     /* Cool-gray Colors */
     --color-cool-gray-50: #f9fafb;
@@ -85,4 +101,12 @@
     --color-emerald-800: #065f46;
     --color-emerald-900: #064e3b;
     --color-emerald-950: #04382a;
+}
+
+:root {
+    --font-sans: 'Overpass', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+}
+
+.font-sans {
+    font-family: 'Overpass', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
 }

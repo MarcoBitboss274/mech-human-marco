@@ -1,16 +1,56 @@
 :root {
-    --bb-primary-base: var(--color-primary);
-    --bb-primary: var(--color-primary);
-    --bb-primary-dark: var(--color-primary-900);
-    --bb-contrasting: white;
-    --bb-contrasting-dark: var(--bb-text);
+    /* Colors */
+    --bb-primary-base: #1b6ec5;
+    --bb-primary: #1b6ec5;
+    --bb-primary-dark: #7ab2e9;
+    --bb-contrasting: #ffffff;
+    --bb-contrasting-dark: #000000;
+    --bb-border-light: #dfe1e3;
+    --bb-border-dark: #767676;
+    --bb-text-light: #313638;
+
+    /* Layout & radius */
     --bb-radius: 6px;
-    --bb-input-prefix-w: 30px;
-    --bb-input-px: 14px;
-    --bb-label-weight: 600;
+    --scrollbar-width: 0px;
     --bb-overlay-opacity: 0.5;
-    --bb-table-cell-h: 36px;
     --logo-h: 10px;
+
+    /* Input */
+    --bb-input-h: 28px;
+    --bb-input-compact-h: 28px;
+    --bb-input-py: 2px;
+    --bb-input-compact-py: 2px;
+    --bb-input-px: 8px;
+    --bb-input-icon: 18px;
+    --bb-input-spacing: 4px;
+    --bb-input-font-size: 14px;
+    --bb-input-prefix-w: 32px;
+    --bb-input-prefix: 14px;
+
+    /* Label */
+    --bb-label-size: 14px;
+    --bb-label-spacing-y: 2px;
+    --bb-label-spacing-x: 6px;
+    --bb-label-weight: 400;
+
+    /* Button */
+    --bb-button-h: 30px;
+    --bb-button-icon: 18px;
+
+    /* Form controls */
+    --bb-checkbox-w: 16px;
+    --bb-radio-space: 4px;
+    --bb-switch-w: 36px;
+    --bb-switch-h: 20px;
+    --bb-switch-thumb: 16px;
+    --bb-rating-size: 20px;
+    --bb-slider-thumb: 16px;
+    --bb-slider-track: 4px;
+
+    /* Table */
+    --bb-table-cell-h: 32px;
+
+    /* Transitions */
     --transition-duration: 0.3s;
     --transition-easing: cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -406,4 +446,329 @@
             @apply text-2xl font-bold text-[var(--bb-text)];
         }
     }
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   SCALA DI GRIGIO — Solo le azioni primarie restano blu.
+   Tutti gli altri elementi interattivi usano variabili --color-mix-*.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* ── Sidebar link selezionato: bg grigio molto chiaro (poco più scuro del
+   sidebar stesso — sidebar ha 4% text, selected ha 12%). */
+.layout-sidebar .sidebar-link.sidebar-link--active,
+.sidebar-link.sidebar-link--active,
+.sidebar-link--active {
+    background-color: color-mix(in sRGB, var(--bb-panel) 88%, var(--bb-text)) !important;
+    color: var(--bb-text) !important;
+}
+
+.layout-sidebar .sidebar-link.sidebar-link--active .bb-icon,
+.sidebar-link--active .bb-icon {
+    color: var(--bb-text) !important;
+}
+
+/* Hover sulla voce selected: appena più scura per feedback */
+.layout-sidebar .sidebar-link.sidebar-link--active:hover,
+.sidebar-link--active:hover {
+    background-color: color-mix(in sRGB, var(--bb-panel) 80%, var(--bb-text)) !important;
+}
+
+.sidebar-link--expanded {
+    color: var(--bb-text) !important;
+}
+
+/* ── Button SECONDARY ────────────────────────────────────────────────────────
+   Due stili distinti:
+   1. Icon-only (auto su `.bb-button--icon`, classe aggiunta da bb quando viene
+      usata la prop `icon`): a riposo solo icona grigia, no bg/no border;
+      all'hover bg grigio chiaro + icona scura.
+   2. Testuali espliciti (class `.bb-button--secondary` oppure attributo
+      `variant="secondary"` passato come prop sconosciuta a BbButton): a riposo
+      outline grigio leggero + testo scuro, no bg; all'hover bg grigio chiaro
+      (stesso colore dell'outline, che così scompare) + testo scuro.
+   Usato in: dialog "Annulla", stepper "Indietro"/"Salva bozza", icon button
+   tabella (edit/view/archive/delete), "Pulisci filtri", menu actions.
+   -------------------------------------------------------------------------- */
+
+/* 1. Icon-only → secondary automatico (con border grigio leggero come i testuali) */
+.bb-button.bb-button--icon:not(.base-btn--disabled) {
+    --color: transparent;
+    --border-color: var(--color-mix-200);
+    --text-color: var(--color-mix-500);
+}
+
+.bb-button.bb-button--icon:not(.base-btn--disabled):hover {
+    background-color: var(--color-mix-200);
+    color: var(--bb-text);
+    /* border-color resta --color-mix-200: scompare visivamente nel bg */
+}
+
+/* 2. Testuali → secondary via class o attributo variant (secondary o outline) */
+.bb-button.bb-button--secondary:not(.bb-button--icon):not(.base-btn--disabled),
+.bb-button[variant='secondary']:not(.bb-button--icon):not(.base-btn--disabled),
+.bb-button[variant='outline']:not(.bb-button--icon):not(.base-btn--disabled) {
+    --color: transparent;
+    --border-color: var(--color-mix-200);
+    --text-color: var(--bb-text);
+}
+
+.bb-button.bb-button--secondary:not(.bb-button--icon):not(.base-btn--disabled):hover,
+.bb-button[variant='secondary']:not(.bb-button--icon):not(.base-btn--disabled):hover,
+.bb-button[variant='outline']:not(.bb-button--icon):not(.base-btn--disabled):hover {
+    background-color: var(--color-mix-200);
+    color: var(--bb-text);
+}
+
+/* ── Altre varianti legacy (outline, ghost, panel): lasciate intatte ─────────
+   Selettori non corretti (descendant invece che combined) — da sistemare in
+   separata sede se servono davvero. Non interferiscono con i secondary sopra.
+   -------------------------------------------------------------------------- */
+.bb-button .bb-button--primary-outline:not(:disabled) {
+    --color: var(--color-mix-700);
+    --text-color: var(--bb-text);
+
+    &:hover {
+        --color: var(--color-mix-700);
+        --text-color: var(--bb-contrasting);
+    }
+}
+
+.bb-button .bb-button--ghost:not(:disabled) {
+    --color: var(--color-mix-700);
+    --text-color: var(--bb-text);
+
+    &:hover {
+        color: var(--bb-text);
+        text-decoration-color: var(--bb-text);
+    }
+}
+
+.bb-button .bb-button--panel:not(:disabled) {
+    --text-color: var(--bb-text);
+}
+
+/* ── Tab attivi ──────────────────────────────────────────────────────────── */
+.bb-tab .bb-tab__label-boundary .bb-tab__label-container::before {
+    background-color: var(--bb-text) !important;
+}
+
+.bb-tab .bb-tab__label-boundary .bb-tab__label-container li .bb-tab__btn--active {
+    color: var(--bb-text) !important;
+}
+
+/* ── Pagination ─────────────────────────────────────────────────────────────
+   Cerchio perfetto (radius 50%), dimensione ridotta, font più piccolo.
+   ------------------------------------------------------------------------ */
+.bb-pagination {
+    --color: var(--color-mix-700);
+    --radius: 50%;
+}
+
+.bb-pagination .bb-pagination__pages li .bb-pagination__page {
+    font-size: 12px !important;
+}
+
+/* ── Avatar nella navbar: dimensione 30px e testo ridotto e centrato ─────── */
+.layout-topbar .bb-avatar,
+.topbar-no-sidebar .bb-avatar {
+    width: 30px !important;
+    height: 30px !important;
+}
+
+.layout-topbar .fallback-avatar,
+.topbar-no-sidebar .fallback-avatar {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    font-size: 14px !important;
+    font-weight: bold;
+    padding-top: 2px;
+}
+
+/* ── Button icons: override --size inline ───────────────────────────────────
+   --size è impostato inline dal componente bb (non sovrascrivibile via variabile).
+   Si agisce direttamente su width/height con !important.
+   -------------------------------------------------------------------------- */
+.bb-button .bb-icon {
+    width: 18px !important;
+    height: 18px !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    align-self: center;
+    line-height: 0;
+}
+
+.bb-button .bb-button__prepend-icon,
+.bb-button .bb-button__append-icon {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    align-self: center;
+    transform: translateY(-1px);
+}
+
+.bb-button .bb-icon svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.bb-button .bb-button__content {
+    line-height: 1;
+    align-self: center;
+    transform: translateY(1px);
+}
+
+/* ── Button: forza altezza massima 30px su tutte le varianti data-size ───────
+   !important su --bb-button-h è necessario perché bitboss-ui ridefinisce
+   la variabile localmente sull'elemento tramite [data-*], bypassando :root.
+   -------------------------------------------------------------------------- */
+.bb-button[data-sm],
+.bb-button[data-md],
+.bb-button[data-lg],
+.bb-button[data-xl] {
+    --bb-button-h: 30px;
+    --font-size: 14px;
+    --py: 2px;
+    min-height: 30px !important;
+}
+
+@media (min-width: 640px) {
+    .bb-button[data-sm\:sm],
+    .bb-button[data-sm\:md],
+    .bb-button[data-sm\:lg],
+    .bb-button[data-sm\:xl] {
+        --bb-button-h: 30px;
+        --font-size: 14px;
+        --py: 2px;
+        min-height: 30px !important;
+    }
+}
+
+@media (min-width: 768px) {
+    .bb-button[data-md\:sm],
+    .bb-button[data-md\:md],
+    .bb-button[data-md\:lg],
+    .bb-button[data-md\:xl] {
+        --bb-button-h: 30px;
+        --font-size: 14px;
+        --py: 2px;
+        min-height: 30px !important;
+    }
+}
+
+@media (min-width: 1024px) {
+    .bb-button[data-lg\:sm],
+    .bb-button[data-lg\:md],
+    .bb-button[data-lg\:lg],
+    .bb-button[data-lg\:xl] {
+        --bb-button-h: 30px;
+        --font-size: 14px;
+        --py: 2px;
+        min-height: 30px !important;
+    }
+}
+
+/* ── Icon-only button: altezza 28px con icona 16px ───────────────────────────
+   Scalato in proporzione dalla versione 30px/18px (ratio ~0.6 → 28×0.6=16.8,
+   arrotondato a 16 per la regola dei valori pari). Vale per tutte le taglie
+   (xs/sm/md/lg/xl) e per i size responsivi. Specificità più alta delle rule
+   data-size sopra (2 classi vs 1 classe + 1 attr) quindi vince.
+   -------------------------------------------------------------------------- */
+.bb-button.bb-button--icon {
+    --bb-button-h: 28px;
+    --bb-button-icon: 16px;
+    min-height: 28px !important;
+    min-width: 28px !important;
+}
+
+.bb-button.bb-button--icon .bb-icon {
+    width: 16px !important;
+    height: 16px !important;
+}
+
+/* ── Pagination: tondi più piccoli ───────────────────────────────────────────
+   --size controlla il diametro dei tondi (default 32px in bb).
+   -------------------------------------------------------------------------- */
+.bb-pagination {
+    --size: 22px;
+}
+
+/* ── Input icons: stessa dimensione delle icone nei button (18px) ────────────
+   bb imposta width: var(--bb-input-icon) !important ma anche --size inline.
+   Forziamo width/height direttamente per vincere sulla specificità.
+   -------------------------------------------------------------------------- */
+.bb-common-input-inner-container .bb-icon {
+    width: 18px !important;
+    height: 18px !important;
+}
+
+.bb-common-input-inner-container .bb-icon svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* ── Date picker calendar button: no hover bg, icona grigia più piccola ──────
+   Di default bb mette bg blu primary all'hover e svg blu primary. Marco vuole
+   che le icone dentro gli input si comportino come l'icona search (lens):
+   nessun bg all'hover, vector sempre grigi. Icona ridotta leggermente (18→16).
+   -------------------------------------------------------------------------- */
+.bb-base-date-picker-input .bb-common-input-inner-container .bb-base-date-picker-input__calendar-btn,
+.bb-base-date-picker-input .bb-common-input-inner-container .bb-base-date-picker-input__calendar-btn:hover:not(:disabled) {
+    background-color: transparent !important;
+}
+
+.bb-base-date-picker-input .bb-common-input-inner-container .bb-base-date-picker-input__calendar-btn svg,
+.bb-base-date-picker-input .bb-common-input-inner-container .bb-base-date-picker-input__calendar-btn:hover:not(:disabled) svg {
+    color: var(--bb-icon-color) !important;
+    width: 16px !important;
+    height: 16px !important;
+}
+
+/* ── Input: centramento verticale perfetto del testo ─────────────────────────
+   bb imposta `line-height: initial` sul `<input>` + margin-top/bottom pari a
+   --bb-input-py. L'interazione tra margins e flex `align-items:center` del
+   container causa mis-centramenti visibili. Per gli input single-line usiamo
+   line-height:1 (line-box = font-size) + flex del container centra perfetto.
+   Per textarea (multi-line) serve line-height leggermente più alto.
+   -------------------------------------------------------------------------- */
+.bb-common-input-inner-container input {
+    line-height: 1 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+.bb-common-input-inner-container textarea {
+    line-height: 1.4 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+/* ── Rimozione focus ring blu su input, select e filtri ──────────────────────
+   Focus-within imposta border-color: var(--bb-primary) e un box-shadow blu.
+   Torniamo al grigio bordo e azzeriamo il ring.
+   -------------------------------------------------------------------------- */
+:root {
+    --bb-ring-opacity: 0;
+}
+
+.bb-common-input-inner-container:focus-within {
+    border-color: var(--bb-border-light) !important;
+    box-shadow: none !important;
+}
+
+/* ── Errori di validazione: margine superiore solo quando aperto ─────────────
+   L'hint container compare sotto il campo; margin-top SOLO quando aperto (con
+   errore), altrimenti contribuisce 4px al wrapper anche da chiuso e disallinea
+   gli icon button in righe flex `items-end`.
+   -------------------------------------------------------------------------- */
+.bb-base-input-outer-container .bb-base-input-container__hint-container.bb-collapsible--open {
+    margin-top: 4px !important;
 }
