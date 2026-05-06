@@ -58,7 +58,7 @@ Il fornitore NON deve assolutamente vedere o sapere:
 - Azioni nell'header;
 
 In generale, quando il fornitore accede al dettaglio di una lavorazione per cui è stato scelto deve poter:
-- Comunicare con M&H all'interno della singola lavorazione; Deve quindi avere una chat con M&H che però è diversa dalla chat tra M&H e Customer.
+- Comunicare con M&H all'interno della singola lavorazione; Deve quindi avere una chat con M&H.
 - Visualizzare i documenti del caso Prescrizione e Allegati ed eventuali documenti e Note della prescrizione per quella singola lavorazione;
 - Caricare dei documenti relativi alla singola lavorazione per renderli visibili a M&H;
 
@@ -67,6 +67,18 @@ ATTENZIONE:
 - Il fornitore deve poter visualizzare i documenti caricati e condivisi solo se è stato scelto.
 - M&H deve poter cambiare il fornitore scelto senza dover ricaricare i documenti. Il nuovo fornitore vedrà quello che vedeva il primo.
 
+
+IMPLICAZIONI DELL'AREA FORNITORE SULLA STRUTTURA DETTAGLIO LAVORAZIONE LATO FORNITORE:
+- Header;
+- Spazio per alert e banner;
+- Unica tab organizzata a sezioni: 1) Documenti del caso (prescrizione, note ecc); 2) Documenti da caricare (quelli che il forntiore deve condividere con M&H);
+- Chat con M&H (Uguale nel design e nella posizione con la chat che M&H ha con il customer);
+
+
+IMPLICAZIONI DELL'AREA FORNITORE SULLA STRUTTURA DETTAGLIO LAVORAZIONE LATO M&H:
+- Per prima cosa bisogna fare in modo che M&H possa aggiungere e scegliere 1 solo forntitore alla volta. Non può aggiungere N fornitori, ne può aggiungere 1 e lo può scegliere, se vuole cambiarlo deve eliminare quello vecchio e ripetere la procedura.
+- Nella Tab Fornitore, ci deve essere una sezione superiore in cui appare la card del forntiore selezionato e una sezione sotto chiamata "Documenti fornitore" in cui appariranno i documenti caricati dal fornitore scelto.
+- Chat con il Forintore. (Utilizzare l'attuale chat con il Customer ma renderla una chat a 2 Tab, ovvero una tab=Chat con customer, altra tab = Chat con Fornitore.);
 
 
 
