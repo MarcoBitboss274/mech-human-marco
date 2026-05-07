@@ -34,10 +34,12 @@ class HomeController extends Controller
 
         if ($user->isCustomer()) {
             return to_route('workspace.index');
-        } else {
-            return Inertia::render('Dashboard');
         }
 
-        abort(403, 'Unauthorized');
+        if ($user->isSupplier()) {
+            return to_route('workspace.supplier.index');
+        }
+
+        return Inertia::render('Dashboard');
     }
 }

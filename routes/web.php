@@ -200,6 +200,34 @@ Route::middleware(['auth', 'verified'])->group(function () {
         });
     });
 
+    // Workspace Supplier — registrato PRIMA di /workspace (customer) per evitare che il
+    // route binding `/workspace/{building:slug}` intercetti `/workspace/supplier`.
+    Route::middleware(['role:supplier'])
+        ->prefix('/workspace/supplier')
+        ->name('workspace.supplier.')
+        ->group(function () {
+
+            // Orphan landing — accessible without the supplier-team check (otherwise infinite redirect).
+            Route::get('/orphan', [\App\Http\Controllers\WorkspaceSupplierController::class, 'orphan'])->name('orphan');
+
+            Route::middleware(['workspace.supplier'])
+                ->group(function () {
+                    Route::get('/', [\App\Http\Controllers\WorkspaceSupplierController::class, 'index'])->name('index');
+                    Route::get('/dashboard', [\App\Http\Controllers\WorkspaceSupplierController::class, 'dashboard'])->name('dashboard');
+                    Route::get('/profile', [\App\Http\Controllers\WorkspaceSupplierController::class, 'profile'])->name('profile.index');
+                    Route::post('/profile', [\App\Http\Controllers\WorkspaceSupplierController::class, 'updateProfile'])->name('profile.update');
+                    Route::get('/settings', [\App\Http\Controllers\WorkspaceSupplierController::class, 'settings'])->name('settings.index');
+                    Route::put('/settings', [\App\Http\Controllers\WorkspaceSupplierController::class, 'updateSettings'])->name('settings.update');
+                    Route::get('/team', [\App\Http\Controllers\WorkspaceSupplierController::class, 'team'])->name('team.index');
+                    Route::put('/team/{user}', [\App\Http\Controllers\WorkspaceSupplierController::class, 'updateTeamMember'])->name('team.update');
+                    Route::delete('/team/{user}', [\App\Http\Controllers\WorkspaceSupplierController::class, 'removeTeamMember'])->name('team.destroy');
+                    Route::get('/operations', [\App\Http\Controllers\WorkspaceSupplierController::class, 'operationsIndex'])->name('operations.index');
+                    Route::get('/operations/{operation}', [\App\Http\Controllers\WorkspaceSupplierController::class, 'operationsShow'])->name('operations.show');
+                    Route::post('/operations/{operation}/documents', [\App\Http\Controllers\WorkspaceSupplierController::class, 'operationsUploadDocument'])->name('operations.documents.store');
+                    Route::delete('/operations/{operation}/documents/{media}', [\App\Http\Controllers\WorkspaceSupplierController::class, 'operationsDeleteDocument'])->name('operations.documents.destroy');
+                });
+        });
+
     // Workspace
     Route::middleware(['role:customer', 'onboarding'])
         ->prefix('/workspace')
@@ -249,32 +277,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 });
         });
 
-    // Workspace Supplier
-    Route::middleware(['role:supplier'])
-        ->prefix('/workspace/supplier')
-        ->name('workspace.supplier.')
-        ->group(function () {
-
-            // Orphan landing — accessible without the supplier-team check (otherwise infinite redirect).
-            Route::get('/orphan', [\App\Http\Controllers\WorkspaceSupplierController::class, 'orphan'])->name('orphan');
-
-            Route::middleware(['workspace.supplier'])
-                ->group(function () {
-                    Route::get('/', [\App\Http\Controllers\WorkspaceSupplierController::class, 'index'])->name('index');
-                    Route::get('/dashboard', [\App\Http\Controllers\WorkspaceSupplierController::class, 'dashboard'])->name('dashboard');
-                    Route::get('/profile', [\App\Http\Controllers\WorkspaceSupplierController::class, 'profile'])->name('profile.index');
-                    Route::post('/profile', [\App\Http\Controllers\WorkspaceSupplierController::class, 'updateProfile'])->name('profile.update');
-                    Route::get('/settings', [\App\Http\Controllers\WorkspaceSupplierController::class, 'settings'])->name('settings.index');
-                    Route::put('/settings', [\App\Http\Controllers\WorkspaceSupplierController::class, 'updateSettings'])->name('settings.update');
-                    Route::get('/team', [\App\Http\Controllers\WorkspaceSupplierController::class, 'team'])->name('team.index');
-                    Route::put('/team/{user}', [\App\Http\Controllers\WorkspaceSupplierController::class, 'updateTeamMember'])->name('team.update');
-                    Route::delete('/team/{user}', [\App\Http\Controllers\WorkspaceSupplierController::class, 'removeTeamMember'])->name('team.destroy');
-                    Route::get('/operations', [\App\Http\Controllers\WorkspaceSupplierController::class, 'operationsIndex'])->name('operations.index');
-                    Route::get('/operations/{operation}', [\App\Http\Controllers\WorkspaceSupplierController::class, 'operationsShow'])->name('operations.show');
-                    Route::post('/operations/{operation}/documents', [\App\Http\Controllers\WorkspaceSupplierController::class, 'operationsUploadDocument'])->name('operations.documents.store');
-                    Route::delete('/operations/{operation}/documents/{media}', [\App\Http\Controllers\WorkspaceSupplierController::class, 'operationsDeleteDocument'])->name('operations.documents.destroy');
-                });
-        });
 });
 
 require __DIR__ . '/auth.php';

@@ -61,6 +61,7 @@ class HandleInertiaRequests extends Middleware
 
         $supplierWorkspacePermissions = null;
         $supplierRole = null;
+        $supplier = null;
         if ($user?->isSupplier()) {
             $supplier = $user->suppliers()->first();
             if ($supplier !== null) {
@@ -87,6 +88,7 @@ class HandleInertiaRequests extends Middleware
             ],
             'avatar' => $user?->getAvatarId() ?? null,
             'workspace' => $workspace ?? null,
+            'supplier' => $supplier ?? null,
             'user_meta' => $userMeta,
         ];
     }
