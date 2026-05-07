@@ -6,7 +6,8 @@ Registro dei piani in `Docs/plans/`: stato di esecuzione, date e note.
 
 | Piano | Stato | Avviato | Completato | Note |
 |---|---|---|---|---|
-| [piano-area_fornitore.md](piano-area_fornitore.md) | In corso | 2026-05-06 | — | Ripreso da lavoro non committato il 2026-05-07 |
+| [piano-area_fornitore.md](piano-area_fornitore.md) | Completato | 2026-05-06 | 2026-05-07 | Fase 1+2 chiuse. Step 11 risolto con `last_login_at` (active/pending) — commit 774ed17. Step 8 sostituito da modal "Invita membro" su suppliers/Show.vue (no `/users/create` query string). |
+| [piano-area_fornitore_lavorazioni.md](piano-area_fornitore_lavorazioni.md) | Da fare | — | — | Dipende da Fase 1 di piano-area_fornitore (`active`/`pending`) |
 | [piano-feature_revisione_prescrizione.md](piano-feature_revisione_prescrizione.md) | Da verificare | — | — | — |
 | [piano-filtraggio_esportazione.md](piano-filtraggio_esportazione.md) | Da verificare | — | — | — |
 | [piano-revisione_aggiornamento.md](piano-revisione_aggiornamento.md) | Da verificare | — | — | — |
