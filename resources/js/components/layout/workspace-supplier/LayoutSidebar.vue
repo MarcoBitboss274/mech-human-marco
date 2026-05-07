@@ -96,14 +96,6 @@ const items = computed<Item[]>(() => {
         active: usePage().url.startsWith('/workspace/supplier/operations'),
     });
     list.push({
-        key: 'profile',
-        text: t('Profilo'),
-        icon: 'users',
-        href: route('workspace.supplier.profile.index'),
-        can: true,
-        active: usePage().url.startsWith('/workspace/supplier/profile'),
-    });
-    list.push({
         key: 'settings',
         text: t('Impostazioni'),
         icon: 'cog',

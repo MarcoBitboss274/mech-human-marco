@@ -1,22 +1,27 @@
 <template>
-    <div>
-        <h1 class="page__title">{{ t('Impostazioni fornitore') }}</h1>
+    <div class="admin-view">
+        <div class="admin-view__header">
+            <h1 class="page__title">{{ t('Impostazioni fornitore') }}</h1>
+        </div>
         <p class="page__subtitle">{{ t('Modifica i dati anagrafici della tua azienda.') }}</p>
 
-        <form class="settings-form" @submit.prevent="submit">
-            <BbTextInput v-model="form.name" :label="t('Ragione sociale')" :errors="form.errors.name" />
-            <BbTextInput v-model="form.vat" :label="t('Partita IVA')" :errors="form.errors.vat" />
-            <BbTextInput v-model="form.mail" :label="t('Email')" type="email" required :errors="form.errors.mail" />
-            <BbTextInput v-model="form.phone" :label="t('Telefono')" :errors="form.errors.phone" />
-            <BbTextInput v-model="form.address" :label="t('Indirizzo')" :errors="form.errors.address" />
-            <BbTextInput v-model="form.cap" :label="t('CAP')" :errors="form.errors.cap" />
-            <BbTextInput v-model="form.city" :label="t('Città')" :errors="form.errors.city" />
-            <BbTextInput v-model="form.province" :label="t('Provincia')" :errors="form.errors.province" />
-
-            <div class="settings-form__actions">
-                <BbButton :loading="form.processing" type="submit">{{ t('Salva') }}</BbButton>
-            </div>
-        </form>
+        <div class="suppliers-show__content">
+            <form class="admin-form" autocomplete="off" @submit.prevent="submit">
+                <div class="admin-form__grid">
+                    <BbTextInput v-model="form.name" autocomplete="off" :label="t('Ragione sociale')" :errors="form.errors.name" />
+                    <BbTextInput v-model="form.vat" autocomplete="off" :label="t('Partita IVA')" :errors="form.errors.vat" />
+                    <BbTextInput v-model="form.mail" autocomplete="off" :label="t('Email')" type="email" required :errors="form.errors.mail" />
+                    <BbTextInput v-model="form.phone" autocomplete="off" :label="t('Telefono')" :errors="form.errors.phone" />
+                    <BbTextInput v-model="form.address" autocomplete="off" :label="t('Indirizzo')" :errors="form.errors.address" />
+                    <BbTextInput v-model="form.cap" autocomplete="off" :label="t('CAP')" :errors="form.errors.cap" />
+                    <BbTextInput v-model="form.city" autocomplete="off" :label="t('Città')" :errors="form.errors.city" />
+                    <BbTextInput v-model="form.province" autocomplete="off" :label="t('Provincia')" :errors="form.errors.province" />
+                </div>
+                <div class="admin-form__actions">
+                    <BbButton :loading="form.processing" type="submit">{{ t('Salva') }}</BbButton>
+                </div>
+            </form>
+        </div>
     </div>
 </template>
 
@@ -71,18 +76,3 @@ const submit = () => {
     });
 };
 </script>
-
-<style scoped>
-.settings-form {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 16px;
-    max-width: 960px;
-}
-
-.settings-form__actions {
-    grid-column: 1 / -1;
-    display: flex;
-    justify-content: flex-end;
-}
-</style>

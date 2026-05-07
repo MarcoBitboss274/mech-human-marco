@@ -94,6 +94,13 @@ onMounted(() => {
         chatStore.fetchUnread();
     }
 
+    userDropdownItems.value.push({
+        key: 'profile',
+        text: t('Profilo'),
+        'prepend:icon': 'users',
+        href: route('workspace.supplier.profile.index'),
+    });
+
     if (impersonating.value) {
         userDropdownItems.value.push({
             key: 'leave-impersonation',

@@ -1,9 +1,14 @@
 <template>
-    <div>
-        <h1 class="page__title">{{ t('Dashboard') }}</h1>
+    <div class="admin-view">
+        <div class="admin-view__header">
+            <h1 class="page__title">{{ t('Dashboard') }}</h1>
+        </div>
         <p class="page__subtitle">{{ t('Benvenuto nell\'area di lavoro del fornitore.') }}</p>
-        <div class="rounded border border-dashed border-gray-300 p-6 text-sm text-gray-500">
-            {{ t('Qui troverai un riepilogo operativo delle lavorazioni a te assegnate. La sezione è in costruzione.') }}
+
+        <div class="suppliers-show__content">
+            <div class="rounded border border-dashed border-gray-300 p-6 text-sm text-gray-500">
+                {{ t('Qui troverai un riepilogo operativo delle lavorazioni a te assegnate. La sezione è in costruzione.') }}
+            </div>
         </div>
     </div>
 </template>

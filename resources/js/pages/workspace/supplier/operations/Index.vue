@@ -1,79 +1,83 @@
 <template>
-    <div class="supplier-operations-index">
-        <h1 class="page__title">{{ t('Lavorazioni') }}</h1>
+    <div class="admin-view supplier-operations-index">
+        <div class="admin-view__header">
+            <h1 class="page__title">{{ t('Lavorazioni') }}</h1>
+        </div>
         <p class="page__subtitle">{{ t('Lavorazioni assegnate alla tua azienda.') }}</p>
 
-        <div class="my-4 flex flex-wrap items-end gap-3">
-            <BbTextInput
-                class="w-full sm:w-1/2 lg:w-1/4"
-                v-model="queryModel"
-                append:icon="lens"
-                clearable
-                :label="t('Cerca per riferimento o lotto')"
-            />
-            <BbTextInput
-                class="w-full sm:w-1/3 lg:w-1/6"
-                v-model="refModel"
-                clearable
-                :label="t('Riferimento')"
-            />
-            <BbTextInput
-                class="w-full sm:w-1/3 lg:w-1/6"
-                v-model="batchModel"
-                clearable
-                :label="t('Lotto')"
-            />
-            <BbSelect
-                class="w-full sm:w-1/3 lg:w-1/6"
-                v-model="statusModel"
-                item-text="label"
-                item-value="value"
-                :items="supplierStatusOptions"
-                :label="t('Stato')"
-                clearable
-            />
-            <BbSelect
-                class="w-full sm:w-1/3 lg:w-1/6"
-                v-model="documentsModel"
-                item-text="label"
-                item-value="value"
-                :items="documentsOptions"
-                :label="t('Stato documenti')"
-                clearable
+        <div class="suppliers-show__content">
+            <div class="my-4 flex flex-wrap items-end gap-3">
+                <BbTextInput
+                    class="w-full sm:w-1/2 lg:w-1/4"
+                    v-model="queryModel"
+                    append:icon="lens"
+                    clearable
+                    :label="t('Cerca per riferimento o lotto')"
+                />
+                <BbTextInput
+                    class="w-full sm:w-1/3 lg:w-1/6"
+                    v-model="refModel"
+                    clearable
+                    :label="t('Riferimento')"
+                />
+                <BbTextInput
+                    class="w-full sm:w-1/3 lg:w-1/6"
+                    v-model="batchModel"
+                    clearable
+                    :label="t('Lotto')"
+                />
+                <BbSelect
+                    class="w-full sm:w-1/3 lg:w-1/6"
+                    v-model="statusModel"
+                    item-text="label"
+                    item-value="value"
+                    :items="supplierStatusOptions"
+                    :label="t('Stato')"
+                    clearable
+                />
+                <BbSelect
+                    class="w-full sm:w-1/3 lg:w-1/6"
+                    v-model="documentsModel"
+                    item-text="label"
+                    item-value="value"
+                    :items="documentsOptions"
+                    :label="t('Stato documenti')"
+                    clearable
+                />
+            </div>
+
+            <BbTable :columns="columns" item-value="id" :items="operations.data ?? []" :loading="loading">
+                <template #no-data>{{ t('Non ti è ancora stata assegnata nessuna lavorazione.') }}</template>
+                <template #typology="{ item }">
+                    <PrescriptionTypologyBadge :typology="item.latest_prescription?.typology" size="xs" />
+                </template>
+                <template #supplier_visible_status="{ item }">
+                    <span class="supplier-status">{{ supplierStatusLabel(item.supplier_visible_status) }}</span>
+                </template>
+                <template #documents_state="{ item }">
+                    <span :class="documentsBadgeClass(item)">
+                        {{ (item.supplier_documents_count ?? 0) > 0 ? t('Caricati') : t('Da caricare') }}
+                    </span>
+                </template>
+                <template #actions="{ item }">
+                    <BbButton
+                        icon="eye"
+                        size="xs"
+                        @click="router.get(route('workspace.supplier.operations.show', { operation: item.id }))"
+                    >
+                        {{ t('Visualizza') }}
+                    </BbButton>
+                </template>
+            </BbTable>
+
+            <XPagination
+                v-model="page"
+                :disabled="loading"
+                :per-page="operations.per_page"
+                :total-items="operations.total"
+                :total-pages="operations.last_page"
             />
         </div>
-
-        <BbTable :columns="columns" item-value="id" :items="operations.data ?? []" :loading="loading">
-            <template #no-data>{{ t('Non ti è ancora stata assegnata nessuna lavorazione.') }}</template>
-            <template #typology="{ item }">
-                <PrescriptionTypologyBadge :typology="item.latest_prescription?.typology" size="xs" />
-            </template>
-            <template #supplier_visible_status="{ item }">
-                <span class="supplier-status">{{ supplierStatusLabel(item.supplier_visible_status) }}</span>
-            </template>
-            <template #documents_state="{ item }">
-                <span :class="documentsBadgeClass(item)">
-                    {{ (item.supplier_documents_count ?? 0) > 0 ? t('Caricati') : t('Da caricare') }}
-                </span>
-            </template>
-            <template #actions="{ item }">
-                <BbButton
-                    icon="eye"
-                    size="xs"
-                    @click="router.get(route('workspace.supplier.operations.show', { operation: item.id }))"
-                >
-                    {{ t('Visualizza') }}
-                </BbButton>
-            </template>
-        </BbTable>
-
-        <XPagination
-            v-model="page"
-            :disabled="loading"
-            :per-page="operations.per_page"
-            :total-items="operations.total"
-            :total-pages="operations.last_page"
-        />
     </div>
 </template>
 

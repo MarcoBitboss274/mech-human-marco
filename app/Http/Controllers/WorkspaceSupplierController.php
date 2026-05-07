@@ -85,7 +85,7 @@ class WorkspaceSupplierController extends Controller
 
         $supplier = $this->currentSupplierOrFail();
         $supplier->load(['users' => function ($q) {
-            $q->select('users.id', 'users.name', 'users.surname', 'users.email')
+            $q->select('users.id', 'users.name', 'users.surname', 'users.email', 'users.created_at')
                 ->orderBy('users.surname')
                 ->orderBy('users.name');
         }]);
@@ -97,13 +97,32 @@ class WorkspaceSupplierController extends Controller
             'full_name' => trim(($u->name ?? '') . ' ' . ($u->surname ?? '')),
             'email' => $u->email,
             'role' => $u->pivot->role ?? null,
+            'created_at' => $u->created_at?->toISOString(),
             'accepted_at' => $u->pivot->accepted_at ? Carbon::parse($u->pivot->accepted_at)->toISOString() : null,
+            'pivot' => [
+                'role' => $u->pivot->role ?? null,
+            ],
         ])->values();
 
         return Inertia::render('workspace/supplier/Team', [
             'supplier' => $this->supplierPayload(),
             'members' => $members,
         ]);
+    }
+
+    public function inviteTeamMember(Request $request)
+    {
+        Gate::authorize('supplierWorkspaceAbility', 'workspace.supplier.team.manage');
+
+        $data = $request->validate([
+            'email' => 'required|email|max:255',
+            'role' => 'required|string|in:admin,member',
+        ]);
+
+        $supplier = $this->currentSupplierOrFail();
+        SupplierService::invite($supplier, $data['email'], $data['role']);
+
+        return back();
     }
 
     public function updateTeamMember(Request $request, User $user)

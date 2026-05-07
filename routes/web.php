@@ -219,6 +219,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
                     Route::get('/settings', [\App\Http\Controllers\WorkspaceSupplierController::class, 'settings'])->name('settings.index');
                     Route::put('/settings', [\App\Http\Controllers\WorkspaceSupplierController::class, 'updateSettings'])->name('settings.update');
                     Route::get('/team', [\App\Http\Controllers\WorkspaceSupplierController::class, 'team'])->name('team.index');
+                    Route::post('/team/invite', [\App\Http\Controllers\WorkspaceSupplierController::class, 'inviteTeamMember'])->name('team.invite');
                     Route::put('/team/{user}', [\App\Http\Controllers\WorkspaceSupplierController::class, 'updateTeamMember'])->name('team.update');
                     Route::delete('/team/{user}', [\App\Http\Controllers\WorkspaceSupplierController::class, 'removeTeamMember'])->name('team.destroy');
                     Route::get('/operations', [\App\Http\Controllers\WorkspaceSupplierController::class, 'operationsIndex'])->name('operations.index');
