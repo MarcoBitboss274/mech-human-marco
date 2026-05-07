@@ -2,15 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\RoleEnum;
 use App\Models\Supplier;
 use App\Models\User;
 use App\Services\SupplierService;
-use App\Services\UserService;
 use App\Http\Requests\Supplier\InviteSupplierMemberRequest;
 use App\Http\Requests\Supplier\StoreSupplierRequest;
 use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Carbon;
 use Inertia\Inertia;
 
 class SupplierController extends Controller
@@ -31,7 +29,7 @@ class SupplierController extends Controller
     public function show(Supplier $supplier)
     {
         $supplier->load(['users' => function ($q) {
-            $q->select('users.id', 'users.name', 'users.surname', 'users.email', 'users.last_login_at')
+            $q->select('users.id', 'users.name', 'users.surname', 'users.email', 'users.created_at')
                 ->orderBy('users.surname')
                 ->orderBy('users.name');
         }]);
@@ -43,8 +41,11 @@ class SupplierController extends Controller
             'full_name' => trim(($u->name ?? '') . ' ' . ($u->surname ?? '')),
             'email' => $u->email,
             'role' => $u->pivot->role ?? null,
-            'status' => $u->last_login_at !== null ? 'active' : 'pending',
-            'last_login_at' => $u->last_login_at?->toISOString(),
+            'created_at' => $u->created_at?->toISOString(),
+            'accepted_at' => $u->pivot->accepted_at ? Carbon::parse($u->pivot->accepted_at)->toISOString() : null,
+            'pivot' => [
+                'role' => $u->pivot->role ?? null,
+            ],
         ])->values();
 
         return Inertia::render('suppliers/Show', [
@@ -93,46 +94,7 @@ class SupplierController extends Controller
      */
     public function inviteMember(InviteSupplierMemberRequest $request, Supplier $supplier)
     {
-        $email = (string) $request->input('email');
-        $role = (string) $request->input('role');
-
-        $existing = User::query()->where('email', $email)->first();
-
-        if ($existing !== null) {
-            if ($existing->role !== RoleEnum::SUPPLIER->value) {
-                throw ValidationException::withMessages([
-                    'email' => 'Esiste già un utente con questa email ma con un ruolo diverso.',
-                ]);
-            }
-
-            $alreadyAttached = $supplier->users()->where('users.id', $existing->id)->exists();
-            if ($alreadyAttached) {
-                throw ValidationException::withMessages([
-                    'email' => 'Questo utente è già membro del team di questo fornitore.',
-                ]);
-            }
-
-            $otherSupplierId = \DB::table('supplier_user')->where('user_id', $existing->id)->value('supplier_id');
-            if ($otherSupplierId !== null && (int) $otherSupplierId !== $supplier->id) {
-                throw ValidationException::withMessages([
-                    'email' => 'Questo utente è già associato a un altro fornitore.',
-                ]);
-            }
-
-            SupplierService::attachUser($supplier, $existing, $role);
-
-            return back();
-        }
-
-        // Crea l'utente al volo: nome/cognome vuoti, M&H li popolerà in seguito se necessario.
-        $newUser = UserService::store(null, [
-            'name' => '',
-            'surname' => '',
-            'email' => $email,
-            'role' => RoleEnum::SUPPLIER->value,
-        ]);
-
-        SupplierService::attachUser($supplier, $newUser, $role);
+        SupplierService::invite($supplier, (string) $request->input('email'), (string) $request->input('role'));
 
         return back();
     }

@@ -15,8 +15,8 @@
                     @update:model-value="(v: string) => onRoleChange(item, v)"
                 />
             </template>
-            <template #status="{ item }">
-                <SupplierMemberStatusBadge :status="item.status" size="xs" />
+            <template #accepted_at="{ item }">
+                {{ formatDateTime(item.accepted_at) }}
             </template>
             <template #actions="{ item }">
                 <BbButton icon="trash" size="xs" variant="danger" @click="onRemove(item)">
@@ -28,7 +28,6 @@
 </template>
 
 <script setup lang="ts">
-import SupplierMemberStatusBadge from '@/components/suppliers/SupplierMemberStatusBadge.vue';
 import { useSelect } from '@/composables/useSelect';
 import WorkspaceSupplierLayout from '@/layouts/WorkspaceSupplierLayout.vue';
 import type { SupplierMember } from '@/types/Supplier';
@@ -56,8 +55,11 @@ const memberColumns: BbTableColumn[] = [
     { key: 'full_name', label: t('Nome') },
     { key: 'email', label: t('Email') },
     { key: 'role', label: t('Ruolo') },
-    { key: 'status', label: t('Stato') },
+    { key: 'accepted_at', label: t('Accettato il') },
 ];
+
+const formatDateTime = (d: string | null | undefined): string =>
+    d ? new Date(d).toLocaleString('it-IT', { dateStyle: 'short', timeStyle: 'short' }) : '--';
 
 const onRoleChange = (member: SupplierMember, newRole: string) => {
     if (!newRole || newRole === member.role) return;

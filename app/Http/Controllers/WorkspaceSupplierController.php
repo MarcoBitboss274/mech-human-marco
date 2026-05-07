@@ -14,6 +14,7 @@ use App\Services\SupplierService;
 use App\Services\UserService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
@@ -84,7 +85,7 @@ class WorkspaceSupplierController extends Controller
 
         $supplier = $this->currentSupplierOrFail();
         $supplier->load(['users' => function ($q) {
-            $q->select('users.id', 'users.name', 'users.surname', 'users.email', 'users.last_login_at')
+            $q->select('users.id', 'users.name', 'users.surname', 'users.email')
                 ->orderBy('users.surname')
                 ->orderBy('users.name');
         }]);
@@ -96,8 +97,7 @@ class WorkspaceSupplierController extends Controller
             'full_name' => trim(($u->name ?? '') . ' ' . ($u->surname ?? '')),
             'email' => $u->email,
             'role' => $u->pivot->role ?? null,
-            'status' => $u->last_login_at !== null ? 'active' : 'pending',
-            'last_login_at' => $u->last_login_at?->toISOString(),
+            'accepted_at' => $u->pivot->accepted_at ? Carbon::parse($u->pivot->accepted_at)->toISOString() : null,
         ])->values();
 
         return Inertia::render('workspace/supplier/Team', [

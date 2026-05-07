@@ -5,8 +5,8 @@ import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
 
 type Props = {
-    status: string | null | undefined;
-    size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | undefined;
+    role: string | null;
+    size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 };
 
 const props = defineProps<Props>();
@@ -18,16 +18,16 @@ const classes = computed(() => ({
     '!text-base': props.size === 'md',
     '!text-lg': props.size === 'lg',
     '!text-xl': props.size === 'xl',
-    '!bg-green-200 border-green-500 !text-green-600': props.status === 'active',
-    '!bg-amber-200 border-amber-500 !text-amber-700': props.status === 'pending',
+    '!bg-violet-200 border-violet-500 !text-violet-600': props.role === 'admin',
+    '!bg-sky-200 border-sky-500 !text-sky-600': props.role === 'member',
 }));
 
 const text = computed(() => {
-    switch (props.status) {
-        case 'active':
-            return t('Attivo');
-        case 'pending':
-            return t('In attesa');
+    switch (props.role) {
+        case 'admin':
+            return t('Admin');
+        case 'member':
+            return t('Membro');
         default:
             return '--';
     }

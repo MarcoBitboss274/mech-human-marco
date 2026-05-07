@@ -22,30 +22,55 @@
             </div>
 
             <div v-else-if="activeTab === 'members'" class="mt-4 space-y-4">
-                <div class="flex items-center justify-between">
-                    <p class="text-sm text-gray-600">{{ t('Membri del team del fornitore') }}</p>
-                    <BbButton prepend:icon="plus" @click="openInviteMember">{{ t('Invita membro') }}</BbButton>
+                <div class="flex items-center justify-end">
+                    <BbButton append:icon="plus" @click="openInviteMember">{{ t('Invita membro') }}</BbButton>
                 </div>
 
-                <BbTable :columns="memberColumns" item-value="id" :items="members" :loading="false">
+                <BbTable :columns="memberColumns" item-value="id" :items="members" :actions="true">
                     <template #no-data>{{ t('Nessun membro associato') }}</template>
                     <template #role="{ item }">
-                        <BbSelect
-                            :model-value="item.role"
-                            item-text="label"
-                            item-value="value"
-                            :items="selectSupplierUserRoles"
-                            class="w-40"
-                            @update:model-value="(v: string) => onRoleChange(item, v)"
-                        />
+                        <SupplierUserRoleBadge :role="item.pivot?.role" />
                     </template>
-                    <template #status="{ item }">
-                        <SupplierMemberStatusBadge :status="item.status" size="xs" />
+                    <template #created_at="{ item }">
+                        {{ formatDateTime(item.created_at) }}
+                    </template>
+                    <template #accepted_at="{ item }">
+                        {{ formatDateTime(item.accepted_at) }}
                     </template>
                     <template #actions="{ item }">
-                        <BbButton icon="trash" size="xs" variant="danger" @click="onRemove(item)">
-                            {{ t('Rimuovi') }}
-                        </BbButton>
+                        <div class="flex gap-x-2">
+                            <BbButton icon="pencil" size="xs" @click="openEditMember(item)">
+                                {{ t('Modifica') }}
+                            </BbButton>
+                            <BbPopover v-if="item.id !== currentUser.id">
+                                <template #activator="{ props }">
+                                    <BbButton icon="trash" size="xs" v-bind="props">
+                                        {{ t('Elimina') }}
+                                    </BbButton>
+                                </template>
+                                <template #default="{ close }">
+                                    <p class="mb-2 max-w-[250px]">
+                                        {{ t('Sei sicuro di voler rimuovere') }}
+                                        <strong> {{ getFullName(item) }}</strong
+                                        >?
+                                    </p>
+                                    <div class="text-right">
+                                        <BbButton
+                                            variant="danger"
+                                            size="xs"
+                                            @click="
+                                                () => {
+                                                    onRemove(item);
+                                                    close();
+                                                }
+                                            "
+                                        >
+                                            {{ t('Elimina') }}
+                                        </BbButton>
+                                    </div>
+                                </template>
+                            </BbPopover>
+                        </div>
                     </template>
                 </BbTable>
             </div>
@@ -58,7 +83,7 @@
                     v-model="inviteMemberForm.role"
                     item-text="label"
                     item-value="value"
-                    :items="selectSupplierUserRoles"
+                    :items="SUPPLIER_ROLES"
                     :label="t('Ruolo')"
                     :errors="inviteMemberForm.errors?.role"
                 />
@@ -67,22 +92,45 @@
                 </BbButton>
             </form>
         </BbDialog>
+
+        <BbDialog v-model="editMemberModal" :title="t('Modifica ruolo membro')" size="md">
+            <form class="flex flex-col gap-4" @submit.prevent="submitEditMemberRole">
+                <BbSelect
+                    v-model="editMemberForm.role"
+                    item-text="label"
+                    item-value="value"
+                    :items="SUPPLIER_ROLES"
+                    :label="t('Ruolo')"
+                    :errors="editMemberForm.errors?.role"
+                />
+                <BbButton type="submit" :disabled="editMemberForm.processing || selectedMemberId === null">
+                    {{ t('Salva') }}
+                </BbButton>
+            </form>
+        </BbDialog>
     </div>
 </template>
 
 <script setup lang="ts">
 import SupplierForm from '@/pages/suppliers/partials/Form.vue';
-import SupplierMemberStatusBadge from '@/components/suppliers/SupplierMemberStatusBadge.vue';
-import { useSelect } from '@/composables/useSelect';
+import SupplierUserRoleBadge from '@/components/suppliers/SupplierUserRoleBadge.vue';
+import { useMainToast } from '@/composables/useMainToast';
+import { usePermissions } from '@/composables/usePermissions';
 import AppLayout from '@/layouts/AppLayout.vue';
 import type { Supplier, SupplierMember } from '@/types/Supplier';
 import { router, useForm } from '@inertiajs/vue3';
-import { BbButton, BbDialog, BbSelect, BbTab, type BbTabItem, BbTable, type BbTableColumn, BbTextInput, useToast } from 'bitboss-ui';
-import { ref } from 'vue';
+import { BbButton, BbDialog, BbPopover, BbSelect, BbTab, type BbTabItem, BbTable, type BbTableColumn, BbTextInput } from 'bitboss-ui';
+import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
-const { toast } = useToast();
+const { success, error } = useMainToast();
+const { currentUser } = usePermissions();
+
+const SUPPLIER_ROLES = computed(() => [
+    { value: 'admin', label: t('Admin') },
+    { value: 'member', label: t('Membro') },
+]);
 
 defineOptions({
     layout: (h: any, page: any) => h(AppLayout, { title: 'Dettaglio fornitore' }, () => [page]),
@@ -95,8 +143,6 @@ type Props = {
 
 const props = defineProps<Props>();
 
-const { select: selectSupplierUserRoles } = useSelect('supplier-user-roles');
-
 const activeTab = ref<'details' | 'members'>('details');
 
 const tabs: BbTabItem[] = [
@@ -104,22 +150,36 @@ const tabs: BbTabItem[] = [
     { key: 'members', label: t('Membri') },
 ];
 
-const members = ref<SupplierMember[]>(props.members);
+const members = computed(() => props.members);
 
 const memberColumns: BbTableColumn[] = [
-    { key: 'full_name', label: t('Nome') },
+    { key: 'name', label: t('Nome') },
+    { key: 'surname', label: t('Cognome') },
     { key: 'email', label: t('Email') },
     { key: 'role', label: t('Ruolo') },
-    { key: 'status', label: t('Stato') },
+    { key: 'created_at', label: t('Data creazione') },
+    { key: 'accepted_at', label: t('Accettato il') },
 ];
 
+const formatDateTime = (d: string | null | undefined): string =>
+    d ? new Date(d).toLocaleString('it-IT', { dateStyle: 'short', timeStyle: 'short' }) : '--';
+
+const getFullName = (item: SupplierMember) => `${item.name ?? ''} ${item.surname ?? ''}`.trim() || (item.email ?? '');
+
 const onSupplierUpdated = () => {
-    toast({ theme: 'success', text: t('Modifiche salvate') });
+    success(t('Modifiche salvate'));
 };
 
 const inviteMemberModal = ref(false);
+const editMemberModal = ref(false);
+const selectedMemberId = ref<number | null>(null);
+
 const inviteMemberForm = useForm({
     email: '',
+    role: 'member' as 'admin' | 'member',
+});
+
+const editMemberForm = useForm({
     role: 'member' as 'admin' | 'member',
 });
 
@@ -135,36 +195,52 @@ const submitInviteMember = () => {
         onSuccess: () => {
             inviteMemberModal.value = false;
             inviteMemberForm.reset();
-            toast({ theme: 'success', text: t('Invito inviato') });
+            success(t('Invito inviato'));
             router.reload({ only: ['members'] });
+        },
+        onError: () => {
+            error(t('Si è verificato un errore'));
         },
     });
 };
 
-const onRoleChange = (member: SupplierMember, newRole: string) => {
-    if (!newRole || newRole === member.role) return;
-    router.put(
-        route('suppliers.members.update', { supplier: props.supplier.id, user: member.id }),
-        { role: newRole },
+const openEditMember = (member: SupplierMember) => {
+    selectedMemberId.value = member.id;
+    editMemberForm.reset();
+    editMemberForm.role = member.pivot?.role === 'admin' ? 'admin' : 'member';
+    editMemberModal.value = true;
+};
+
+const submitEditMemberRole = () => {
+    if (selectedMemberId.value === null) return;
+    editMemberForm.put(
+        route('suppliers.members.update', { supplier: props.supplier.id, user: selectedMemberId.value }),
         {
             preserveScroll: true,
             onSuccess: () => {
-                member.role = newRole;
-                toast({ theme: 'success', text: t('Ruolo aggiornato') });
+                editMemberModal.value = false;
+                selectedMemberId.value = null;
+                success(t('Ruolo membro aggiornato'));
+                router.reload({ only: ['members'] });
+            },
+            onError: () => {
+                error(t('Si è verificato un errore'));
             },
         },
     );
 };
 
 const onRemove = (member: SupplierMember) => {
-    if (!confirm(t('Rimuovere {name} dal team?', { name: member.full_name }))) return;
     router.delete(
         route('suppliers.members.destroy', { supplier: props.supplier.id, user: member.id }),
         {
             preserveScroll: true,
             onSuccess: () => {
-                members.value = members.value.filter((m) => m.id !== member.id);
-                toast({ theme: 'success', text: t('Utente rimosso dal team del fornitore') });
+                success(t('Utente rimosso dal team del fornitore'));
+                router.reload({ only: ['members'] });
+            },
+            onError: () => {
+                error(t('Si è verificato un errore'));
             },
         },
     );

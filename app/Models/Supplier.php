@@ -55,7 +55,7 @@ class Supplier extends Model
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'supplier_user')
-            ->withPivot('role')
+            ->withPivot(['role', 'accepted_at', 'invite_token', 'is_new'])
             ->withTimestamps();
     }
 

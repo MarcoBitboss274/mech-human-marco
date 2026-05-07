@@ -2,12 +2,15 @@
 
 namespace App\Services;
 
+use App\Enums\RoleEnum;
 use App\Enums\SupplierUserRoleEnum;
 use App\Models\Supplier;
 use App\Models\User;
+use App\Notifications\Supplier\Invite;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Validation\ValidationException;
@@ -74,11 +77,74 @@ class SupplierService extends ModelService
             }
 
             $supplier->users()->syncWithoutDetaching([
-                $user->id => ['role' => $role, 'updated_at' => now(), 'created_at' => now()],
+                $user->id => [
+                    'role' => $role,
+                    'accepted_at' => now(),
+                    'updated_at' => now(),
+                    'created_at' => now(),
+                ],
             ]);
             // Ensure the role is updated even if the row already existed.
             $supplier->users()->updateExistingPivot($user->id, ['role' => $role]);
         });
+    }
+
+    /**
+     * Invite a member to the supplier team by email. Specchio di
+     * WorkspaceService::inviteBuildingMember: crea l'utente se non esiste, attacca
+     * il pivot con invite_token e accepted_at=null, manda la mail di invito.
+     */
+    public static function invite(Supplier $supplier, string $email, string $role): User
+    {
+        self::assertValidRole($role);
+
+        $existing = User::query()->where('email', $email)->first();
+
+        if ($existing && $supplier->users()->where('users.id', $existing->id)->exists()) {
+            throw ValidationException::withMessages([
+                'email' => ['Questo utente è già membro del team di questo fornitore.'],
+            ]);
+        }
+
+        if ($existing && $existing->role !== RoleEnum::SUPPLIER->value) {
+            throw ValidationException::withMessages([
+                'email' => ['Esiste già un utente con questa email ma con un ruolo diverso.'],
+            ]);
+        }
+
+        if ($existing) {
+            $otherSupplierId = DB::table('supplier_user')->where('user_id', $existing->id)->value('supplier_id');
+            if ($otherSupplierId !== null && (int) $otherSupplierId !== $supplier->id) {
+                throw ValidationException::withMessages([
+                    'email' => ['Questo utente è già associato a un altro fornitore.'],
+                ]);
+            }
+        }
+
+        $inviteToken = Str::uuid()->toString();
+        $isNew = $existing === null;
+
+        if ($existing) {
+            $user = $existing;
+        } else {
+            $user = UserService::store(null, [
+                'name' => '',
+                'surname' => '',
+                'email' => $email,
+                'role' => RoleEnum::SUPPLIER->value,
+            ]);
+        }
+
+        $supplier->users()->attach($user->id, [
+            'role' => $role,
+            'is_new' => $isNew,
+            'invite_token' => $inviteToken,
+        ]);
+
+        $url = route('invitation.index', ['token' => $inviteToken]);
+        $user->notify(new Invite($supplier, $url));
+
+        return $user;
     }
 
     /**
