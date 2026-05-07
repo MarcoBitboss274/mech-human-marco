@@ -5,7 +5,7 @@ import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
 
 type Props = {
-    status: 'pending' | 'active' | string | null | undefined;
+    status: string | null | undefined;
     size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | undefined;
 };
 
@@ -19,7 +19,7 @@ const classes = computed(() => ({
     '!text-lg': props.size === 'lg',
     '!text-xl': props.size === 'xl',
     '!bg-green-200 border-green-500 !text-green-600': props.status === 'active',
-    '!bg-amber-200 border-amber-500 !text-amber-600': props.status === 'pending',
+    '!bg-amber-200 border-amber-500 !text-amber-700': props.status === 'pending',
 }));
 
 const text = computed(() => {

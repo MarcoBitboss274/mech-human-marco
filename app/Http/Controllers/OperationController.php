@@ -12,6 +12,8 @@ use App\Http\Requests\Operation\RemoveOperationOrderRequest;
 use App\Http\Requests\Operation\RemoveOperationQuoteRequest;
 use App\Http\Requests\Operation\SelectOperationSupplierRequest;
 use App\Http\Requests\Operation\StoreOperationRequest;
+use App\Http\Requests\Operation\SwapOperationSupplierRequest;
+use App\Http\Requests\Operation\UploadOperationSupplierDocumentRequest;
 use App\Http\Requests\Operation\StoreOperationWithPrescriptionRequest;
 use App\Http\Requests\Operation\UpdateOperationInvoiceRequest;
 use App\Http\Requests\Operation\UpdateOperationInvoiceStatusRequest;
@@ -216,6 +218,8 @@ class OperationController extends Controller
             'chat' => [
                 'can_read' => app(OperationChatPolicy::class)->viewMessages($user, $operation),
                 'can_send' => app(OperationChatPolicy::class)->sendMessage($user, $operation),
+                'can_read_supplier' => app(\App\Policies\OperationSupplierChatPolicy::class)->viewMessages($user, $operation),
+                'can_send_supplier' => app(\App\Policies\OperationSupplierChatPolicy::class)->sendMessage($user, $operation),
             ],
         ]);
     }
@@ -329,6 +333,19 @@ class OperationController extends Controller
     }
 
     /**
+     * Cambio del fornitore selezionato (hard delete del precedente + attach del nuovo).
+     */
+    public function swapSupplier(SwapOperationSupplierRequest $request, Operation $operation)
+    {
+        Gate::authorize('manageSupplier', $operation);
+
+        $supplier = Supplier::query()->findOrFail($request->integer('supplier_id'));
+        OperationService::swapSupplier($operation, $supplier);
+
+        return to_route('operations.show', ['operation' => $operation->id]);
+    }
+
+    /**
      * Remove a supplier from the specified operation.
      */
     public function removeSupplier(Operation $operation, Supplier $supplier)
@@ -349,6 +366,30 @@ class OperationController extends Controller
 
         $supplier = Supplier::query()->findOrFail($request->integer('supplier_id'));
         OperationService::updateSupplierStatus($operation, $supplier, $request->input('status'));
+
+        return to_route('operations.show', ['operation' => $operation->id]);
+    }
+
+    /**
+     * Upload one supplier document on the Operation (M&H può sempre).
+     */
+    public function uploadSupplierDocument(UploadOperationSupplierDocumentRequest $request, Operation $operation)
+    {
+        Gate::authorize('manageSupplier', $operation);
+
+        OperationService::uploadSupplierDocument($operation, $request->file('file'), $request->user());
+
+        return to_route('operations.show', ['operation' => $operation->id]);
+    }
+
+    /**
+     * Delete one supplier document (M&H può sempre, anche post-`requested`).
+     */
+    public function deleteSupplierDocument(Operation $operation, \Spatie\MediaLibrary\MediaCollections\Models\Media $media)
+    {
+        Gate::authorize('manageSupplier', $operation);
+
+        OperationService::deleteSupplierDocument($operation, $media, asAdmin: true);
 
         return to_route('operations.show', ['operation' => $operation->id]);
     }

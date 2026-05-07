@@ -19,6 +19,10 @@ use App\Models\Quote;
 use App\Models\Supplier;
 use App\Models\User;
 use App\Notifications\Admin\SendPrescriptionForAdmin;
+use App\Notifications\Supplier\OperationCanceledForSupplierNotification;
+use App\Notifications\Supplier\OperationProductionCanceledForSupplierNotification;
+use App\Notifications\Supplier\OperationProductionConfirmedForSupplierNotification;
+use App\Notifications\Supplier\SupplierAssignedToOperationNotification;
 use App\Services\UserService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -26,6 +30,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 /**
  * @method static void cancel(Operation $operation)
@@ -52,6 +57,11 @@ class OperationService extends ModelService
         $operation->update([
             'canceled_at' => now(),
         ]);
+
+        $supplier = $operation->selectedSupplier()->first();
+        if ($supplier) {
+            NotificationService::sendToSupplier($supplier, new OperationCanceledForSupplierNotification($operation));
+        }
     }
 
     public static function reactivate(Operation $operation): void
@@ -738,16 +748,46 @@ class OperationService extends ModelService
             'suppliers:id,name,vat,mail,phone,address,cap,city,province,status',
             'selectedSupplier:id,name,vat,mail,phone,address,cap,city,province,status',
             'latestPrescription' => fn($q) => $q->with('activeRevision:id,prescription_id,opened_at,closed_at'),
+            'media',
         ]);
 
         $selectedSupplier = $operation->selectedSupplier->first();
         $operationData = $operation->toArray();
         $operationData['selected_supplier'] = $selectedSupplier?->toArray();
+        $operationData['supplier_documents'] = static::mapSupplierDocumentsForAdmin($operation);
 
         return [
             'operation' => $operationData,
             'overview' => static::buildOverviewPayload($operation, asCustomer: false),
         ];
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    public static function mapSupplierDocumentsForAdmin(Operation $operation): array
+    {
+        return $operation->getMedia('supplier_documents')->map(function (Media $media) {
+            $authorId = $media->getCustomProperty('uploaded_by_user_id');
+            $author = null;
+            if ($authorId) {
+                $user = User::query()->find((int) $authorId);
+                if ($user) {
+                    $name = trim(($user->name ?? '') . ' ' . ($user->surname ?? ''));
+                    $author = $name !== '' ? $name : $user->email;
+                }
+            }
+
+            return [
+                'id' => $media->id,
+                'name' => $media->name,
+                'file_name' => $media->file_name,
+                'size' => $media->size,
+                'uploaded_at' => $media->getCustomProperty('uploaded_at') ?? $media->created_at?->toIso8601String(),
+                'uploaded_by' => $author,
+                'url' => route('media.index', ['media' => $media->id]),
+            ];
+        })->values()->all();
     }
 
     /**
@@ -907,6 +947,8 @@ class OperationService extends ModelService
      */
     public static function confirmProduction(Operation $operation): void
     {
+        $wasAlreadyInProduction = $operation->status === OperationStatusEnum::PRODUCTION->value;
+
         DB::transaction(function () use ($operation) {
             $production = $operation->productions()->oldest()->first();
 
@@ -921,8 +963,20 @@ class OperationService extends ModelService
                 ]);
             }
 
+            // Una nuova conferma di produzione "riapre" l'avvio: azzera il marker di annullamento.
+            $operation->update([
+                'production_canceled_at' => null,
+            ]);
+
             static::updateStatus($operation, OperationStatusEnum::PRODUCTION->value, true);
         });
+
+        if (! $wasAlreadyInProduction) {
+            $supplier = $operation->fresh()->selectedSupplier()->first();
+            if ($supplier) {
+                NotificationService::sendToSupplier($supplier, new OperationProductionConfirmedForSupplierNotification($operation));
+            }
+        }
     }
 
     /**
@@ -936,9 +990,23 @@ class OperationService extends ModelService
             return;
         }
 
+        $wasInProduction = $operation->status === OperationStatusEnum::PRODUCTION->value;
+
         $production->update([
             'status' => ProductionStatusEnum::CANCELED->value,
         ]);
+
+        if ($wasInProduction) {
+            $operation->update([
+                'production_canceled_at' => now(),
+                'status' => OperationStatusEnum::WAITING_APPROVAL->value,
+            ]);
+
+            $supplier = $operation->selectedSupplier()->first();
+            if ($supplier) {
+                NotificationService::sendToSupplier($supplier, new OperationProductionCanceledForSupplierNotification($operation));
+            }
+        }
     }
 
     /**
@@ -963,10 +1031,14 @@ class OperationService extends ModelService
 
     /**
      * Attach a supplier to the operation.
+     *
+     * Vincolo: 1 solo fornitore selezionato per Operation. Se esiste già un fornitore
+     * selezionato, lanciare ValidationException — chi vuole cambiare deve usare swapSupplier().
      */
     public static function attachSupplier(Operation $operation, Supplier $supplier): void
     {
         $alreadyAttached = $operation->suppliers()
+            ->wherePivot('selected', true)
             ->where('suppliers.id', $supplier->id)
             ->exists();
 
@@ -974,14 +1046,28 @@ class OperationService extends ModelService
             return;
         }
 
+        $hasSelected = $operation->suppliers()
+            ->wherePivot('selected', true)
+            ->exists();
+
+        if ($hasSelected) {
+            throw ValidationException::withMessages([
+                'supplier_id' => 'Esiste già un fornitore assegnato a questa lavorazione. Usa "Cambia fornitore".',
+            ]);
+        }
+
         $operation->suppliers()->attach($supplier->id, [
             'status' => OperationSupplierStatusEnum::TO_CONTACT->value,
-            'selected' => false,
+            'selected' => true,
+            'selected_at' => now(),
         ]);
+
+        NotificationService::sendToSupplier($supplier, new SupplierAssignedToOperationNotification($operation));
     }
 
     /**
-     * Select a supplier for the operation.
+     * Select a supplier already attached. Mantenuto per retro-compatibilità: nel nuovo
+     * flusso il fornitore è selezionato già al momento dell'attach.
      */
     public static function selectSupplier(Operation $operation, Supplier $supplier): void
     {
@@ -1014,6 +1100,29 @@ class OperationService extends ModelService
     }
 
     /**
+     * Cambio fornitore: hard delete del pivot esistente + creazione del nuovo, in un'unica transazione.
+     * I documenti `supplier_documents` restano sull'Operation e diventano visibili al nuovo fornitore.
+     */
+    public static function swapSupplier(Operation $operation, Supplier $newSupplier): void
+    {
+        DB::transaction(function () use ($operation, $newSupplier) {
+            $operation->suppliers()
+                ->newPivotStatement()
+                ->where('operation_id', $operation->id)
+                ->where('selected', true)
+                ->delete();
+
+            $operation->suppliers()->attach($newSupplier->id, [
+                'status' => OperationSupplierStatusEnum::TO_CONTACT->value,
+                'selected' => true,
+                'selected_at' => now(),
+            ]);
+        });
+
+        NotificationService::sendToSupplier($newSupplier, new SupplierAssignedToOperationNotification($operation));
+    }
+
+    /**
      * Detach a supplier from the operation.
      */
     public static function detachSupplier(Operation $operation, Supplier $supplier): void
@@ -1030,6 +1139,57 @@ class OperationService extends ModelService
             'status' => $status,
             'updated_at' => now(),
         ]);
+    }
+
+    /**
+     * Upload one supplier document on the Operation media collection.
+     * Custom properties: uploaded_by_user_id, uploaded_at.
+     */
+    public static function uploadSupplierDocument(Operation $operation, UploadedFile $file, User $author): Media
+    {
+        return $operation->addMedia($file)
+            ->withCustomProperties([
+                'uploaded_by_user_id' => $author->id,
+                'uploaded_at' => now()->toIso8601String(),
+            ])
+            ->toMediaCollection('supplier_documents');
+    }
+
+    /**
+     * Delete one supplier document. Per il fornitore è permesso solo se lo stato
+     * originale dell'Operation è ≤ requested; M&H può sempre rimuovere ($asAdmin = true).
+     */
+    public static function deleteSupplierDocument(
+        Operation $operation,
+        Media $media,
+        bool $asAdmin
+    ): void {
+        if ($media->model_type !== Operation::class || (int) $media->model_id !== $operation->id) {
+            throw ValidationException::withMessages([
+                'media' => 'Il documento non appartiene a questa lavorazione.',
+            ]);
+        }
+
+        if ($media->collection_name !== 'supplier_documents') {
+            throw ValidationException::withMessages([
+                'media' => 'Il documento non è un documento fornitore.',
+            ]);
+        }
+
+        if (! $asAdmin) {
+            $allowedStatuses = [
+                OperationStatusEnum::DRAFT->value,
+                OperationStatusEnum::REQUESTED->value,
+            ];
+
+            if (! in_array($operation->status, $allowedStatuses, true)) {
+                throw ValidationException::withMessages([
+                    'media' => 'Non è più possibile rimuovere questo documento.',
+                ]);
+            }
+        }
+
+        $media->delete();
     }
 
     /**

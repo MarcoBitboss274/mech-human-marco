@@ -47,6 +47,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->middleware('can:chat.read')
         ->name('chat.unread-by-operation');
 
+    // Supplier chat (M&H ↔ Fornitore). Authorization gestita interamente dalla FormRequest via OperationSupplierChatPolicy.
+    Route::get('/operations/{operation}/supplier-chat/messages', [\App\Http\Controllers\SupplierChatController::class, 'messages'])
+        ->name('operations.supplier-chat.messages');
+    Route::post('/operations/{operation}/supplier-chat/messages', [\App\Http\Controllers\SupplierChatController::class, 'store'])
+        ->name('operations.supplier-chat.store');
+    Route::post('/operations/{operation}/supplier-chat/read', [\App\Http\Controllers\SupplierChatController::class, 'markAsRead'])
+        ->name('operations.supplier-chat.read');
+    Route::get('/supplier-chat/unread-by-operation', [\App\Http\Controllers\SupplierChatController::class, 'unreadByOperation'])
+        ->name('supplier-chat.unread-by-operation');
+
     // Selects workspace
     Route::prefix('/select')->name('select.')->group(function () {
         Route::get('/buildings', [SelectController::class, 'buildings'])->name('buildings');
@@ -90,8 +100,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('/operations/{operation}/prescriptions/{prescription}', [OperationController::class, 'updatePrescription'])->name('operations.prescriptions.update');
         Route::post('/operations/{operation}/suppliers', [OperationController::class, 'addSupplier'])->name('operations.suppliers.store');
         Route::patch('/operations/{operation}/suppliers/select', [OperationController::class, 'selectSupplier'])->name('operations.suppliers.select');
+        Route::patch('/operations/{operation}/suppliers/swap', [OperationController::class, 'swapSupplier'])->name('operations.suppliers.swap');
         Route::patch('/operations/{operation}/suppliers/status', [OperationController::class, 'updateSupplierStatus'])->name('operations.suppliers.status');
         Route::delete('/operations/{operation}/suppliers/{supplier}', [OperationController::class, 'removeSupplier'])->name('operations.suppliers.destroy');
+        Route::post('/operations/{operation}/supplier-documents', [OperationController::class, 'uploadSupplierDocument'])->name('operations.supplier-documents.store');
+        Route::delete('/operations/{operation}/supplier-documents/{media}', [OperationController::class, 'deleteSupplierDocument'])->name('operations.supplier-documents.destroy');
         Route::post('/operations/{operation}/quotes', [OperationController::class, 'addQuote'])->name('operations.quotes.store');
         Route::put('/operations/{operation}/quotes/{quote}', [OperationController::class, 'updateQuote'])->name('operations.quotes.update');
         Route::patch('/operations/{operation}/quotes/{quote}/status', [OperationController::class, 'updateQuoteStatus'])->name('operations.quotes.status');
@@ -258,6 +271,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
                     Route::delete('/team/{user}', [\App\Http\Controllers\WorkspaceSupplierController::class, 'removeTeamMember'])->name('team.destroy');
                     Route::get('/operations', [\App\Http\Controllers\WorkspaceSupplierController::class, 'operationsIndex'])->name('operations.index');
                     Route::get('/operations/{operation}', [\App\Http\Controllers\WorkspaceSupplierController::class, 'operationsShow'])->name('operations.show');
+                    Route::post('/operations/{operation}/documents', [\App\Http\Controllers\WorkspaceSupplierController::class, 'operationsUploadDocument'])->name('operations.documents.store');
+                    Route::delete('/operations/{operation}/documents/{media}', [\App\Http\Controllers\WorkspaceSupplierController::class, 'operationsDeleteDocument'])->name('operations.documents.destroy');
                 });
         });
 });

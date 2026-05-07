@@ -5,21 +5,56 @@
 
         <div class="my-4 flex flex-wrap items-end gap-3">
             <BbTextInput
-                class="w-full sm:w-1/2 lg:w-1/3"
+                class="w-full sm:w-1/2 lg:w-1/4"
                 v-model="queryModel"
                 append:icon="lens"
                 clearable
                 :label="t('Cerca per riferimento o lotto')"
             />
+            <BbTextInput
+                class="w-full sm:w-1/3 lg:w-1/6"
+                v-model="refModel"
+                clearable
+                :label="t('Riferimento')"
+            />
+            <BbTextInput
+                class="w-full sm:w-1/3 lg:w-1/6"
+                v-model="batchModel"
+                clearable
+                :label="t('Lotto')"
+            />
+            <BbSelect
+                class="w-full sm:w-1/3 lg:w-1/6"
+                v-model="statusModel"
+                item-text="label"
+                item-value="value"
+                :items="supplierStatusOptions"
+                :label="t('Stato')"
+                clearable
+            />
+            <BbSelect
+                class="w-full sm:w-1/3 lg:w-1/6"
+                v-model="documentsModel"
+                item-text="label"
+                item-value="value"
+                :items="documentsOptions"
+                :label="t('Stato documenti')"
+                clearable
+            />
         </div>
 
         <BbTable :columns="columns" item-value="id" :items="operations.data ?? []" :loading="loading">
-            <template #no-data>{{ t('Nessuna lavorazione assegnata') }}</template>
+            <template #no-data>{{ t('Non ti è ancora stata assegnata nessuna lavorazione.') }}</template>
             <template #typology="{ item }">
                 <PrescriptionTypologyBadge :typology="item.latest_prescription?.typology" size="xs" />
             </template>
             <template #supplier_visible_status="{ item }">
                 <span class="supplier-status">{{ supplierStatusLabel(item.supplier_visible_status) }}</span>
+            </template>
+            <template #documents_state="{ item }">
+                <span :class="documentsBadgeClass(item)">
+                    {{ (item.supplier_documents_count ?? 0) > 0 ? t('Caricati') : t('Da caricare') }}
+                </span>
             </template>
             <template #actions="{ item }">
                 <BbButton
@@ -50,7 +85,7 @@ import WorkspaceSupplierLayout from '@/layouts/WorkspaceSupplierLayout.vue';
 import type { Operation } from '@/types/Operation';
 import type { Pagination } from '@/types/Pagination';
 import { router, usePage } from '@inertiajs/vue3';
-import { BbButton, BbTable, type BbTableColumn, BbTextInput } from 'bitboss-ui';
+import { BbButton, BbSelect, BbTable, type BbTableColumn, BbTextInput } from 'bitboss-ui';
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -60,9 +95,22 @@ defineOptions({
     layout: (h: any, page: any) => h(WorkspaceSupplierLayout, { title: 'Lavorazioni' }, () => [page]),
 });
 
+type SupplierOperation = Operation & {
+    supplier_visible_status: string | null;
+    supplier_documents_count?: number;
+    assigned_at?: string | null;
+};
+
 type Props = {
     supplier: { id: number; name: string | null };
-    operations: Pagination<Operation & { supplier_visible_status: string | null }>;
+    operations: Pagination<SupplierOperation>;
+    filters: {
+        query: string | null;
+        ref: string | null;
+        batch_number: string | null;
+        supplier_visible_status: string | null;
+        documents_state: string | null;
+    };
 };
 
 const props = defineProps<Props>();
@@ -76,33 +124,27 @@ const queryParam = (key: string): unknown => {
 
 const filtersDefault = {
     query: (queryParam('query') as string | undefined) ?? null,
+    ref: (queryParam('ref') as string | undefined) ?? null,
+    batch_number: (queryParam('batch_number') as string | undefined) ?? null,
+    supplier_visible_status: (queryParam('supplier_visible_status') as string | undefined) ?? null,
+    documents_state: (queryParam('documents_state') as string | undefined) ?? null,
 };
 
 const { loading, page, filters } = useIndexPage('/workspace/supplier/operations', filtersDefault, props.operations);
 
-const queryModel = computed<string | null>({
-    get: () => (filters.query == null || filters.query === '' ? null : String(filters.query)),
-    set: (value) => {
-        filters.query = value;
-    },
-});
+const stringModel = (key: keyof typeof filtersDefault) =>
+    computed<string | null>({
+        get: () => (filters[key] == null || filters[key] === '' ? null : String(filters[key])),
+        set: (value) => {
+            filters[key] = value;
+        },
+    });
 
-const columns: BbTableColumn[] = [
-    { key: 'batch_number', label: t('Lotto'), formatter: (d) => d ?? '--' },
-    { key: 'typology', label: t('Tipologia') },
-    { key: 'latest_prescription.ref', label: t('Riferimento'), formatter: (d) => d ?? '--' },
-    { key: 'supplier_visible_status', label: t('Stato') },
-    {
-        key: 'latest_prescription.expire_at',
-        label: t('Scadenza'),
-        formatter: (d) => (d ? new Date(d).toLocaleDateString('it-IT') : '--'),
-    },
-    {
-        key: 'created_at',
-        label: t('Creata il'),
-        formatter: (d) => (d ? new Date(d).toLocaleDateString('it-IT') : '--'),
-    },
-];
+const queryModel = stringModel('query');
+const refModel = stringModel('ref');
+const batchModel = stringModel('batch_number');
+const statusModel = stringModel('supplier_visible_status');
+const documentsModel = stringModel('documents_state');
 
 const supplierStatusLabels: Record<string, string> = {
     assigned_waiting_documents: t('Assegnata, in attesa documenti'),
@@ -117,4 +159,34 @@ const supplierStatusLabel = (key: string | null | undefined): string => {
     if (!key) return '--';
     return supplierStatusLabels[key] ?? key;
 };
+
+const supplierStatusOptions = Object.entries(supplierStatusLabels).map(([value, label]) => ({ value, label }));
+
+const documentsOptions = [
+    { value: 'missing', label: t('Da caricare') },
+    { value: 'uploaded', label: t('Caricati') },
+];
+
+const documentsBadgeClass = (item: SupplierOperation) =>
+    (item.supplier_documents_count ?? 0) > 0
+        ? 'inline-block rounded px-2 py-0.5 text-xs font-medium bg-emerald-100 text-emerald-700'
+        : 'inline-block rounded px-2 py-0.5 text-xs font-medium bg-amber-100 text-amber-700';
+
+const columns: BbTableColumn[] = [
+    { key: 'typology', label: t('Tipologia') },
+    { key: 'batch_number', label: t('Lotto'), formatter: (d) => d ?? '--' },
+    { key: 'latest_prescription.ref', label: t('Riferimento'), formatter: (d) => d ?? '--' },
+    { key: 'supplier_visible_status', label: t('Stato') },
+    { key: 'documents_state', label: t('Stato documenti') },
+    {
+        key: 'latest_prescription.expire_at',
+        label: t('Scadenza'),
+        formatter: (d) => (d ? new Date(d).toLocaleDateString('it-IT') : '--'),
+    },
+    {
+        key: 'assigned_at',
+        label: t('Assegnata il'),
+        formatter: (d) => (d ? new Date(d).toLocaleDateString('it-IT') : '--'),
+    },
+];
 </script>

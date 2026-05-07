@@ -37,4 +37,5 @@ enum WorkspaceAbilityEnum: string
     case SUPPLIER_TEAM_VIEW = 'workspace.supplier.team.view';
     case SUPPLIER_TEAM_MANAGE = 'workspace.supplier.team.manage';
     case SUPPLIER_OPERATIONS_VIEW = 'workspace.supplier.operations.view';
+    case SUPPLIER_OPERATIONS_DOCUMENTS_MANAGE = 'workspace.supplier.operations.documents.manage';
 }

@@ -6,19 +6,52 @@ import { BbButton, BbOffCanvas } from 'bitboss-ui';
 import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { route } from 'ziggy-js';
 
+type ChatScope = 'customer' | 'supplier';
+
 type Props = {
     title?: string;
     operationId: number;
     currentUserId: number;
     canRead?: boolean;
     canSend?: boolean;
+    chatScope?: ChatScope;
+    embedded?: boolean;
 };
 
 const props = withDefaults(defineProps<Props>(), {
     title: 'Chat lavorazione',
     canRead: false,
     canSend: false,
+    chatScope: 'customer',
+    embedded: false,
 });
+
+const routes = {
+    customer: {
+        messages: 'operations.chat.messages',
+        store: 'operations.chat.store',
+        read: 'operations.chat.read',
+    },
+    supplier: {
+        messages: 'operations.supplier-chat.messages',
+        store: 'operations.supplier-chat.store',
+        read: 'operations.supplier-chat.read',
+    },
+} as const;
+
+const channels = {
+    customer: {
+        channel: (id: number) => `operations.chat.${id}`,
+        event: '.operation.chat.message.sent',
+    },
+    supplier: {
+        channel: (id: number) => `operations.supplier-chat.${id}`,
+        event: '.operation.supplier-chat.message.sent',
+    },
+} as const;
+
+const routeNames = () => routes[props.chatScope];
+const channelConfig = () => channels[props.chatScope];
 
 const modelValue = defineModel<boolean>('modelValue', {
     required: true,
@@ -76,7 +109,7 @@ const loadMessages = async () => {
 
     loadingMessages.value = true;
     try {
-        const response = await axios.get(route('operations.chat.messages', props.operationId), {
+        const response = await axios.get(route(routeNames().messages, props.operationId), {
             params: {
                 limit: 100,
             },
@@ -92,8 +125,10 @@ const markAsRead = async () => {
         return;
     }
 
-    await axios.post(route('operations.chat.read', props.operationId));
-    chatStore.removeUnreadByOperation(props.operationId);
+    await axios.post(route(routeNames().read, props.operationId));
+    if (props.chatScope === 'customer') {
+        chatStore.removeUnreadByOperation(props.operationId);
+    }
 };
 
 const sendMessage = async () => {
@@ -108,13 +143,15 @@ const sendMessage = async () => {
 
     sendingMessage.value = true;
     try {
-        const response = await axios.post(route('operations.chat.store', props.operationId), {
+        const response = await axios.post(route(routeNames().store, props.operationId), {
             body: trimmedMessage,
         });
         appendMessage(response.data.message);
         draftMessage.value = '';
         await markAsRead();
-        await chatStore.fetchUnread();
+        if (props.chatScope === 'customer') {
+            await chatStore.fetchUnread();
+        }
         await scrollToBottom();
     } finally {
         sendingMessage.value = false;
@@ -126,18 +163,40 @@ const registerOperationRealtime = () => {
         return;
     }
 
-    stopOperationWatch.value = chatStore.watchOperationChannel(props.operationId, async (message) => {
-        appendMessage(message);
+    if (props.chatScope === 'customer') {
+        stopOperationWatch.value = chatStore.watchOperationChannel(props.operationId, async (message) => {
+            appendMessage(message);
 
+            if (modelValue.value) {
+                await markAsRead();
+            }
+
+            await chatStore.fetchUnread();
+            if (modelValue.value) {
+                await scrollToBottom();
+            }
+        });
+        return;
+    }
+
+    // Supplier scope: subscribe direttamente al canale supplier-chat (l'unread tracking lato store
+    // resta limitato alla customer chat in questa fase — TODO: estendere chat store con unread fornitore).
+    if (!window.Echo) {
+        return;
+    }
+    const cfg = channelConfig();
+    window.Echo.private(cfg.channel(props.operationId)).listen(cfg.event, async (event: { message?: OperationChatMessage }) => {
+        if (!event?.message) return;
+        appendMessage(event.message);
         if (modelValue.value) {
             await markAsRead();
-        }
-
-        await chatStore.fetchUnread();
-        if (modelValue.value) {
             await scrollToBottom();
         }
     });
+    stopOperationWatch.value = () => {
+        if (!window.Echo) return;
+        window.Echo.leave(cfg.channel(props.operationId));
+    };
 };
 
 const onComposerKeydown = async (event: KeyboardEvent) => {
@@ -158,7 +217,9 @@ watch(
                 hasInitialized.value = true;
             }
             await markAsRead();
-            await chatStore.fetchUnread();
+            if (props.chatScope === 'customer') {
+                await chatStore.fetchUnread();
+            }
             await scrollToBottom();
         }
     },
@@ -178,7 +239,9 @@ onMounted(async () => {
 
     if (modelValue.value) {
         await markAsRead();
-        await chatStore.fetchUnread();
+        if (props.chatScope === 'customer') {
+            await chatStore.fetchUnread();
+        }
         await scrollToBottom();
     }
 });
@@ -189,7 +252,10 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <BbOffCanvas v-model="modelValue" direction="right" :title="props.title" overlay-classes="chat-slider-offcanvas">
+    <component
+        :is="props.embedded ? 'div' : BbOffCanvas"
+        v-bind="props.embedded ? {} : { modelValue, 'onUpdate:modelValue': (v: boolean) => (modelValue = v), direction: 'right', title: props.title, 'overlay-classes': 'chat-slider-offcanvas' }"
+    >
         <div class="chat-slider">
             <div v-if="!props.canRead" class="chat-slider__empty">Non hai i permessi per visualizzare questa chat.</div>
 
@@ -226,7 +292,7 @@ onBeforeUnmount(() => {
                 <p v-if="!props.canSend" class="chat-slider__send-disabled">Puoi leggere i messaggi ma non inviarne di nuovi.</p>
             </div>
         </div>
-    </BbOffCanvas>
+    </component>
 </template>
 
 <style>

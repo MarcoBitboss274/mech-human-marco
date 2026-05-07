@@ -76,26 +76,27 @@ class NotificationService
         try {
             $supplier->loadMissing('users');
 
-            $emails = collect();
+            $deliveredEmails = collect();
 
-            if (! empty($supplier->mail)) {
-                $emails->push($supplier->mail);
-            }
-
+            // Active users (last_login_at != null) ricevono mail + bell in-app via via().
             foreach ($supplier->users as $user) {
-                if (! empty($user->email)) {
-                    $emails->push($user->email);
+                if ($user->last_login_at === null) {
+                    continue;
                 }
+                if (empty($user->email)) {
+                    continue;
+                }
+
+                $user->notify($notification);
+                $deliveredEmails->push(strtolower(trim((string) $user->email)));
             }
 
-            $unique = $emails
-                ->map(fn ($e) => strtolower(trim((string) $e)))
-                ->filter()
-                ->unique()
-                ->values();
-
-            foreach ($unique as $email) {
-                FacadesNotification::route('mail', $email)->notify($notification);
+            // Indirizzo anagrafico del fornitore: solo mail, dedupato vs utenti attivi.
+            if (! empty($supplier->mail)) {
+                $anagraphic = strtolower(trim((string) $supplier->mail));
+                if (! $deliveredEmails->contains($anagraphic)) {
+                    FacadesNotification::route('mail', $supplier->mail)->notify($notification);
+                }
             }
         } catch (Exception $e) {
             Log::error('Error sending notification to supplier: ' . $e->getMessage());

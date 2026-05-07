@@ -74,12 +74,15 @@
             </BbTab>
         </div>
 
-        <ChatSlider
+        <OperationChatTabbed
             v-model="chatSliderOpen"
             :operation-id="props.operation.id"
             :current-user-id="currentUserId"
-            :can-read="props.chat.can_read"
-            :can-send="props.chat.can_send"
+            :can-read-customer="props.chat.can_read"
+            :can-send-customer="props.chat.can_send"
+            :can-read-supplier="props.chat.can_read_supplier"
+            :can-send-supplier="props.chat.can_send_supplier"
+            :has-supplier="!!hasSelectedSupplier"
         />
 
         <ActivitySlider v-model="activitySliderOpen" model-type="operation" :model-id="props.operation.id" />
@@ -99,7 +102,7 @@
 
 <script setup lang="ts">
 import ActivitySlider from '@/components/activity/ActivitySlider.vue';
-import ChatSlider from '@/components/chat/ChatSlider.vue';
+import OperationChatTabbed from '@/components/chat/OperationChatTabbed.vue';
 import OperationArchivedBadge from '@/components/operations/OperationArchivedBadge.vue';
 import OperationCanceledBadge from '@/components/operations/OperationCanceledBadge.vue';
 import OperationNotice from '@/components/operations/OperationNotice.vue';
@@ -148,6 +151,8 @@ type Props = {
     chat: {
         can_read: boolean;
         can_send: boolean;
+        can_read_supplier: boolean;
+        can_send_supplier: boolean;
     };
 };
 
@@ -250,6 +255,7 @@ const handleAction = (action: string) => {
 
 const page = usePage<any>();
 const currentUserId = computed(() => page.props.auth.user?.id ?? 0);
+const hasSelectedSupplier = computed(() => !!(props.operation as any).selected_supplier);
 
 onMounted(() => {
     const query = new URLSearchParams(window.location.search);

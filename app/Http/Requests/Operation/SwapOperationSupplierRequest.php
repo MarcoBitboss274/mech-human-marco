@@ -7,21 +7,13 @@ use App\Models\Operation;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class AddOperationSupplierRequest extends FormRequest
+class SwapOperationSupplierRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         /** @var Operation $operation */
@@ -33,12 +25,13 @@ class AddOperationSupplierRequest extends FormRequest
                 'integer',
                 Rule::exists('suppliers', 'id')->where(fn ($query) => $query->where('status', SupplierStatusEnum::ACTIVE->value)),
                 function (string $attribute, mixed $value, \Closure $fail) use ($operation): void {
-                    $hasSelected = $operation->suppliers()
+                    $isCurrent = $operation->suppliers()
                         ->wherePivot('selected', true)
+                        ->where('suppliers.id', $value)
                         ->exists();
 
-                    if ($hasSelected) {
-                        $fail('Esiste già un fornitore assegnato a questa lavorazione.');
+                    if ($isCurrent) {
+                        $fail('Il fornitore selezionato è già quello attuale.');
                     }
                 },
             ],

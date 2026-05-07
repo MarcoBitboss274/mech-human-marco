@@ -13,12 +13,15 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Operation extends Model
+class Operation extends Model implements HasMedia
 {
     use \Illuminate\Database\Eloquent\Factories\HasFactory;
     use SoftDeletes;
     use LogsActivity;
+    use InteractsWithMedia;
 
     /**
      * The attributes that are mass assignable.
@@ -32,6 +35,7 @@ class Operation extends Model
         'batch_number',
         'canceled_at',
         'archived_at',
+        'production_canceled_at',
     ];
 
     /**
@@ -42,7 +46,13 @@ class Operation extends Model
     protected $casts = [
         'canceled_at' => 'datetime',
         'archived_at' => 'datetime',
+        'production_canceled_at' => 'datetime',
     ];
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('supplier_documents');
+    }
 
     /**
      * The accessors to append to the model's array form.
@@ -68,14 +78,28 @@ class Operation extends Model
             return SupplierVisibleStatusEnum::CANCELED->value;
         }
 
+        if ($this->status === OperationStatusEnum::REQUESTED->value) {
+            return $this->hasSupplierDocuments()
+                ? SupplierVisibleStatusEnum::DOCUMENTS_SENT->value
+                : SupplierVisibleStatusEnum::ASSIGNED_WAITING_DOCUMENTS->value;
+        }
+
         return match ($this->status) {
-            OperationStatusEnum::REQUESTED->value => SupplierVisibleStatusEnum::ASSIGNED_WAITING_DOCUMENTS->value,
             OperationStatusEnum::IN_PROGRESS->value, OperationStatusEnum::WAITING_APPROVAL->value
                 => SupplierVisibleStatusEnum::UNDER_EVALUATION->value,
             OperationStatusEnum::PRODUCTION->value => SupplierVisibleStatusEnum::PRODUCTION_CONFIRMED->value,
             OperationStatusEnum::COMPLETED->value => SupplierVisibleStatusEnum::COMPLETED->value,
             default => null, // draft → non visibile al fornitore
         };
+    }
+
+    private function hasSupplierDocuments(): bool
+    {
+        if (array_key_exists('supplier_documents_count', $this->attributes)) {
+            return (int) $this->attributes['supplier_documents_count'] > 0;
+        }
+
+        return $this->getMedia('supplier_documents')->isNotEmpty();
     }
 
     public function getCanBeCanceledAttribute(): bool
@@ -234,6 +258,22 @@ class Operation extends Model
     public function chatReads(): HasMany
     {
         return $this->hasMany(OperationChatRead::class);
+    }
+
+    /**
+     * Supplier chat messages (M&H ↔ Fornitore) associated with this operation.
+     */
+    public function supplierChatMessages(): HasMany
+    {
+        return $this->hasMany(OperationSupplierChatMessage::class);
+    }
+
+    /**
+     * Supplier chat read markers associated with this operation.
+     */
+    public function supplierChatReads(): HasMany
+    {
+        return $this->hasMany(OperationSupplierChatRead::class);
     }
 
     /**
