@@ -33,6 +33,7 @@ export type SupplierMember = {
     full_name: string;
     email: string | null;
     role: string | null;
+    status: 'pending' | 'active' | null;
     last_login_at: string | null;
 };
 

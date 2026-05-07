@@ -92,6 +92,7 @@ class WorkspaceSupplierController extends Controller
             'full_name' => trim(($u->name ?? '') . ' ' . ($u->surname ?? '')),
             'email' => $u->email,
             'role' => $u->pivot->role ?? null,
+            'status' => $u->last_login_at !== null ? 'active' : 'pending',
             'last_login_at' => $u->last_login_at?->toISOString(),
         ])->values();
 

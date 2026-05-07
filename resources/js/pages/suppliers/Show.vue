@@ -39,6 +39,9 @@
                             @update:model-value="(v: string) => onRoleChange(item, v)"
                         />
                     </template>
+                    <template #status="{ item }">
+                        <SupplierMemberStatusBadge :status="item.status" size="xs" />
+                    </template>
                     <template #actions="{ item }">
                         <BbButton icon="trash" size="xs" variant="danger" @click="onRemove(item)">
                             {{ t('Rimuovi') }}
@@ -69,6 +72,7 @@
 
 <script setup lang="ts">
 import SupplierForm from '@/pages/suppliers/partials/Form.vue';
+import SupplierMemberStatusBadge from '@/components/suppliers/SupplierMemberStatusBadge.vue';
 import { useSelect } from '@/composables/useSelect';
 import AppLayout from '@/layouts/AppLayout.vue';
 import type { Supplier, SupplierMember } from '@/types/Supplier';
@@ -106,6 +110,7 @@ const memberColumns: BbTableColumn[] = [
     { key: 'full_name', label: t('Nome') },
     { key: 'email', label: t('Email') },
     { key: 'role', label: t('Ruolo') },
+    { key: 'status', label: t('Stato') },
 ];
 
 const onSupplierUpdated = () => {
