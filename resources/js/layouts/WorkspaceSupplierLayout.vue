@@ -66,6 +66,13 @@ const items = computed(() => {
             active: isActive('workspace.supplier.dashboard'),
         },
         {
+            key: 'operations',
+            text: t('Lavorazioni'),
+            icon: 'box',
+            href: route('workspace.supplier.operations.index'),
+            active: isActive('workspace.supplier.operations.*'),
+        },
+        {
             key: 'profile',
             text: t('Profilo'),
             icon: 'users',

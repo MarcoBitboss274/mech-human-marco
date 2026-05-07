@@ -256,6 +256,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
                     Route::get('/team', [\App\Http\Controllers\WorkspaceSupplierController::class, 'team'])->name('team.index');
                     Route::put('/team/{user}', [\App\Http\Controllers\WorkspaceSupplierController::class, 'updateTeamMember'])->name('team.update');
                     Route::delete('/team/{user}', [\App\Http\Controllers\WorkspaceSupplierController::class, 'removeTeamMember'])->name('team.destroy');
+                    Route::get('/operations', [\App\Http\Controllers\WorkspaceSupplierController::class, 'operationsIndex'])->name('operations.index');
+                    Route::get('/operations/{operation}', [\App\Http\Controllers\WorkspaceSupplierController::class, 'operationsShow'])->name('operations.show');
                 });
         });
 });

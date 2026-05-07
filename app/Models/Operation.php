@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\OperationStatusEnum;
+use App\Enums\SupplierVisibleStatusEnum;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -53,8 +54,29 @@ class Operation extends Model
         'can_be_archived',
         'can_be_reopened',
         'can_be_reactivated',
-        'can_be_deleted'
+        'can_be_deleted',
+        'supplier_visible_status',
     ];
+
+    /**
+     * Stato visibile al fornitore — derivato da `status` + `canceled_at`.
+     * Mai persistito, ricalcolato in lettura. Vedi enum SupplierVisibleStatusEnum.
+     */
+    public function getSupplierVisibleStatusAttribute(): ?string
+    {
+        if ($this->canceled_at !== null) {
+            return SupplierVisibleStatusEnum::CANCELED->value;
+        }
+
+        return match ($this->status) {
+            OperationStatusEnum::REQUESTED->value => SupplierVisibleStatusEnum::ASSIGNED_WAITING_DOCUMENTS->value,
+            OperationStatusEnum::IN_PROGRESS->value, OperationStatusEnum::WAITING_APPROVAL->value
+                => SupplierVisibleStatusEnum::UNDER_EVALUATION->value,
+            OperationStatusEnum::PRODUCTION->value => SupplierVisibleStatusEnum::PRODUCTION_CONFIRMED->value,
+            OperationStatusEnum::COMPLETED->value => SupplierVisibleStatusEnum::COMPLETED->value,
+            default => null, // draft → non visibile al fornitore
+        };
+    }
 
     public function getCanBeCanceledAttribute(): bool
     {

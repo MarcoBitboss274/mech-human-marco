@@ -26,6 +26,7 @@ class UserController extends Controller
         $with = [
             'buildings' => fn($q) => $q->select('buildings.id', 'buildings.name'),
             'managedBuildings' => fn($q) => $q->select('buildings.id', 'buildings.name', 'buildings.agent_id'),
+            'suppliers' => fn($q) => $q->select('suppliers.id', 'suppliers.name'),
         ];
 
         return Inertia::render('users/Index', [

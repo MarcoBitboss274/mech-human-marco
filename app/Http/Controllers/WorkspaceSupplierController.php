@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\OperationStatusEnum;
 use App\Http\Requests\Supplier\StoreSupplierRequest;
 use App\Http\Requests\Workspace\UpdateWorkspaceProfileRequest;
+use App\Models\Operation;
 use App\Models\Supplier;
 use App\Models\User;
 use App\Services\SupplierService;
 use App\Services\UserService;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
@@ -124,6 +127,62 @@ class WorkspaceSupplierController extends Controller
         SupplierService::detachUser($supplier, $user);
 
         return back();
+    }
+
+    public function operationsIndex(Request $request)
+    {
+        Gate::authorize('supplierWorkspaceAbility', 'workspace.supplier.operations.view');
+
+        $supplier = $this->currentSupplierOrFail();
+
+        $query = Operation::query()
+            ->whereHas('suppliers', fn (Builder $q) => $q->where('suppliers.id', $supplier->id))
+            ->whereIn('status', [
+                OperationStatusEnum::REQUESTED->value,
+                OperationStatusEnum::IN_PROGRESS->value,
+                OperationStatusEnum::WAITING_APPROVAL->value,
+                OperationStatusEnum::PRODUCTION->value,
+                OperationStatusEnum::COMPLETED->value,
+            ])
+            ->with([
+                'latestPrescription:id,operation_id,ref,typology,send_at,expire_at',
+                'building:id,name',
+            ])
+            ->latest();
+
+        $search = $request->input('query');
+        if (is_string($search) && trim($search) !== '') {
+            $query->where(function (Builder $q) use ($search) {
+                $q->where('batch_number', 'like', "%{$search}%")
+                    ->orWhereHas('latestPrescription', fn (Builder $p) => $p->where('ref', 'like', "%{$search}%"));
+            });
+        }
+
+        $perPage = (int) ($request->input('per_page') ?? 25);
+
+        return Inertia::render('workspace/supplier/operations/Index', [
+            'supplier' => $this->supplierPayload(),
+            'operations' => $query->paginate($perPage),
+        ]);
+    }
+
+    public function operationsShow(Operation $operation)
+    {
+        Gate::authorize('supplierWorkspaceAbility', 'workspace.supplier.operations.view');
+
+        $supplier = $this->currentSupplierOrFail();
+        $belongs = $operation->suppliers()->where('suppliers.id', $supplier->id)->exists();
+        abort_unless($belongs, 404);
+
+        $operation->load([
+            'latestPrescription:id,operation_id,ref,typology,send_at,expire_at',
+            'building:id,name',
+        ]);
+
+        return Inertia::render('workspace/supplier/operations/Show', [
+            'supplier' => $this->supplierPayload(),
+            'operation' => $operation,
+        ]);
     }
 
     private function currentSupplierOrFail(): Supplier
