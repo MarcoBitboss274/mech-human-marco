@@ -37,6 +37,7 @@ export type ProductionSummary = {
     status: string | null;
     main_id: number | null;
     confirmed_at: string | null;
+    completed_at: string | null;
     canceled_at: string | null;
 };
 

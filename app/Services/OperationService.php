@@ -892,6 +892,9 @@ class OperationService extends ModelService
                 'confirmed_at' => $mainProduction?->status === ProductionStatusEnum::CONFIRMED->value
                     ? $mainProduction?->confirmed_at?->toISOString()
                     : null,
+                'completed_at' => $mainProduction?->status === ProductionStatusEnum::COMPLETED->value
+                    ? $mainProduction?->completed_at?->toISOString()
+                    : null,
                 'canceled_at' => $mainProduction?->status === ProductionStatusEnum::CANCELED->value
                     ? $mainProduction?->canceled_at?->toISOString()
                     : null,
@@ -932,7 +935,7 @@ class OperationService extends ModelService
             'prescriptions' => fn($q) => $q->select(['id', 'operation_id'])->latest(),
             'quotes' => fn($q) => $q->select(['id', 'operation_id', 'status'])->latest(),
             'orders' => fn($q) => $q->select(['id', 'operation_id', 'status'])->latest(),
-            'productions' => fn($q) => $q->select(['id', 'operation_id', 'status', 'confirmed_at', 'canceled_at'])->oldest(),
+            'productions' => fn($q) => $q->select(['id', 'operation_id', 'status', 'confirmed_at', 'canceled_at', 'completed_at'])->oldest(),
             'invoices' => fn($q) => $q->select(['id', 'operation_id', 'status'])->latest(),
             'latestPrescription' => fn($q) => $q
                 ->select(['id', 'operation_id', 'user_id', 'typology', 'ref', 'created_at'])
@@ -1325,12 +1328,21 @@ class OperationService extends ModelService
             ]);
         }
 
-        DB::table('operation_supplier')
-            ->where('id', $row->id)
-            ->update([
-                'supplier_completed_at' => now(),
-                'updated_at' => now(),
-            ]);
+        DB::transaction(function () use ($operation, $row) {
+            DB::table('operation_supplier')
+                ->where('id', $row->id)
+                ->update([
+                    'supplier_completed_at' => now(),
+                    'updated_at' => now(),
+                ]);
+
+            $production = $operation->productions()->oldest()->first();
+            if ($production && $production->status !== ProductionStatusEnum::COMPLETED->value) {
+                $production->update([
+                    'status' => ProductionStatusEnum::COMPLETED->value,
+                ]);
+            }
+        });
 
         static::logOperationActivity(
             $operation,

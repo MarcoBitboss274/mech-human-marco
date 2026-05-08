@@ -104,12 +104,17 @@ const columns = ref<BbTableColumn[]>([
     },
     {
         key: 'confirmed_at',
-        label: t('Confermato il'),
+        label: t('Confermata il'),
+        formatter: (d) => (d ? new Date(d).toLocaleDateString('it-IT') : '--'),
+    },
+    {
+        key: 'completed_at',
+        label: t('Completata il'),
         formatter: (d) => (d ? new Date(d).toLocaleDateString('it-IT') : '--'),
     },
     {
         key: 'canceled_at',
-        label: t('Annullato il'),
+        label: t('Annullata il'),
         formatter: (d) => (d ? new Date(d).toLocaleDateString('it-IT') : '--'),
     },
 ]);

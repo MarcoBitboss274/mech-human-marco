@@ -160,6 +160,7 @@ class WorkspaceSupplierController extends Controller
         $supplier = $this->currentSupplierOrFail();
 
         $query = Operation::query()
+            ->select('operations.*')
             ->whereHas('suppliers', fn (Builder $q) => $q
                 ->where('suppliers.id', $supplier->id)
                 ->where('operation_supplier.selected', true))
@@ -228,8 +229,7 @@ class WorkspaceSupplierController extends Controller
         })
             ->orderByRaw('prescriptions.expire_at IS NULL ASC')
             ->orderBy('prescriptions.expire_at', 'asc')
-            ->orderBy('operations.id', 'desc')
-            ->select('operations.*');
+            ->orderBy('operations.id', 'desc');
 
         $perPage = (int) ($request->input('per_page') ?? 25);
 

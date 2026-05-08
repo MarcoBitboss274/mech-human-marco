@@ -4,15 +4,11 @@
             <div>
                 <div class="flex flex-wrap items-center gap-4">
                     <h1 class="page__title">{{ t(operation.latest_prescription?.typology ?? '') }}</h1>
-                    <div
+                    <SupplierVisibleStatusBadge
                         v-if="operation.supplier_visible_status"
-                        :class="[
-                            'flex w-fit items-center justify-center whitespace-nowrap rounded-md border bg-gray-100 px-3 py-1 text-sm leading-none text-gray-500',
-                            statusBadgeVariantClass,
-                        ]"
-                    >
-                        {{ supplierStatusLabel(operation.supplier_visible_status) }}
-                    </div>
+                        :status="operation.supplier_visible_status"
+                        size="sm"
+                    />
                     <div
                         v-if="isCanceled"
                         class="flex w-fit items-center justify-center whitespace-nowrap rounded-md border border-red-500 !bg-red-200 px-3 py-1 text-sm leading-none !text-red-700"
@@ -132,6 +128,7 @@
 <script setup lang="ts">
 import ActivitySlider from '@/components/activity/ActivitySlider.vue';
 import ChatSlider from '@/components/chat/ChatSlider.vue';
+import SupplierVisibleStatusBadge from '@/components/operations/SupplierVisibleStatusBadge.vue';
 import PrescriptionDetailsCard from '@/components/prescriptions/PrescriptionDetailsCard.vue';
 import { useMainToast } from '@/composables/useMainToast';
 import WorkspaceSupplierLayout from '@/layouts/WorkspaceSupplierLayout.vue';
@@ -216,30 +213,6 @@ const canMarkCompleted = computed(
         !props.operation.supplier_completed_at &&
         !isCanceled.value,
 );
-
-const supplierStatusLabels: Record<string, string> = {
-    new_case: t('Nuovo caso'),
-    production_confirmed: t('Produzione confermata'),
-    completed: t('Completato'),
-};
-
-const supplierStatusLabel = (key: string | null | undefined): string => {
-    if (!key) return '--';
-    return supplierStatusLabels[key] ?? key;
-};
-
-const statusBadgeVariantClass = computed<string>(() => {
-    switch (props.operation.supplier_visible_status) {
-        case 'new_case':
-            return '!bg-yellow-200 border-yellow-500 !text-yellow-700';
-        case 'production_confirmed':
-            return '!bg-purple-200 border-purple-500 !text-purple-700';
-        case 'completed':
-            return '!bg-green-200 border-green-500 !text-green-600';
-        default:
-            return '';
-    }
-});
 
 const formatDateTime = (d: string | null | undefined): string =>
     d ? new Date(d).toLocaleString('it-IT', { dateStyle: 'short', timeStyle: 'short' }) : '--';

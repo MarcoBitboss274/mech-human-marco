@@ -1,5 +1,10 @@
 # UI Activity Log
 
+## 2026-05-08 — OverviewSection: pulsante arrow di redirect più piccolo
+
+- `resources/css/admin_view_override.css`: nuova regola su `.overview-section__arrow-btn.bb-button--icon` → forza il bottone a 18×18px e l'icona interna (`.bb-icon` / `.bb-icon svg`) a 12×12px. Padding del button azzerato. Valori pari (design system).
+- Nessuna modifica a `OverviewSection.vue` né a `base.css` / `main.css` / `theming.css`.
+
 ## 2026-05-06 — UI override globali admin/workspace + restyling header/counter Lavorazioni
 
 - **Nuovo file `resources/css/admin_view_override.css`** importato dopo `main.css` in `resources/js/app.ts`. Contiene override globali (non si tocca alcuno dei 3 CSS base):

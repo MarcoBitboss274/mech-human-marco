@@ -21,11 +21,15 @@
                         <ProductionStatusBadge :status="production.status" />
                     </div>
                     <div class="productions-show__details-item">
-                        <span class="productions-show__label">{{ t('Confermato il') }}</span>
+                        <span class="productions-show__label">{{ t('Completata il') }}</span>
+                        <span class="productions-show__value">{{ dateTime(production.completed_at) ?? '--' }}</span>
+                    </div>
+                    <div class="productions-show__details-item">
+                        <span class="productions-show__label">{{ t('Confermata il') }}</span>
                         <span class="productions-show__value">{{ dateTime(production.confirmed_at) ?? '--' }}</span>
                     </div>
                     <div class="productions-show__details-item">
-                        <span class="productions-show__label">{{ t('Annullato il') }}</span>
+                        <span class="productions-show__label">{{ t('Annullata il') }}</span>
                         <span class="productions-show__value">{{ dateTime(production.canceled_at) ?? '--' }}</span>
                     </div>
                     <div class="productions-show__details-item">

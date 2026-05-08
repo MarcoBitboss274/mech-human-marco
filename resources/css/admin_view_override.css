@@ -104,3 +104,25 @@
     margin-right: auto;
     box-sizing: border-box;
 }
+
+
+/* ── OverviewSection — pulsante arrow di redirect più piccolo ─────────────────
+   Il bottone "vai a [scheda]" accanto al titolo di ogni sezione del tab
+   Panoramica (OverviewSection.vue, classe `.overview-section__arrow-btn`) è di
+   default `size="xs"` di bb-button (~28px). Marco l'ha richiesto più piccolo:
+   18×18 col bottone, 12×12 con l'icona interna (entrambi valori pari). Il padding
+   è azzerato per non gonfiare l'hit area oltre i 18px.
+   -------------------------------------------------------------------------- */
+.overview-section__arrow-btn.bb-button--icon {
+    width: 18px !important;
+    height: 18px !important;
+    min-width: 18px !important;
+    min-height: 18px !important;
+    padding: 0 !important;
+}
+
+.overview-section__arrow-btn .bb-icon,
+.overview-section__arrow-btn .bb-icon svg {
+    width: 12px !important;
+    height: 12px !important;
+}

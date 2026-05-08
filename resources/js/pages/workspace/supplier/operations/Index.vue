@@ -62,7 +62,7 @@
                 </template>
                 <template #supplier_visible_status="{ item }">
                     <span class="inline-flex flex-wrap items-center gap-1">
-                        <span class="supplier-status">{{ supplierStatusLabel(item.supplier_visible_status) }}</span>
+                        <SupplierVisibleStatusBadge :status="item.supplier_visible_status" size="xs" />
                         <span
                             v-if="item.canceled_at"
                             class="rounded border border-red-500 bg-red-200 px-2 py-0.5 text-xs font-medium text-red-700"
@@ -95,6 +95,7 @@
 
 <script setup lang="ts">
 import XPagination from '@/components/common/XPagination.vue';
+import SupplierVisibleStatusBadge from '@/components/operations/SupplierVisibleStatusBadge.vue';
 import PrescriptionTypologyBadge from '@/components/prescriptions/PrescriptionTypologyBadge.vue';
 import { useIndexPage } from '@/composables/useIndexPage';
 import WorkspaceSupplierLayout from '@/layouts/WorkspaceSupplierLayout.vue';
@@ -165,18 +166,11 @@ const statusModel = stringModel('supplier_visible_status');
 const canceledModel = stringModel('canceled_state');
 const documentsModel = stringModel('documents_state');
 
-const supplierStatusLabels: Record<string, string> = {
-    new_case: t('Nuovo caso'),
-    production_confirmed: t('Produzione confermata'),
-    completed: t('Completato'),
-};
-
-const supplierStatusLabel = (key: string | null | undefined): string => {
-    if (!key) return '--';
-    return supplierStatusLabels[key] ?? key;
-};
-
-const supplierStatusOptions = Object.entries(supplierStatusLabels).map(([value, label]) => ({ value, label }));
+const supplierStatusOptions = [
+    { value: 'new_case', label: t('Nuovo caso') },
+    { value: 'production_confirmed', label: t('Produzione confermata') },
+    { value: 'completed', label: t('Completata') },
+];
 
 const canceledOptions = [
     { value: 'only', label: t('Solo annullate') },

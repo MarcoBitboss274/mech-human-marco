@@ -27,11 +27,20 @@ class Production extends Model
         return [
             'confirmed_at' => 'datetime',
             'canceled_at' => 'datetime',
+            'completed_at' => 'datetime',
         ];
     }
 
     /**
-     * Sync confirmed_at/canceled_at when status changes.
+     * Sync confirmed_at/canceled_at/completed_at when status changes.
+     *
+     * Regole:
+     * - status = confirmed → set confirmed_at (mantiene il valore originale se presente);
+     *   azzera canceled_at e completed_at.
+     * - status = completed → completed implica confermata: mantieni confirmed_at originale
+     *   o impostalo a now() se mancante; set completed_at; azzera canceled_at.
+     * - status = canceled → set canceled_at; azzera confirmed_at e completed_at.
+     * - altri valori (incluso null) → azzera tutti i timestamp.
      */
     protected static function booted(): void
     {
@@ -42,25 +51,30 @@ class Production extends Model
 
             $confirmedValue = ProductionStatusEnum::CONFIRMED->value;
             $canceledValue = ProductionStatusEnum::CANCELED->value;
-
-            if ($production->status === $confirmedValue) {
-                if ($production->getOriginal('status') !== $confirmedValue) {
-                    $production->confirmed_at = now();
-                }
-
-                return;
-            }
-
-            if ($production->status === $canceledValue) {
-                if ($production->getOriginal('status') !== $canceledValue) {
-                    $production->canceled_at = now();
-                }
-
-                return;
-            }
+            $completedValue = ProductionStatusEnum::COMPLETED->value;
+            $newStatus = $production->status;
+            $originalConfirmedAt = $production->getOriginal('confirmed_at');
+            $originalCompletedAt = $production->getOriginal('completed_at');
 
             $production->confirmed_at = null;
             $production->canceled_at = null;
+            $production->completed_at = null;
+
+            if ($newStatus === $confirmedValue) {
+                $production->confirmed_at = $originalConfirmedAt ?? now();
+                return;
+            }
+
+            if ($newStatus === $completedValue) {
+                $production->confirmed_at = $originalConfirmedAt ?? now();
+                $production->completed_at = $originalCompletedAt ?? now();
+                return;
+            }
+
+            if ($newStatus === $canceledValue) {
+                $production->canceled_at = now();
+                return;
+            }
         });
     }
 

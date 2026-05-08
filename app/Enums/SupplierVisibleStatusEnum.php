@@ -15,7 +15,7 @@ enum SupplierVisibleStatusEnum: string
         return match ($this) {
             self::NEW_CASE => 'Nuovo caso',
             self::PRODUCTION_CONFIRMED => 'Produzione confermata',
-            self::COMPLETED => 'Completato',
+            self::COMPLETED => 'Completata',
         };
     }
 }

@@ -33,12 +33,16 @@ const production = computed<Production | null>(() => productions.value[0] ?? nul
                 <span class="operation-production__label">{{ t('Stato') }}</span>
                 <ProductionStatusBadge :status="production.status" />
             </div>
-            <div class="operation-production__row">
-                <span class="operation-production__label">{{ t('Confermato il') }}</span>
+            <div v-if="production.status === 'completed'" class="operation-production__row">
+                <span class="operation-production__label">{{ t('Completata il') }}</span>
+                <span class="operation-production__value">{{ dateTime(production.completed_at) ?? '--' }}</span>
+            </div>
+            <div v-else-if="production.status === 'confirmed'" class="operation-production__row">
+                <span class="operation-production__label">{{ t('Confermata il') }}</span>
                 <span class="operation-production__value">{{ dateTime(production.confirmed_at) ?? '--' }}</span>
             </div>
-            <div class="operation-production__row">
-                <span class="operation-production__label">{{ t('Annullato il') }}</span>
+            <div v-else-if="production.status === 'canceled'" class="operation-production__row">
+                <span class="operation-production__label">{{ t('Annullata il') }}</span>
                 <span class="operation-production__value">{{ dateTime(production.canceled_at) ?? '--' }}</span>
             </div>
         </div>

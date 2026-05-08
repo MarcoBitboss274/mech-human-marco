@@ -107,7 +107,7 @@ const alertItems = computed<OperationNoticeItem[]>(() => [
         action_cta: null,
         show: () =>
             ['production', 'completed'].includes(props.operation.status ?? '') &&
-            !(props.operation.productions?.some((production) => production.status === 'confirmed') ?? false),
+            !(props.operation.productions?.some((production) => ['confirmed', 'completed'].includes(production.status ?? '')) ?? false),
     },
     // {
     //     key: 'order-not-present',

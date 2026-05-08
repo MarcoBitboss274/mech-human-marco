@@ -26,12 +26,7 @@ const emit = defineEmits<{
 const productions = computed<Production[]>(() => props.operation.productions ?? []);
 const production = computed<Production | null>(() => productions.value[0] ?? null);
 
-const hasConfirmedProduction = computed(() => production.value?.status === 'confirmed');
-
-const supplierCompletedAt = computed<string | null>(() => {
-    const selected = (props.operation.suppliers ?? []).find((s: any) => s.pivot?.selected);
-    return (selected?.pivot?.supplier_completed_at as string | null | undefined) ?? null;
-});
+const hasConfirmedProduction = computed(() => production.value?.status === 'confirmed' || production.value?.status === 'completed');
 const working = ref(false);
 
 const confirmProduction = () => {
@@ -107,23 +102,18 @@ const cancelProduction = () => {
         <div v-else class="operation-production__content">
             <div class="operation-production__row">
                 <span class="operation-production__label">{{ t('Stato') }}</span>
-                <span class="inline-flex flex-wrap items-center gap-2">
-                    <ProductionStatusBadge :status="production.status" />
-                    <span
-                        v-if="supplierCompletedAt"
-                        :title="t('Il fornitore ha segnato la produzione come completata il') + ' ' + (dateTime(supplierCompletedAt) ?? '')"
-                        class="inline-flex items-center rounded border border-green-500 bg-green-200 px-2 py-0.5 text-xs font-medium text-green-700"
-                    >
-                        {{ t('Completata dal fornitore') }}
-                    </span>
-                </span>
+                <ProductionStatusBadge :status="production.status" />
             </div>
-            <div class="operation-production__row">
-                <span class="operation-production__label">{{ t('Confermato il') }}</span>
+            <div v-if="production.status === 'completed'" class="operation-production__row">
+                <span class="operation-production__label">{{ t('Completata il') }}</span>
+                <span class="operation-production__value">{{ dateTime(production.completed_at) ?? '--' }}</span>
+            </div>
+            <div v-else-if="production.status === 'confirmed'" class="operation-production__row">
+                <span class="operation-production__label">{{ t('Confermata il') }}</span>
                 <span class="operation-production__value">{{ dateTime(production.confirmed_at) ?? '--' }}</span>
             </div>
-            <div class="operation-production__row">
-                <span class="operation-production__label">{{ t('Annullato il') }}</span>
+            <div v-else-if="production.status === 'canceled'" class="operation-production__row">
+                <span class="operation-production__label">{{ t('Annullata il') }}</span>
                 <span class="operation-production__value">{{ dateTime(production.canceled_at) ?? '--' }}</span>
             </div>
         </div>

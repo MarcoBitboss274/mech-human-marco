@@ -8,13 +8,14 @@ enum ProductionStatusEnum: string
 
     case CONFIRMED = 'confirmed';
     case CANCELED = 'canceled';
+    case COMPLETED = 'completed';
 
     public function label(): string
     {
         return match ($this) {
-            self::CONFIRMED => 'Confermato',
-            self::CANCELED => 'Annullato',
+            self::CONFIRMED => 'Confermata',
+            self::CANCELED => 'Annullata',
+            self::COMPLETED => 'Completata',
         };
     }
 }
-

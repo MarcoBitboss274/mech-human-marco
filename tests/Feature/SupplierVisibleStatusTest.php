@@ -200,3 +200,72 @@ test('uploadSupplierDocument allowed for supplier in WAITING_APPROVAL', function
 
     expect($media->collection_name)->toBe('supplier_documents');
 });
+
+test('markSupplierProductionCompleted updates Production.status to completed and sets completed_at', function () {
+    Notification::fake();
+    [$operation, $supplier] = buildSupplierVisibleScenario('prod-completed', OperationStatusEnum::PRODUCTION->value);
+    \App\Models\Production::create([
+        'operation_id' => $operation->id,
+        'status' => \App\Enums\ProductionStatusEnum::CONFIRMED->value,
+    ]);
+    $user = User::factory()->create();
+
+    OperationService::markSupplierProductionCompleted($operation, $supplier, $user);
+
+    $production = $operation->productions()->oldest()->first();
+    expect($production->status)->toBe(\App\Enums\ProductionStatusEnum::COMPLETED->value);
+    expect($production->completed_at)->not->toBeNull();
+    expect($production->confirmed_at)->not->toBeNull();
+});
+
+test('operations index payload exposes supplier_visible_status = completed when pivot is completed', function () {
+    Notification::fake();
+    \Spatie\Permission\Models\Role::firstOrCreate(['name' => \App\Enums\RoleEnum::SUPPLIER->value, 'guard_name' => 'web']);
+
+    [$operation, $supplier] = buildSupplierVisibleScenario('idx-completed', OperationStatusEnum::PRODUCTION->value);
+    \App\Models\Production::create([
+        'operation_id' => $operation->id,
+        'status' => \App\Enums\ProductionStatusEnum::CONFIRMED->value,
+    ]);
+
+    // Crea utente supplier admin associato al fornitore (Spatie role)
+    $admin = User::factory()->create();
+    $admin->makeSupplier();
+    $supplier->users()->attach($admin->id, [
+        'role' => \App\Enums\SupplierUserRoleEnum::ADMIN->value,
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+
+    OperationService::markSupplierProductionCompleted($operation, $supplier, $admin);
+
+    $response = test()->actingAs($admin)->get(route('workspace.supplier.operations.index'));
+    $response->assertOk();
+
+    $rendered = $response->viewData('page');
+    $items = $rendered['props']['operations']['data'] ?? [];
+    $found = collect($items)->firstWhere('id', $operation->id);
+
+    expect($found)->not->toBeNull();
+    expect($found['supplier_visible_status'])->toBe('completed');
+});
+
+test('cancelProduction on completed Production clears confirmed_at and completed_at', function () {
+    Notification::fake();
+    [$operation, $supplier] = buildSupplierVisibleScenario('cancel-after-completed', OperationStatusEnum::PRODUCTION->value);
+    $production = \App\Models\Production::create([
+        'operation_id' => $operation->id,
+        'status' => \App\Enums\ProductionStatusEnum::CONFIRMED->value,
+    ]);
+    $user = User::factory()->create();
+
+    OperationService::markSupplierProductionCompleted($operation, $supplier, $user);
+
+    OperationService::cancelProduction($operation->fresh());
+
+    $production->refresh();
+    expect($production->status)->toBe(\App\Enums\ProductionStatusEnum::CANCELED->value);
+    expect($production->confirmed_at)->toBeNull();
+    expect($production->completed_at)->toBeNull();
+    expect($production->canceled_at)->not->toBeNull();
+});

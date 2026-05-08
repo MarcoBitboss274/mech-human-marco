@@ -21,14 +21,17 @@ const classes = computed(() => ({
     'bg-amber-100 border-amber-500 text-amber-700': !props.status,
     '!bg-green-100 border-green-500 !text-green-700': props.status === 'confirmed',
     '!bg-red-100 border-red-500 !text-red-700': props.status === 'canceled',
+    '!bg-emerald-200 border-emerald-600 !text-emerald-800': props.status === 'completed',
 }));
 
 const text = computed(() => {
     switch (props.status) {
         case 'confirmed':
-            return t('Confermato');
+            return t('Confermata');
         case 'canceled':
-            return t('Annullato');
+            return t('Annullata');
+        case 'completed':
+            return t('Completata');
         default:
             return '--';
     }

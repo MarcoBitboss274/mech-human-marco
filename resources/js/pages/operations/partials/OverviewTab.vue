@@ -229,7 +229,7 @@ const goToTab = (key: string) => emit('change-tab', key);
 const productionEmptyLabel = computed(() => {
     const p = props.overview.summary.production;
     if (p.empty) return t('Nessuna produzione ancora');
-    if (!p.confirmed_at && !p.canceled_at) return t('Non ancora confermata');
+    if (!p.confirmed_at && !p.canceled_at && !p.completed_at) return t('Non ancora confermata');
     return null;
 });
 </script>
@@ -335,10 +335,13 @@ const productionEmptyLabel = computed(() => {
                         <p class="operations-overview__empty">{{ productionEmptyLabel }}</p>
                     </template>
                     <template v-else>
-                        <p v-if="overview.summary.production.confirmed_at">
+                        <p v-if="overview.summary.production.completed_at">
+                            {{ t('Completata il') }} <strong>{{ dateTime(overview.summary.production.completed_at) }}</strong>
+                        </p>
+                        <p v-else-if="overview.summary.production.confirmed_at">
                             {{ t('Confermata il') }} <strong>{{ dateTime(overview.summary.production.confirmed_at) }}</strong>
                         </p>
-                        <p v-if="overview.summary.production.canceled_at">
+                        <p v-else-if="overview.summary.production.canceled_at">
                             {{ t('Annullata il') }} <strong>{{ dateTime(overview.summary.production.canceled_at) }}</strong>
                         </p>
                     </template>
