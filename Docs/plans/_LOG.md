@@ -13,6 +13,7 @@ Registro dei piani in `Docs/plans/`: stato di esecuzione, date e note.
 | [piano-revisione_aggiornamento.md](piano-revisione_aggiornamento.md) | Da verificare | — | — | — |
 | [piano-tab_panoramica.md](piano-tab_panoramica.md) | Da verificare | — | — | — |
 | [piano-tab_panoramica_aggiornamento.md](piano-tab_panoramica_aggiornamento.md) | Da verificare | — | — | — |
+| [piano-stati_fornitore.md](piano-stati_fornitore.md) | Completato | 2026-05-08 | 2026-05-08 | Refactor stati 6→3 + supplier_completed_at su pivot + endpoint POST complete + activity log custom (8 eventi) + reset auto su cancelProduction + alert "Prescrizione in revisione" + badge "Completata dal fornitore" su ProductionsTab M&H. Notifica admin via `NotificationService::sendToAdmins` (solo role=admin v1; superadmin/agent specifico Operation rimasti fuori scope, da estendere se richiesto). 13 test Pest nuovi verdi (`SupplierVisibleStatusTest`). 5 fallimenti residui in test suite erano preesistenti su `main` (Chat/ProductionCrud/ProductionStatusTimestamps), non regressioni. |
 
 ## Convenzioni
 

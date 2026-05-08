@@ -12,9 +12,18 @@ const { t } = useI18n();
 type Props = {
     prescription: Prescription;
     operation: Operation;
+    hidePatientData?: boolean;
+    hideRequester?: boolean;
+    hideBuilding?: boolean;
+    hideStatusBadge?: boolean;
 };
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+    hidePatientData: false,
+    hideRequester: false,
+    hideBuilding: false,
+    hideStatusBadge: false,
+});
 
 const typologyLabel = computed(() => {
     if (!props.prescription.typology) {
@@ -58,7 +67,11 @@ const v = (value: unknown): string => {
                 <h3 class="prescription-details-card__title">
                     {{ `${t('Lavorazione')} ${typologyLabel}` }}
                 </h3>
-                <PrescriptionStatusBadge :status="prescription.status" :in-revision="!!prescription.active_revision" />
+                <PrescriptionStatusBadge
+                    v-if="!hideStatusBadge"
+                    :status="prescription.status"
+                    :in-revision="!!prescription.active_revision"
+                />
             </div>
 
             <div class="prescription-details-card__fields">
@@ -72,11 +85,11 @@ const v = (value: unknown): string => {
                         date(prescription.expire_at) ?? '--'
                     }}</span>
                 </div>
-                <div class="prescription-details-card__field">
+                <div v-if="!hideRequester" class="prescription-details-card__field">
                     <span class="prescription-details-card__label">{{ t('Richiedente') }}</span>
                     <span class="prescription-details-card__value">{{ requesterFullName }}</span>
                 </div>
-                <div class="prescription-details-card__field">
+                <div v-if="!hideBuilding" class="prescription-details-card__field">
                     <span class="prescription-details-card__label">{{ t('Struttura') }}</span>
                     <span class="prescription-details-card__value">{{ prescription.building?.name ?? '--' }}</span>
                 </div>
@@ -87,7 +100,7 @@ const v = (value: unknown): string => {
             </div>
         </section>
 
-        <section class="prescription-details-card__section">
+        <section v-if="!hidePatientData" class="prescription-details-card__section">
             <h3 class="prescription-details-card__title">{{ t('Dati paziente') }}</h3>
             <div class="prescription-details-card__fields">
                 <div class="prescription-details-card__field">

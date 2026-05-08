@@ -24,12 +24,14 @@ class SupplierWorkspacePermissionMap
                 WorkspaceAbilityEnum::SUPPLIER_TEAM_MANAGE->value,
                 WorkspaceAbilityEnum::SUPPLIER_OPERATIONS_VIEW->value,
                 WorkspaceAbilityEnum::SUPPLIER_OPERATIONS_DOCUMENTS_MANAGE->value,
+                WorkspaceAbilityEnum::SUPPLIER_OPERATIONS_COMPLETE->value,
             ],
             SupplierUserRoleEnum::MEMBER => [
                 WorkspaceAbilityEnum::SUPPLIER_DASHBOARD_VIEW->value,
                 WorkspaceAbilityEnum::SUPPLIER_PROFILE_VIEW->value,
                 WorkspaceAbilityEnum::SUPPLIER_OPERATIONS_VIEW->value,
                 WorkspaceAbilityEnum::SUPPLIER_OPERATIONS_DOCUMENTS_MANAGE->value,
+                WorkspaceAbilityEnum::SUPPLIER_OPERATIONS_COMPLETE->value,
             ],
         };
     }

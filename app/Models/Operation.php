@@ -69,37 +69,63 @@ class Operation extends Model implements HasMedia
     ];
 
     /**
-     * Stato visibile al fornitore — derivato da `status` + `canceled_at`.
-     * Mai persistito, ricalcolato in lettura. Vedi enum SupplierVisibleStatusEnum.
+     * Stato visibile al fornitore — derivato. Mai persistito.
+     *
+     * Mapping (in ordine di valutazione):
+     *  - DRAFT → null (non visibile)
+     *  - supplier_completed_at != null → COMPLETED
+     *  - PRODUCTION o COMPLETED (lato M&H) → PRODUCTION_CONFIRMED
+     *  - REQUESTED / IN_PROGRESS / WAITING_APPROVAL → NEW_CASE
+     *
+     * `canceled_at` è ortogonale: si veicola via badge a parte, non come stato.
+     *
+     * Si appoggia all'attributo `supplier_completed_at` opzionalmente esposto via
+     * `Operation::scopeWithSupplierPivot($supplierId)` (addSelect dal pivot).
      */
     public function getSupplierVisibleStatusAttribute(): ?string
     {
-        if ($this->canceled_at !== null) {
-            return SupplierVisibleStatusEnum::CANCELED->value;
+        if ($this->status === OperationStatusEnum::DRAFT->value) {
+            return null;
         }
 
-        if ($this->status === OperationStatusEnum::REQUESTED->value) {
-            return $this->hasSupplierDocuments()
-                ? SupplierVisibleStatusEnum::DOCUMENTS_SENT->value
-                : SupplierVisibleStatusEnum::ASSIGNED_WAITING_DOCUMENTS->value;
+        if ($this->getRawSupplierCompletedAt() !== null) {
+            return SupplierVisibleStatusEnum::COMPLETED->value;
         }
 
         return match ($this->status) {
-            OperationStatusEnum::IN_PROGRESS->value, OperationStatusEnum::WAITING_APPROVAL->value
-                => SupplierVisibleStatusEnum::UNDER_EVALUATION->value,
-            OperationStatusEnum::PRODUCTION->value => SupplierVisibleStatusEnum::PRODUCTION_CONFIRMED->value,
-            OperationStatusEnum::COMPLETED->value => SupplierVisibleStatusEnum::COMPLETED->value,
-            default => null, // draft → non visibile al fornitore
+            OperationStatusEnum::PRODUCTION->value,
+            OperationStatusEnum::COMPLETED->value => SupplierVisibleStatusEnum::PRODUCTION_CONFIRMED->value,
+            OperationStatusEnum::REQUESTED->value,
+            OperationStatusEnum::IN_PROGRESS->value,
+            OperationStatusEnum::WAITING_APPROVAL->value => SupplierVisibleStatusEnum::NEW_CASE->value,
+            default => null,
         };
     }
 
-    private function hasSupplierDocuments(): bool
+    private function getRawSupplierCompletedAt(): mixed
     {
-        if (array_key_exists('supplier_documents_count', $this->attributes)) {
-            return (int) $this->attributes['supplier_documents_count'] > 0;
+        if (array_key_exists('supplier_completed_at', $this->attributes)) {
+            return $this->attributes['supplier_completed_at'];
         }
 
-        return $this->getMedia('supplier_documents')->isNotEmpty();
+        return null;
+    }
+
+    /**
+     * Eager-load `supplier_completed_at` from `operation_supplier` pivot for the given supplier.
+     * Use it in workspace supplier queries so the visible-status accessor can read the timestamp
+     * without an N+1.
+     */
+    public function scopeWithSupplierPivot(Builder $query, int $supplierId): Builder
+    {
+        return $query->addSelect([
+            'supplier_completed_at' => \DB::table('operation_supplier')
+                ->select('supplier_completed_at')
+                ->whereColumn('operation_supplier.operation_id', 'operations.id')
+                ->where('operation_supplier.supplier_id', $supplierId)
+                ->where('operation_supplier.selected', true)
+                ->limit(1),
+        ]);
     }
 
     public function getCanBeCanceledAttribute(): bool
@@ -229,7 +255,7 @@ class Operation extends Model implements HasMedia
     public function suppliers(): BelongsToMany
     {
         return $this->belongsToMany(Supplier::class)
-            ->withPivot(['status', 'selected', 'selected_at'])
+            ->withPivot(['status', 'selected', 'selected_at', 'supplier_completed_at'])
             ->withTimestamps();
     }
 

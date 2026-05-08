@@ -37,6 +37,15 @@
                 />
                 <BbSelect
                     class="w-full sm:w-1/3 lg:w-1/6"
+                    v-model="canceledModel"
+                    item-text="label"
+                    item-value="value"
+                    :items="canceledOptions"
+                    :label="t('Annullate')"
+                    clearable
+                />
+                <BbSelect
+                    class="w-full sm:w-1/3 lg:w-1/6"
                     v-model="documentsModel"
                     item-text="label"
                     item-value="value"
@@ -46,17 +55,20 @@
                 />
             </div>
 
-            <BbTable :columns="columns" item-value="id" :items="operations.data ?? []" :loading="loading">
+            <BbTable :columns="columns" item-value="id" :items="operations.data ?? []" :loading="loading" actions>
                 <template #no-data>{{ t('Non ti è ancora stata assegnata nessuna lavorazione.') }}</template>
                 <template #typology="{ item }">
                     <PrescriptionTypologyBadge :typology="item.latest_prescription?.typology" size="xs" />
                 </template>
                 <template #supplier_visible_status="{ item }">
-                    <span class="supplier-status">{{ supplierStatusLabel(item.supplier_visible_status) }}</span>
-                </template>
-                <template #documents_state="{ item }">
-                    <span :class="documentsBadgeClass(item)">
-                        {{ (item.supplier_documents_count ?? 0) > 0 ? t('Caricati') : t('Da caricare') }}
+                    <span class="inline-flex flex-wrap items-center gap-1">
+                        <span class="supplier-status">{{ supplierStatusLabel(item.supplier_visible_status) }}</span>
+                        <span
+                            v-if="item.canceled_at"
+                            class="rounded border border-red-500 bg-red-200 px-2 py-0.5 text-xs font-medium text-red-700"
+                        >
+                            {{ t('Annullata') }}
+                        </span>
                     </span>
                 </template>
                 <template #actions="{ item }">
@@ -113,6 +125,7 @@ type Props = {
         ref: string | null;
         batch_number: string | null;
         supplier_visible_status: string | null;
+        canceled_state: string | null;
         documents_state: string | null;
     };
 };
@@ -131,6 +144,7 @@ const filtersDefault = {
     ref: (queryParam('ref') as string | undefined) ?? null,
     batch_number: (queryParam('batch_number') as string | undefined) ?? null,
     supplier_visible_status: (queryParam('supplier_visible_status') as string | undefined) ?? null,
+    canceled_state: (queryParam('canceled_state') as string | undefined) ?? null,
     documents_state: (queryParam('documents_state') as string | undefined) ?? null,
 };
 
@@ -148,15 +162,13 @@ const queryModel = stringModel('query');
 const refModel = stringModel('ref');
 const batchModel = stringModel('batch_number');
 const statusModel = stringModel('supplier_visible_status');
+const canceledModel = stringModel('canceled_state');
 const documentsModel = stringModel('documents_state');
 
 const supplierStatusLabels: Record<string, string> = {
-    assigned_waiting_documents: t('Assegnata, in attesa documenti'),
-    documents_sent: t('Documenti inviati, in valutazione M&H'),
-    under_evaluation: t('In valutazione M&H'),
+    new_case: t('Nuovo caso'),
     production_confirmed: t('Produzione confermata'),
-    completed: t('Completata'),
-    canceled: t('Annullata'),
+    completed: t('Completato'),
 };
 
 const supplierStatusLabel = (key: string | null | undefined): string => {
@@ -166,30 +178,30 @@ const supplierStatusLabel = (key: string | null | undefined): string => {
 
 const supplierStatusOptions = Object.entries(supplierStatusLabels).map(([value, label]) => ({ value, label }));
 
+const canceledOptions = [
+    { value: 'only', label: t('Solo annullate') },
+    { value: 'excluded', label: t('Escludi annullate') },
+];
+
 const documentsOptions = [
     { value: 'missing', label: t('Da caricare') },
     { value: 'uploaded', label: t('Caricati') },
 ];
 
-const documentsBadgeClass = (item: SupplierOperation) =>
-    (item.supplier_documents_count ?? 0) > 0
-        ? 'inline-block rounded px-2 py-0.5 text-xs font-medium bg-emerald-100 text-emerald-700'
-        : 'inline-block rounded px-2 py-0.5 text-xs font-medium bg-amber-100 text-amber-700';
-
 const columns: BbTableColumn[] = [
     { key: 'typology', label: t('Tipologia') },
-    { key: 'batch_number', label: t('Lotto'), formatter: (d) => d ?? '--' },
-    { key: 'latest_prescription.ref', label: t('Riferimento'), formatter: (d) => d ?? '--' },
-    { key: 'supplier_visible_status', label: t('Stato') },
-    { key: 'documents_state', label: t('Stato documenti') },
-    {
-        key: 'latest_prescription.expire_at',
-        label: t('Scadenza'),
-        formatter: (d) => (d ? new Date(d).toLocaleDateString('it-IT') : '--'),
-    },
     {
         key: 'assigned_at',
         label: t('Assegnata il'),
+        formatter: (d) => (d ? new Date(d).toLocaleDateString('it-IT') : '--'),
+    },
+    { key: 'batch_number', label: t('Lotto'), formatter: (d) => d ?? '--' },
+    { key: 'latest_prescription.ref', label: t('Riferimento'), formatter: (d) => d ?? '--' },
+    { key: 'supplier_visible_status', label: t('Stato') },
+    { key: 'supplier_documents_count', label: t('Documenti caricati'), formatter: (d) => String(d ?? 0) },
+    {
+        key: 'latest_prescription.expire_at',
+        label: t('Scadenza'),
         formatter: (d) => (d ? new Date(d).toLocaleDateString('it-IT') : '--'),
     },
 ];

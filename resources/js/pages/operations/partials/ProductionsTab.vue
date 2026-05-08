@@ -27,6 +27,11 @@ const productions = computed<Production[]>(() => props.operation.productions ?? 
 const production = computed<Production | null>(() => productions.value[0] ?? null);
 
 const hasConfirmedProduction = computed(() => production.value?.status === 'confirmed');
+
+const supplierCompletedAt = computed<string | null>(() => {
+    const selected = (props.operation.suppliers ?? []).find((s: any) => s.pivot?.selected);
+    return (selected?.pivot?.supplier_completed_at as string | null | undefined) ?? null;
+});
 const working = ref(false);
 
 const confirmProduction = () => {
@@ -102,7 +107,16 @@ const cancelProduction = () => {
         <div v-else class="operation-production__content">
             <div class="operation-production__row">
                 <span class="operation-production__label">{{ t('Stato') }}</span>
-                <ProductionStatusBadge :status="production.status" />
+                <span class="inline-flex flex-wrap items-center gap-2">
+                    <ProductionStatusBadge :status="production.status" />
+                    <span
+                        v-if="supplierCompletedAt"
+                        :title="t('Il fornitore ha segnato la produzione come completata il') + ' ' + (dateTime(supplierCompletedAt) ?? '')"
+                        class="inline-flex items-center rounded border border-green-500 bg-green-200 px-2 py-0.5 text-xs font-medium text-green-700"
+                    >
+                        {{ t('Completata dal fornitore') }}
+                    </span>
+                </span>
             </div>
             <div class="operation-production__row">
                 <span class="operation-production__label">{{ t('Confermato il') }}</span>

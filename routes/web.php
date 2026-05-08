@@ -224,6 +224,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
                     Route::delete('/team/{user}', [\App\Http\Controllers\WorkspaceSupplierController::class, 'removeTeamMember'])->name('team.destroy');
                     Route::get('/operations', [\App\Http\Controllers\WorkspaceSupplierController::class, 'operationsIndex'])->name('operations.index');
                     Route::get('/operations/{operation}', [\App\Http\Controllers\WorkspaceSupplierController::class, 'operationsShow'])->name('operations.show');
+                    Route::post('/operations/{operation}/complete', [\App\Http\Controllers\WorkspaceSupplierController::class, 'operationsMarkCompleted'])->name('operations.complete');
                     Route::post('/operations/{operation}/documents', [\App\Http\Controllers\WorkspaceSupplierController::class, 'operationsUploadDocument'])->name('operations.documents.store');
                     Route::delete('/operations/{operation}/documents/{media}', [\App\Http\Controllers\WorkspaceSupplierController::class, 'operationsDeleteDocument'])->name('operations.documents.destroy');
                 });

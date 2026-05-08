@@ -19,10 +19,12 @@ use App\Models\Quote;
 use App\Models\Supplier;
 use App\Models\User;
 use App\Notifications\Admin\SendPrescriptionForAdmin;
+use App\Notifications\Admin\SupplierProductionCompletedForAdmin;
 use App\Notifications\Supplier\OperationCanceledForSupplierNotification;
 use App\Notifications\Supplier\OperationProductionCanceledForSupplierNotification;
 use App\Notifications\Supplier\OperationProductionConfirmedForSupplierNotification;
 use App\Notifications\Supplier\SupplierAssignedToOperationNotification;
+use App\Enums\SupplierVisibleStatusEnum;
 use App\Services\UserService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -57,6 +59,8 @@ class OperationService extends ModelService
         $operation->update([
             'canceled_at' => now(),
         ]);
+
+        static::logOperationActivity($operation, 'operation_canceled', 'M&H ha annullato la lavorazione');
 
         $supplier = $operation->selectedSupplier()->first();
         if ($supplier) {
@@ -972,6 +976,8 @@ class OperationService extends ModelService
         });
 
         if (! $wasAlreadyInProduction) {
+            static::logOperationActivity($operation, 'production_confirmed', 'M&H ha confermato la produzione');
+
             $supplier = $operation->fresh()->selectedSupplier()->first();
             if ($supplier) {
                 NotificationService::sendToSupplier($supplier, new OperationProductionConfirmedForSupplierNotification($operation));
@@ -1002,11 +1008,46 @@ class OperationService extends ModelService
                 'status' => OperationStatusEnum::WAITING_APPROVAL->value,
             ]);
 
+            static::resetSupplierCompletedForCurrentSupplier($operation);
+
+            static::logOperationActivity($operation, 'production_canceled', 'M&H ha annullato la produzione');
+
             $supplier = $operation->selectedSupplier()->first();
             if ($supplier) {
                 NotificationService::sendToSupplier($supplier, new OperationProductionCanceledForSupplierNotification($operation));
             }
         }
+    }
+
+    /**
+     * Reset `supplier_completed_at` su pivot del fornitore corrente, se valorizzato.
+     * Effetto collaterale dell'annullamento produzione lato M&H. Logga l'evento di reset.
+     */
+    private static function resetSupplierCompletedForCurrentSupplier(Operation $operation): void
+    {
+        $row = DB::table('operation_supplier')
+            ->where('operation_id', $operation->id)
+            ->where('selected', true)
+            ->whereNotNull('supplier_completed_at')
+            ->first();
+
+        if (! $row) {
+            return;
+        }
+
+        DB::table('operation_supplier')
+            ->where('id', $row->id)
+            ->update([
+                'supplier_completed_at' => null,
+                'updated_at' => now(),
+            ]);
+
+        static::logOperationActivity(
+            $operation,
+            'supplier_completed_reset_for_production_cancel',
+            'Il completato è stato resettato perché M&H ha annullato la produzione',
+            ['supplier_id' => $row->supplier_id],
+        );
     }
 
     /**
@@ -1061,6 +1102,13 @@ class OperationService extends ModelService
             'selected' => true,
             'selected_at' => now(),
         ]);
+
+        static::logOperationActivity(
+            $operation,
+            'supplier_assigned',
+            'M&H ti ha assegnato la lavorazione',
+            ['supplier_id' => $supplier->id],
+        );
 
         NotificationService::sendToSupplier($supplier, new SupplierAssignedToOperationNotification($operation));
     }
@@ -1119,6 +1167,13 @@ class OperationService extends ModelService
             ]);
         });
 
+        static::logOperationActivity(
+            $operation,
+            'supplier_assigned',
+            'M&H ti ha assegnato la lavorazione',
+            ['supplier_id' => $newSupplier->id],
+        );
+
         NotificationService::sendToSupplier($newSupplier, new SupplierAssignedToOperationNotification($operation));
     }
 
@@ -1143,21 +1198,43 @@ class OperationService extends ModelService
 
     /**
      * Upload one supplier document on the Operation media collection.
-     * Custom properties: uploaded_by_user_id, uploaded_at.
+     * Per il fornitore (asAdmin=false) ammesso solo durante "Nuovo caso"
+     * (REQUESTED / IN_PROGRESS / WAITING_APPROVAL); M&H può sempre caricare.
      */
-    public static function uploadSupplierDocument(Operation $operation, UploadedFile $file, User $author): Media
-    {
-        return $operation->addMedia($file)
+    public static function uploadSupplierDocument(
+        Operation $operation,
+        UploadedFile $file,
+        User $author,
+        bool $asAdmin = false,
+    ): Media {
+        if (! $asAdmin) {
+            static::ensureSupplierDocumentsEditable($operation);
+        }
+
+        $media = $operation->addMedia($file)
             ->withCustomProperties([
                 'uploaded_by_user_id' => $author->id,
                 'uploaded_at' => now()->toIso8601String(),
             ])
             ->toMediaCollection('supplier_documents');
+
+        static::logOperationActivity(
+            $operation,
+            'supplier_document_uploaded',
+            ($asAdmin ? 'M&H ha caricato il documento ' : 'Hai caricato il documento ') . $media->file_name,
+            [
+                'media_id' => $media->id,
+                'file_name' => $media->file_name,
+            ],
+            $author,
+        );
+
+        return $media;
     }
 
     /**
-     * Delete one supplier document. Per il fornitore è permesso solo se lo stato
-     * originale dell'Operation è ≤ requested; M&H può sempre rimuovere ($asAdmin = true).
+     * Delete one supplier document. Per il fornitore (asAdmin=false) ammesso solo durante
+     * "Nuovo caso" (REQUESTED / IN_PROGRESS / WAITING_APPROVAL); M&H può sempre rimuovere.
      */
     public static function deleteSupplierDocument(
         Operation $operation,
@@ -1177,19 +1254,115 @@ class OperationService extends ModelService
         }
 
         if (! $asAdmin) {
-            $allowedStatuses = [
-                OperationStatusEnum::DRAFT->value,
-                OperationStatusEnum::REQUESTED->value,
-            ];
-
-            if (! in_array($operation->status, $allowedStatuses, true)) {
-                throw ValidationException::withMessages([
-                    'media' => 'Non è più possibile rimuovere questo documento.',
-                ]);
-            }
+            static::ensureSupplierDocumentsEditable($operation);
         }
 
+        $fileName = $media->file_name;
+        $mediaId = $media->id;
         $media->delete();
+
+        static::logOperationActivity(
+            $operation,
+            'supplier_document_removed',
+            ($asAdmin ? 'M&H ha rimosso il documento ' : 'Hai rimosso il documento ') . $fileName,
+            [
+                'media_id' => $mediaId,
+                'file_name' => $fileName,
+                'removed_by_admin' => $asAdmin,
+            ],
+        );
+    }
+
+    /**
+     * I documenti fornitore sono editabili dal fornitore solo durante "Nuovo caso"
+     * (mapping = REQUESTED / IN_PROGRESS / WAITING_APPROVAL).
+     */
+    private static function ensureSupplierDocumentsEditable(Operation $operation): void
+    {
+        $allowed = [
+            OperationStatusEnum::REQUESTED->value,
+            OperationStatusEnum::IN_PROGRESS->value,
+            OperationStatusEnum::WAITING_APPROVAL->value,
+        ];
+
+        if (! in_array($operation->status, $allowed, true) || $operation->canceled_at !== null) {
+            throw ValidationException::withMessages([
+                'media' => 'Non è più possibile modificare i documenti.',
+            ]);
+        }
+    }
+
+    /**
+     * Click "Produzione completata" dal fornitore: valorizza il pivot, logga, notifica admin M&H.
+     * Idempotente: se già completato lancia ValidationException.
+     */
+    public static function markSupplierProductionCompleted(
+        Operation $operation,
+        Supplier $supplier,
+        User $causer,
+    ): void {
+        $row = DB::table('operation_supplier')
+            ->where('operation_id', $operation->id)
+            ->where('supplier_id', $supplier->id)
+            ->where('selected', true)
+            ->first();
+
+        if (! $row) {
+            throw ValidationException::withMessages([
+                'supplier' => 'Questa lavorazione non è assegnata al tuo fornitore.',
+            ]);
+        }
+
+        if ($row->supplier_completed_at !== null) {
+            throw ValidationException::withMessages([
+                'supplier_completed_at' => 'Lavorazione già completata.',
+            ]);
+        }
+
+        if ($operation->canceled_at !== null || $operation->status !== OperationStatusEnum::PRODUCTION->value) {
+            throw ValidationException::withMessages([
+                'status' => 'Lo stato della lavorazione è cambiato. Aggiorna la pagina.',
+            ]);
+        }
+
+        DB::table('operation_supplier')
+            ->where('id', $row->id)
+            ->update([
+                'supplier_completed_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+        static::logOperationActivity(
+            $operation,
+            'supplier_marked_completed',
+            trim(($causer->name ?? '') . ' ' . ($causer->surname ?? '')) . ' ha segnato la produzione come completata',
+            ['supplier_id' => $supplier->id],
+            $causer,
+        );
+
+        NotificationService::sendToAdmins(new SupplierProductionCompletedForAdmin($operation, $supplier));
+    }
+
+    /**
+     * Helper centralizzato per gli eventi activity log custom su Operation.
+     */
+    private static function logOperationActivity(
+        Operation $operation,
+        string $event,
+        string $description,
+        array $properties = [],
+        ?User $causer = null,
+    ): void {
+        $logger = activity()
+            ->performedOn($operation)
+            ->withProperties($properties)
+            ->event($event);
+
+        if ($causer !== null) {
+            $logger->causedBy($causer);
+        }
+
+        $logger->log($description);
     }
 
     /**

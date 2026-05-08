@@ -1,71 +1,120 @@
 <template>
-    <div class="supplier-operation-show">
-        <div class="supplier-operation-show__header">
-            <BbButton variant="secondary" prepend:icon="arrow-left" @click="goBack">
-                {{ t('Torna alla lista') }}
-            </BbButton>
-            <h1 class="page__title">{{ t('Lavorazione') }} #{{ operation.batch_number ?? operation.id }}</h1>
+    <div class="admin-view boxed supplier-operation-show">
+        <div class="admin-view__header">
+            <div>
+                <div class="flex flex-wrap items-center gap-4">
+                    <h1 class="page__title">{{ t(operation.latest_prescription?.typology ?? '') }}</h1>
+                    <div
+                        v-if="operation.supplier_visible_status"
+                        :class="[
+                            'flex w-fit items-center justify-center whitespace-nowrap rounded-md border bg-gray-100 px-3 py-1 text-sm leading-none text-gray-500',
+                            statusBadgeVariantClass,
+                        ]"
+                    >
+                        {{ supplierStatusLabel(operation.supplier_visible_status) }}
+                    </div>
+                    <div
+                        v-if="isCanceled"
+                        class="flex w-fit items-center justify-center whitespace-nowrap rounded-md border border-red-500 !bg-red-200 px-3 py-1 text-sm leading-none !text-red-700"
+                    >
+                        {{ t('Annullata') }}
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <span class="page__subtitle"
+                        >{{ t('Lotto') }}: <span class="font-bold">{{ operation.batch_number ?? '--' }}</span></span
+                    >
+                    <span class="page__subtitle"
+                        >{{ t('Riferimento') }}: <span class="font-bold">{{ operation.latest_prescription?.ref ?? '--' }}</span></span
+                    >
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <BbButton
+                    v-if="canMarkCompleted"
+                    variant="primary"
+                    :disabled="markingCompleted"
+                    @click="openCompleteDialog"
+                >
+                    {{ markingCompleted ? t('Invio…') : t('Produzione completata') }}
+                </BbButton>
+                <BbButton icon="activity" @click="activityOpen = true">{{ t('Attività') }}</BbButton>
+                <BbButton icon="chat" @click="chatOpen = true">{{ t('Chat') }}</BbButton>
+                <BbButton icon="arrow-left" :title="t('Torna alla lista')" @click="goBack" />
+            </div>
         </div>
 
-        <SupplierOperationAlert :operation="operation" :on-go-to-upload="scrollToUpload" />
+        <SupplierOperationAlert :operation="operation" />
 
-        <div class="supplier-operation-show__grid">
-            <div class="supplier-operation-show__field">
-                <span class="supplier-operation-show__label">{{ t('Tipologia') }}</span>
-                <PrescriptionTypologyBadge
-                    v-if="operation.latest_prescription?.typology"
-                    :typology="operation.latest_prescription.typology"
-                    size="xs"
-                />
-                <span v-else class="supplier-operation-show__value">--</span>
+        <BbDialog v-model="showCompleteDialog" :title="t('Confermi il completamento?')" size="md">
+            <p>{{ t('Stai segnando la produzione come completata.') }}</p>
+            <p class="mt-2 font-bold">{{ t("L'azione è irreversibile.") }}</p>
+            <div class="mt-4 flex justify-end gap-2">
+                <BbButton variant="ghost" @click="showCompleteDialog = false">{{ t('Annulla') }}</BbButton>
+                <BbButton variant="primary" :disabled="markingCompleted" @click="confirmComplete">{{ t('Conferma') }}</BbButton>
             </div>
-            <div class="supplier-operation-show__field">
-                <span class="supplier-operation-show__label">{{ t('Codice di lotto') }}</span>
-                <span class="supplier-operation-show__value">{{ operation.batch_number ?? '--' }}</span>
-            </div>
-            <div class="supplier-operation-show__field">
-                <span class="supplier-operation-show__label">{{ t('Riferimento') }}</span>
-                <span class="supplier-operation-show__value">{{ operation.latest_prescription?.ref ?? '--' }}</span>
-            </div>
-            <div class="supplier-operation-show__field">
-                <span class="supplier-operation-show__label">{{ t('Stato') }}</span>
-                <span class="supplier-operation-show__value">{{ supplierStatusLabel(operation.supplier_visible_status) }}</span>
-            </div>
-            <div class="supplier-operation-show__field">
-                <span class="supplier-operation-show__label">{{ t('Scadenza prescrizione') }}</span>
-                <span class="supplier-operation-show__value">{{ formatDate(operation.latest_prescription?.expire_at) }}</span>
-            </div>
-            <div class="supplier-operation-show__field">
-                <span class="supplier-operation-show__label">{{ t('Data di assegnazione') }}</span>
-                <span class="supplier-operation-show__value">{{ formatDate(operation.assigned_at) }}</span>
-            </div>
-        </div>
+        </BbDialog>
 
-        <section class="supplier-operation-show__section">
-            <h2 class="supplier-operation-show__section-title">{{ t('Documenti del caso') }}</h2>
-            <p v-if="!caseDocuments.length" class="supplier-operation-show__empty">
-                {{ t('Nessun documento del caso disponibile.') }}
-            </p>
-            <ul v-else class="supplier-operation-show__doc-list">
-                <li v-for="doc in caseDocuments" :key="doc.id" class="supplier-operation-show__doc-row">
-                    <a :href="doc.url" target="_blank" rel="noopener">{{ doc.name }}</a>
-                </li>
-            </ul>
-        </section>
+        <ActivitySlider v-model="activityOpen" model-type="supplier_operation" :model-id="operation.id" />
 
-        <section v-if="mhDocuments.length" class="supplier-operation-show__section">
-            <h2 class="supplier-operation-show__section-title">{{ t('Documenti aggiuntivi e note di M&H') }}</h2>
-            <ul class="supplier-operation-show__doc-list">
-                <li v-for="doc in mhDocuments" :key="doc.id" class="supplier-operation-show__doc-row">
-                    <a :href="doc.url" target="_blank" rel="noopener">{{ doc.name }}</a>
-                </li>
-            </ul>
-        </section>
+        <div class="mt-2">
+            <BbTab v-model="tab" :items="tabs">
+                <template #case>
+                    <div v-if="latestPrescription" class="py-4">
+                        <PrescriptionDetailsCard
+                            :prescription="latestPrescription"
+                            :operation="operation"
+                            hide-patient-data
+                            hide-requester
+                            hide-building
+                            hide-status-badge
+                        />
+                    </div>
+                    <div v-else class="py-8 text-center text-gray-500">
+                        {{ t('Nessuna prescrizione collegata') }}
+                    </div>
+                </template>
 
-        <div class="supplier-operation-show__chat-actions">
-            <BbButton icon="chat" variant="secondary" @click="chatOpen = true">
-                {{ t('Chat con M&H') }}
-            </BbButton>
+                <template #my-documents>
+                    <section class="supplier-operation-show__section">
+                        <h2 class="supplier-operation-show__section-title">{{ t('Documenti da caricare') }}</h2>
+                        <p class="supplier-operation-show__hint">
+                            {{ t('Carica i documenti necessari a M&H per procedere con il preventivo.') }}
+                        </p>
+
+                        <div v-if="canUpload" class="supplier-operation-show__upload">
+                            <input ref="fileInput" type="file" class="hidden" @change="onFileChange" />
+                            <BbButton :disabled="uploading" prepend:icon="upload" @click="fileInput?.click()">
+                                {{ uploading ? t('Caricamento…') : t('Carica documento') }}
+                            </BbButton>
+                        </div>
+
+                        <p v-if="!supplierDocuments.length" class="supplier-operation-show__empty">
+                            {{ t('Nessun documento caricato.') }}
+                        </p>
+                        <ul v-else class="supplier-operation-show__doc-list">
+                            <li v-for="doc in supplierDocuments" :key="doc.id" class="supplier-operation-show__doc-row">
+                                <div class="flex flex-col">
+                                    <a :href="doc.url" target="_blank" rel="noopener">{{ doc.name }}</a>
+                                    <span class="text-xs text-gray-500">
+                                        {{ doc.uploaded_by ?? '--' }} · {{ formatDateTime(doc.uploaded_at) }}
+                                    </span>
+                                </div>
+                                <BbButton
+                                    v-if="canDelete"
+                                    variant="danger"
+                                    size="xs"
+                                    :disabled="deletingId === doc.id"
+                                    @click="deleteDocument(doc)"
+                                >
+                                    {{ t('Elimina') }}
+                                </BbButton>
+                            </li>
+                        </ul>
+                    </section>
+                </template>
+            </BbTab>
         </div>
 
         <ChatSlider
@@ -77,54 +126,19 @@
             :can-read="true"
             :can-send="true"
         />
-
-        <section ref="uploadSection" class="supplier-operation-show__section">
-            <h2 class="supplier-operation-show__section-title">{{ t('Documenti da caricare') }}</h2>
-            <p class="supplier-operation-show__hint">
-                {{ t('Carica i documenti necessari a M&H per procedere con il preventivo.') }}
-            </p>
-
-            <div v-if="canUpload" class="supplier-operation-show__upload">
-                <input ref="fileInput" type="file" class="hidden" @change="onFileChange" />
-                <BbButton :disabled="uploading" prepend:icon="upload" @click="fileInput?.click()">
-                    {{ uploading ? t('Caricamento…') : t('Carica documento') }}
-                </BbButton>
-            </div>
-
-            <p v-if="!supplierDocuments.length" class="supplier-operation-show__empty">
-                {{ t('Nessun documento caricato.') }}
-            </p>
-            <ul v-else class="supplier-operation-show__doc-list">
-                <li v-for="doc in supplierDocuments" :key="doc.id" class="supplier-operation-show__doc-row">
-                    <div class="flex flex-col">
-                        <a :href="doc.url" target="_blank" rel="noopener">{{ doc.name }}</a>
-                        <span class="text-xs text-gray-500">
-                            {{ doc.uploaded_by ?? '--' }} · {{ formatDateTime(doc.uploaded_at) }}
-                        </span>
-                    </div>
-                    <BbButton
-                        v-if="canDelete"
-                        variant="danger"
-                        size="xs"
-                        :disabled="deletingId === doc.id"
-                        @click="deleteDocument(doc)"
-                    >
-                        {{ t('Elimina') }}
-                    </BbButton>
-                </li>
-            </ul>
-        </section>
     </div>
 </template>
 
 <script setup lang="ts">
+import ActivitySlider from '@/components/activity/ActivitySlider.vue';
 import ChatSlider from '@/components/chat/ChatSlider.vue';
-import PrescriptionTypologyBadge from '@/components/prescriptions/PrescriptionTypologyBadge.vue';
+import PrescriptionDetailsCard from '@/components/prescriptions/PrescriptionDetailsCard.vue';
 import { useMainToast } from '@/composables/useMainToast';
 import WorkspaceSupplierLayout from '@/layouts/WorkspaceSupplierLayout.vue';
 import type { Operation } from '@/types/Operation';
+import type { Prescription } from '@/types/Prescription';
 import { router, usePage } from '@inertiajs/vue3';
-import { BbButton } from 'bitboss-ui';
+import { BbButton, BbDialog, BbTab, type BbTabItem } from 'bitboss-ui';
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import SupplierOperationAlert from './partials/SupplierOperationAlert.vue';
@@ -150,12 +164,17 @@ type ExtendedOperation = Operation & {
     supplier_visible_status: string | null;
     batch_number: string | null;
     assigned_at: string | null;
+    supplier_completed_at: string | null;
+    canceled_at: string | null;
+    production_canceled_at: string | null;
     latest_prescription?: {
         ref: string | null;
         typology: string | null;
         send_at: string | null;
         expire_at: string | null;
+        active_revision?: { id: number } | null;
     } | null;
+    prescriptions?: Prescription[];
 };
 
 const props = defineProps<{
@@ -165,33 +184,43 @@ const props = defineProps<{
 }>();
 
 const supplierDocuments = computed(() => props.supplier_documents ?? []);
-const caseDocuments = computed<SupplierDocument[]>(() => []);
-const mhDocuments = computed<SupplierDocument[]>(() => []);
+const latestPrescription = computed<Prescription | undefined>(() => props.operation.prescriptions?.[0]);
 
 const fileInput = ref<HTMLInputElement | null>(null);
-const uploadSection = ref<HTMLElement | null>(null);
 const uploading = ref(false);
 const deletingId = ref<number | null>(null);
 const chatOpen = ref(false);
+const activityOpen = ref(false);
+const showCompleteDialog = ref(false);
+const markingCompleted = ref(false);
+
+const tab = ref<string>('case');
+const tabs = computed<BbTabItem[]>(() => [
+    { key: 'case', label: t('Caso') },
+    { key: 'my-documents', label: t('Miei documenti') },
+]);
 
 const inertiaPage = usePage<any>();
 const currentUserId = computed<number>(() => inertiaPage.props.auth?.user?.id ?? 0);
 
-const isEditableState = computed(() => {
-    const status = props.operation.supplier_visible_status;
-    return status === 'assigned_waiting_documents' || status === 'documents_sent';
-});
+const isCanceled = computed(() => !!props.operation.canceled_at);
+
+const isEditableState = computed(() => props.operation.supplier_visible_status === 'new_case' && !isCanceled.value);
 
 const canUpload = computed(() => isEditableState.value);
 const canDelete = computed(() => isEditableState.value);
 
+const canMarkCompleted = computed(
+    () =>
+        props.operation.supplier_visible_status === 'production_confirmed' &&
+        !props.operation.supplier_completed_at &&
+        !isCanceled.value,
+);
+
 const supplierStatusLabels: Record<string, string> = {
-    assigned_waiting_documents: t('Assegnata, in attesa documenti'),
-    documents_sent: t('Documenti inviati, in valutazione M&H'),
-    under_evaluation: t('In valutazione M&H'),
+    new_case: t('Nuovo caso'),
     production_confirmed: t('Produzione confermata'),
-    completed: t('Completata'),
-    canceled: t('Annullata'),
+    completed: t('Completato'),
 };
 
 const supplierStatusLabel = (key: string | null | undefined): string => {
@@ -199,16 +228,24 @@ const supplierStatusLabel = (key: string | null | undefined): string => {
     return supplierStatusLabels[key] ?? key;
 };
 
-const formatDate = (d: string | null | undefined): string => (d ? new Date(d).toLocaleDateString('it-IT') : '--');
+const statusBadgeVariantClass = computed<string>(() => {
+    switch (props.operation.supplier_visible_status) {
+        case 'new_case':
+            return '!bg-yellow-200 border-yellow-500 !text-yellow-700';
+        case 'production_confirmed':
+            return '!bg-purple-200 border-purple-500 !text-purple-700';
+        case 'completed':
+            return '!bg-green-200 border-green-500 !text-green-600';
+        default:
+            return '';
+    }
+});
+
 const formatDateTime = (d: string | null | undefined): string =>
     d ? new Date(d).toLocaleString('it-IT', { dateStyle: 'short', timeStyle: 'short' }) : '--';
 
 const goBack = () => {
     router.get(route('workspace.supplier.operations.index'));
-};
-
-const scrollToUpload = () => {
-    uploadSection.value?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 };
 
 const onFileChange = (event: Event) => {
@@ -255,42 +292,32 @@ const deleteDocument = (doc: SupplierDocument) => {
         },
     );
 };
+
+const openCompleteDialog = () => {
+    if (!canMarkCompleted.value) return;
+    showCompleteDialog.value = true;
+};
+
+const confirmComplete = () => {
+    if (markingCompleted.value) return;
+    markingCompleted.value = true;
+    router.post(
+        route('workspace.supplier.operations.complete', { operation: props.operation.id }),
+        {},
+        {
+            preserveScroll: true,
+            onSuccess: () => {
+                success(t('Produzione segnata come completata.'));
+                showCompleteDialog.value = false;
+            },
+            onError: () => error(t('Lo stato è cambiato. Aggiorna la pagina.')),
+            onFinish: () => (markingCompleted.value = false),
+        },
+    );
+};
 </script>
 
 <style scoped>
-.supplier-operation-show__header {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 16px;
-}
-
-.supplier-operation-show__grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 16px;
-    margin: 24px 0;
-}
-
-.supplier-operation-show__field {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.supplier-operation-show__label {
-    font-size: 12px;
-    font-weight: 500;
-    color: #6b7280;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-}
-
-.supplier-operation-show__value {
-    font-size: 14px;
-    color: var(--bb-text);
-}
-
 .supplier-operation-show__section {
     margin-top: 32px;
     padding: 16px;

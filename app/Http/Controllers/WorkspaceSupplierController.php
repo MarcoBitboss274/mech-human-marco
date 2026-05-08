@@ -163,7 +163,7 @@ class WorkspaceSupplierController extends Controller
             ->whereHas('suppliers', fn (Builder $q) => $q
                 ->where('suppliers.id', $supplier->id)
                 ->where('operation_supplier.selected', true))
-            ->whereIn('status', [
+            ->whereIn('operations.status', [
                 OperationStatusEnum::REQUESTED->value,
                 OperationStatusEnum::IN_PROGRESS->value,
                 OperationStatusEnum::WAITING_APPROVAL->value,
@@ -175,6 +175,7 @@ class WorkspaceSupplierController extends Controller
                 'building:id,name',
             ])
             ->withCount(['media as supplier_documents_count' => fn ($q) => $q->where('collection_name', 'supplier_documents')])
+            ->withSupplierPivot($supplier->id)
             ->addSelect([
                 'assigned_at' => DB::table('operation_supplier')
                     ->select('selected_at')
@@ -204,7 +205,14 @@ class WorkspaceSupplierController extends Controller
 
         $supplierStatus = $request->input('supplier_visible_status');
         if (is_string($supplierStatus) && $supplierStatus !== '') {
-            $this->applySupplierVisibleStatusFilter($query, $supplierStatus);
+            $this->applySupplierVisibleStatusFilter($query, $supplierStatus, $supplier->id);
+        }
+
+        $canceledState = $request->input('canceled_state');
+        if ($canceledState === 'only') {
+            $query->whereNotNull('operations.canceled_at');
+        } elseif ($canceledState === 'excluded') {
+            $query->whereNull('operations.canceled_at');
         }
 
         $documentsState = $request->input('documents_state');
@@ -233,36 +241,43 @@ class WorkspaceSupplierController extends Controller
                 'ref' => $ref,
                 'batch_number' => $batch,
                 'supplier_visible_status' => $supplierStatus,
+                'canceled_state' => $canceledState,
                 'documents_state' => $documentsState,
             ],
         ]);
     }
 
-    private function applySupplierVisibleStatusFilter(Builder $query, string $status): void
+    /**
+     * Filtro per i 3 stati base visibili al fornitore. `Annullata` è un flag ortogonale,
+     * gestito a parte tramite il filtro `canceled_state`.
+     */
+    private function applySupplierVisibleStatusFilter(Builder $query, string $status, int $supplierId): void
     {
-        // Lo stato visibile è derivato: lo traduciamo in condizioni su status + canceled_at + presenza media.
+        $newCaseStatuses = [
+            OperationStatusEnum::REQUESTED->value,
+            OperationStatusEnum::IN_PROGRESS->value,
+            OperationStatusEnum::WAITING_APPROVAL->value,
+        ];
+
+        $productionConfirmedStatuses = [
+            OperationStatusEnum::PRODUCTION->value,
+            OperationStatusEnum::COMPLETED->value,
+        ];
+
+        $pivotCompletedQuery = fn () => DB::table('operation_supplier')
+            ->whereColumn('operation_supplier.operation_id', 'operations.id')
+            ->where('operation_supplier.supplier_id', $supplierId)
+            ->where('operation_supplier.selected', true)
+            ->whereNotNull('operation_supplier.supplier_completed_at');
+
         match ($status) {
-            'canceled' => $query->whereNotNull('canceled_at'),
-            'assigned_waiting_documents' => $query
-                ->whereNull('canceled_at')
-                ->where('operations.status', OperationStatusEnum::REQUESTED->value)
-                ->whereDoesntHave('media', fn (Builder $m) => $m->where('collection_name', 'supplier_documents')),
-            'documents_sent' => $query
-                ->whereNull('canceled_at')
-                ->where('operations.status', OperationStatusEnum::REQUESTED->value)
-                ->whereHas('media', fn (Builder $m) => $m->where('collection_name', 'supplier_documents')),
-            'under_evaluation' => $query
-                ->whereNull('canceled_at')
-                ->whereIn('operations.status', [
-                    OperationStatusEnum::IN_PROGRESS->value,
-                    OperationStatusEnum::WAITING_APPROVAL->value,
-                ]),
+            'new_case' => $query
+                ->whereIn('operations.status', $newCaseStatuses)
+                ->whereNotExists($pivotCompletedQuery()),
             'production_confirmed' => $query
-                ->whereNull('canceled_at')
-                ->where('operations.status', OperationStatusEnum::PRODUCTION->value),
-            'completed' => $query
-                ->whereNull('canceled_at')
-                ->where('operations.status', OperationStatusEnum::COMPLETED->value),
+                ->whereIn('operations.status', $productionConfirmedStatuses)
+                ->whereNotExists($pivotCompletedQuery()),
+            'completed' => $query->whereExists($pivotCompletedQuery()),
             default => null,
         };
     }
@@ -273,10 +288,30 @@ class WorkspaceSupplierController extends Controller
 
         $supplier = $this->ensureOperationBelongsToCurrentSupplier($operation);
 
+        // Esponi `supplier_completed_at` dal pivot per il calcolo dello stato visibile lato Vue.
+        $supplierCompletedAt = DB::table('operation_supplier')
+            ->where('operation_id', $operation->id)
+            ->where('supplier_id', $supplier->id)
+            ->where('selected', true)
+            ->value('supplier_completed_at');
+        $operation->setAttribute('supplier_completed_at', $supplierCompletedAt);
+
         $operation->load([
             'latestPrescription:id,operation_id,ref,typology,send_at,expire_at',
+            'latestPrescription.activeRevision',
             'building:id,name',
             'media',
+            'prescriptions' => fn ($q) => $q->latest()->with([
+                'user:id,name,surname,email',
+                'building:id,name',
+                'protrusorDetails',
+                'lybraAlignerDetails',
+                'guidedSurgeryDetails',
+                'threeDMeshDetails',
+                'prosthesisDetails',
+                'semiFinishedProsthesisDetails',
+                'activeRevision.reasons',
+            ]),
         ]);
 
         return Inertia::render('workspace/supplier/operations/Show', [
@@ -292,7 +327,7 @@ class WorkspaceSupplierController extends Controller
 
         $this->ensureOperationBelongsToCurrentSupplier($operation);
 
-        OperationService::uploadSupplierDocument($operation, $request->file('file'), $request->user());
+        OperationService::uploadSupplierDocument($operation, $request->file('file'), $request->user(), asAdmin: false);
 
         return back();
     }
@@ -304,6 +339,17 @@ class WorkspaceSupplierController extends Controller
         $this->ensureOperationBelongsToCurrentSupplier($operation);
 
         OperationService::deleteSupplierDocument($operation, $media, asAdmin: false);
+
+        return back();
+    }
+
+    public function operationsMarkCompleted(Operation $operation)
+    {
+        Gate::authorize('supplierWorkspaceAbility', 'workspace.supplier.operations.complete');
+
+        $supplier = $this->ensureOperationBelongsToCurrentSupplier($operation);
+
+        OperationService::markSupplierProductionCompleted($operation, $supplier, UserService::currentUser());
 
         return back();
     }
