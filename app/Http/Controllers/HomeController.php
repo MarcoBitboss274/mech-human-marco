@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use Inertia\Inertia;
 use App\Enums\RoleEnum;
 use Illuminate\Http\Request;
 use App\Services\UserService;
@@ -40,6 +39,6 @@ class HomeController extends Controller
             return to_route('workspace.supplier.index');
         }
 
-        return Inertia::render('Dashboard');
+        return to_route('operations.index', ['mode' => 'active']);
     }
 }

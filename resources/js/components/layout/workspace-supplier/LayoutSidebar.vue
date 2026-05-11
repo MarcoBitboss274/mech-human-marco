@@ -80,14 +80,6 @@ watch(currentUser, (n, o) => {
 const items = computed<Item[]>(() => {
     const list: Item[] = [];
     list.push({
-        key: 'dashboard',
-        text: t('Dashboard'),
-        icon: 'chart-bar',
-        href: route('workspace.supplier.dashboard'),
-        can: true,
-        active: usePage().url.startsWith('/workspace/supplier/dashboard'),
-    });
-    list.push({
         key: 'operations',
         text: t('Lavorazioni'),
         icon: 'circle-stack',

@@ -8,6 +8,7 @@ enum SupplierVisibleStatusEnum: string
 
     case NEW_CASE = 'new_case';
     case PRODUCTION_CONFIRMED = 'production_confirmed';
+    case PRODUCTION_CANCELED = 'production_canceled';
     case COMPLETED = 'completed';
 
     public function label(): string
@@ -15,6 +16,7 @@ enum SupplierVisibleStatusEnum: string
         return match ($this) {
             self::NEW_CASE => 'Nuovo caso',
             self::PRODUCTION_CONFIRMED => 'Produzione confermata',
+            self::PRODUCTION_CANCELED => 'Produzione annullata',
             self::COMPLETED => 'Completata',
         };
     }

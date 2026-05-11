@@ -35,6 +35,21 @@
             </div>
         </div>
 
+        <div v-if="showSupplierCompletedBanner" class="operations-show__supplier-completed-banner">
+            <div class="operations-show__supplier-completed-banner__left">
+                <BbIcon type="warning" class="operations-show__supplier-completed-banner__icon" size="sm" />
+                <p class="operations-show__supplier-completed-banner__title">{{ t('Il fornitore ha completato la produzione') }}</p>
+            </div>
+            <button
+                type="button"
+                class="operations-show__supplier-completed-banner__close"
+                :aria-label="t('Chiudi')"
+                @click="dismissSupplierCompletedBanner"
+            >
+                ×
+            </button>
+        </div>
+
         <div>
             <OperationNotice :enable-hint="isAdmin" :operation="props.operation" @action="(action: string) => handleAction(action)" />
         </div>
@@ -119,7 +134,7 @@ import QuotesTab from '@/pages/operations/partials/QuotesTab.vue';
 import SuppliersTab from '@/pages/operations/partials/SuppliersTab.vue';
 import type { Operation } from '@/types/Operation';
 import { router, usePage } from '@inertiajs/vue3';
-import { BbButton, BbDialog, BbTab, type BbTabItem } from 'bitboss-ui';
+import { BbButton, BbDialog, BbIcon, BbTab, type BbTabItem } from 'bitboss-ui';
 import { computed, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -146,7 +161,7 @@ type OverviewPayload = {
 };
 
 type Props = {
-    operation: Operation;
+    operation: Operation & { supplier_completed_at?: string | null };
     overview: OverviewPayload;
     chat: {
         can_read: boolean;
@@ -257,12 +272,29 @@ const page = usePage<any>();
 const currentUserId = computed(() => page.props.auth.user?.id ?? 0);
 const hasSelectedSupplier = computed(() => !!(props.operation as any).selected_supplier);
 
+const showSupplierCompletedBanner = ref(false);
+
+const supplierCompletedSeenKey = computed(() => {
+    const completedAt = props.operation.supplier_completed_at;
+    if (!completedAt) return null;
+    return `op-${props.operation.id}-supplier-completed-${completedAt}-seen`;
+});
+
+const dismissSupplierCompletedBanner = () => {
+    showSupplierCompletedBanner.value = false;
+};
+
 onMounted(() => {
     const query = new URLSearchParams(window.location.search);
     const shouldOpenChat = query.get('chat') === 'open';
 
     if (shouldOpenChat && props.chat.can_read) {
         chatSliderOpen.value = true;
+    }
+
+    if (supplierCompletedSeenKey.value && !localStorage.getItem(supplierCompletedSeenKey.value)) {
+        showSupplierCompletedBanner.value = true;
+        localStorage.setItem(supplierCompletedSeenKey.value, '1');
     }
 });
 </script>
@@ -280,5 +312,25 @@ onMounted(() => {
 
 .operations-show__placeholder {
     @apply min-h-[8rem] py-4;
+}
+
+.operations-show__supplier-completed-banner {
+    @apply mt-4 mb-4 flex w-full flex-wrap items-center justify-between gap-4 rounded-md border border-yellow-300 bg-yellow-50 px-2 py-1.5;
+}
+
+.operations-show__supplier-completed-banner__left {
+    @apply flex flex-wrap items-center gap-2;
+}
+
+.operations-show__supplier-completed-banner__icon {
+    @apply m-0 p-0 text-yellow-700;
+}
+
+.operations-show__supplier-completed-banner__title {
+    @apply text-sm font-semibold text-yellow-700;
+}
+
+.operations-show__supplier-completed-banner__close {
+    @apply flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded-md text-lg leading-none text-yellow-700 hover:bg-yellow-100;
 }
 </style>

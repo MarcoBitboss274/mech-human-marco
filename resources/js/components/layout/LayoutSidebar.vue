@@ -113,14 +113,6 @@ const items = computed<Item[]>(
     () =>
         [
             {
-                key: 'dashboard',
-                text: t('Dashboard'),
-                icon: 'chart-bar',
-                href: route('dashboard'),
-                can: true,
-                active: usePage().url.startsWith('/dashboard'),
-            },
-            {
                 key: 'users',
                 text: t('Utenti'),
                 icon: 'users',

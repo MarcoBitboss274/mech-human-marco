@@ -19,9 +19,9 @@ const classes = computed(() => ({
     '!text-lg': props.size === 'lg',
     '!text-xl': props.size === 'xl',
     'bg-amber-100 border-amber-500 text-amber-700': !props.status,
-    '!bg-green-100 border-green-500 !text-green-700': props.status === 'confirmed',
+    '!bg-yellow-200 border-yellow-500 !text-yellow-700': props.status === 'confirmed',
     '!bg-red-100 border-red-500 !text-red-700': props.status === 'canceled',
-    '!bg-emerald-200 border-emerald-600 !text-emerald-800': props.status === 'completed',
+    '!bg-green-200 border-green-500 !text-green-700': props.status === 'completed',
 }));
 
 const text = computed(() => {

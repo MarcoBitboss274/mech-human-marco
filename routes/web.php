@@ -103,8 +103,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::patch('/operations/{operation}/suppliers/swap', [OperationController::class, 'swapSupplier'])->name('operations.suppliers.swap');
         Route::patch('/operations/{operation}/suppliers/status', [OperationController::class, 'updateSupplierStatus'])->name('operations.suppliers.status');
         Route::delete('/operations/{operation}/suppliers/{supplier}', [OperationController::class, 'removeSupplier'])->name('operations.suppliers.destroy');
-        Route::post('/operations/{operation}/supplier-documents', [OperationController::class, 'uploadSupplierDocument'])->name('operations.supplier-documents.store');
-        Route::delete('/operations/{operation}/supplier-documents/{media}', [OperationController::class, 'deleteSupplierDocument'])->name('operations.supplier-documents.destroy');
         Route::post('/operations/{operation}/quotes', [OperationController::class, 'addQuote'])->name('operations.quotes.store');
         Route::put('/operations/{operation}/quotes/{quote}', [OperationController::class, 'updateQuote'])->name('operations.quotes.update');
         Route::patch('/operations/{operation}/quotes/{quote}/status', [OperationController::class, 'updateQuoteStatus'])->name('operations.quotes.status');

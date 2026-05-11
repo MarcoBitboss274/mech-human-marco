@@ -24,7 +24,7 @@ class WorkspaceSupplierController extends Controller
 {
     public function index()
     {
-        return redirect()->route('workspace.supplier.dashboard');
+        return redirect()->route('workspace.supplier.operations.index');
     }
 
     public function orphan()
@@ -34,11 +34,7 @@ class WorkspaceSupplierController extends Controller
 
     public function dashboard()
     {
-        Gate::authorize('supplierWorkspaceAbility', 'workspace.supplier.dashboard.view');
-
-        return Inertia::render('workspace/supplier/Dashboard', [
-            'supplier' => $this->supplierPayload(),
-        ]);
+        return redirect()->route('workspace.supplier.operations.index');
     }
 
     public function profile()

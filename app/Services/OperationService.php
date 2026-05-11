@@ -759,6 +759,13 @@ class OperationService extends ModelService
         $operationData = $operation->toArray();
         $operationData['selected_supplier'] = $selectedSupplier?->toArray();
         $operationData['supplier_documents'] = static::mapSupplierDocumentsForAdmin($operation);
+        $operationData['supplier_completed_at'] = $selectedSupplier
+            ? DB::table('operation_supplier')
+                ->where('operation_id', $operation->id)
+                ->where('supplier_id', $selectedSupplier->id)
+                ->where('selected', true)
+                ->value('supplier_completed_at')
+            : null;
 
         return [
             'operation' => $operationData,
@@ -943,6 +950,10 @@ class OperationService extends ModelService
         ]);
 
         $operationData = $operation->toArray();
+        $operationData['supplier_completed_at'] = DB::table('operation_supplier')
+            ->where('operation_id', $operation->id)
+            ->where('selected', true)
+            ->value('supplier_completed_at');
 
         return [
             'operation' => $operationData,

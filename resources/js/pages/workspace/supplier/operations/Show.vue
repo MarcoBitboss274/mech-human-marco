@@ -293,9 +293,6 @@ const confirmComplete = () => {
 <style scoped>
 .supplier-operation-show__section {
     margin-top: 32px;
-    padding: 16px;
-    border: 2px solid var(--bb-border-light, #e5e7eb);
-    border-radius: 8px;
 }
 
 .supplier-operation-show__section-title {

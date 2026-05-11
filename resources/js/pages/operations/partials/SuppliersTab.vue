@@ -47,10 +47,6 @@ const addForm = useForm<{ supplier_id: number | null }>({ supplier_id: null });
 const swapForm = useForm<{ supplier_id: number | null }>({ supplier_id: null });
 const statusForm = useForm<{ supplier_id: number | null; status: string | null }>({ supplier_id: null, status: null });
 
-const fileInput = ref<HTMLInputElement | null>(null);
-const uploading = ref(false);
-const deletingId = ref<number | null>(null);
-
 const openAdd = () => {
     addForm.reset();
     addForm.clearErrors();
@@ -117,46 +113,6 @@ const submitStatus = () => {
         },
         onError: () => error(t('Si è verificato un errore.')),
     });
-};
-
-const onFileChange = (event: Event) => {
-    const target = event.target as HTMLInputElement;
-    const file = target.files?.[0];
-    if (!file) return;
-
-    const formData = new FormData();
-    formData.append('file', file);
-
-    uploading.value = true;
-    router.post(route('operations.supplier-documents.store', { operation: props.operation.id }), formData, {
-        preserveScroll: true,
-        forceFormData: true,
-        onSuccess: () => {
-            success(t('Documento caricato.'));
-            target.value = '';
-        },
-        onError: () => error(t('Caricamento fallito. Riprova.')),
-        onFinish: () => {
-            uploading.value = false;
-        },
-    });
-};
-
-const deleteDocument = (doc: SupplierDocument) => {
-    if (deletingId.value === doc.id) return;
-
-    deletingId.value = doc.id;
-    router.delete(
-        route('operations.supplier-documents.destroy', { operation: props.operation.id, media: doc.id }),
-        {
-            preserveScroll: true,
-            onSuccess: () => success(t('Documento rimosso.')),
-            onError: () => error(t('Si è verificato un errore.')),
-            onFinish: () => {
-                deletingId.value = null;
-            },
-        },
-    );
 };
 
 const address = (supplier: OperationSupplier | null): string => {
@@ -241,16 +197,6 @@ const formatDateTime = (d: string | null | undefined): string =>
         <section class="operation-suppliers__documents">
             <div class="operation-suppliers__documents-header">
                 <h3>{{ t('Documenti fornitore') }}</h3>
-                <input ref="fileInput" type="file" class="hidden" @change="onFileChange" />
-                <BbButton
-                    v-if="can('operations.supplier.manage')"
-                    :disabled="uploading"
-                    size="xs"
-                    prepend:icon="upload"
-                    @click="fileInput?.click()"
-                >
-                    {{ uploading ? t('Caricamento…') : t('Carica documento') }}
-                </BbButton>
             </div>
 
             <p v-if="!documents.length" class="operation-suppliers__empty">
@@ -265,13 +211,13 @@ const formatDateTime = (d: string | null | undefined): string =>
                         </span>
                     </div>
                     <BbButton
-                        v-if="can('operations.supplier.manage')"
+                        :href="doc.url"
+                        target="_blank"
                         size="xs"
-                        variant="danger"
-                        :disabled="deletingId === doc.id"
-                        @click="deleteDocument(doc)"
+                        variant="outline"
+                        prepend:icon="download"
                     >
-                        {{ t('Elimina') }}
+                        {{ t('Scarica') }}
                     </BbButton>
                 </li>
             </ul>
@@ -417,7 +363,7 @@ const formatDateTime = (d: string | null | undefined): string =>
 }
 
 .operation-suppliers__documents {
-    @apply mt-6 rounded-lg border border-gray-200 bg-white p-4;
+    @apply mt-6;
 }
 
 .operation-suppliers__documents-header {

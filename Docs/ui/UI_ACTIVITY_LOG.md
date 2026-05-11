@@ -1,5 +1,47 @@
 # UI Activity Log
 
+## 2026-05-11 — Area Admin: Dashboard nascosta, landing su Lavorazioni (tab Attive)
+
+- `components/layout/LayoutSidebar.vue`: rimossa voce "Dashboard" (icona `chart-bar`, prima voce di menu). Ora la sidebar admin parte direttamente da "Utenti".
+- `app/Http/Controllers/HomeController.php`: il metodo `dashboard()` per utenti non-customer/non-supplier (admin, superadmin, agent) ora redirige a `to_route('operations.index', ['mode' => 'active'])` invece di renderizzare `Dashboard`. Customer continua su `workspace.index`, supplier su `workspace.supplier.index`. Rimosso import inutilizzato `Inertia\Inertia`.
+- Effetti: entrando in `/` o `/dashboard` (o tramite `home`) gli utenti M&H atterrano direttamente su `/operations?mode=active` (tab "Attive" della pagina Lavorazioni).
+- File `resources/js/pages/Dashboard.vue` lasciato in place ma non più referenziato (page nascosta, non eliminata). La route `/dashboard` resta registrata (HomeController la usa come redirect target da `home`).
+
+## 2026-05-11 — Nuovo stato "Produzione annullata" lato fornitore + flat section documenti
+
+- **Stato fornitore "Produzione annullata"**: nuovo case `PRODUCTION_CANCELED = 'production_canceled'` su `SupplierVisibleStatusEnum` (label "Produzione annullata"). `Operation::getSupplierVisibleStatusAttribute` ora include nel mapping (in ordine, dopo `supplier_completed_at` e prima del match status) il check `production_canceled_at != null → PRODUCTION_CANCELED`. Quando l'admin annulla la produzione, il service già setta `production_canceled_at = now()` e resetta `supplier_completed_at`; un eventuale riconferma produzione (`confirmProduction`) rimette `production_canceled_at = null` → lo stato torna a `production_confirmed`.
+- `components/operations/SupplierVisibleStatusBadge.vue`: nuovo case `production_canceled` con classi `!bg-red-200 border-red-500 !text-red-700` (badge rosso, label "Produzione annullata").
+- **Sezione "Documenti fornitore" (admin)**: `pages/operations/partials/SuppliersTab.vue` → `.operation-suppliers__documents` ora ha solo `mt-6` (rimossi `rounded-lg border border-gray-200 bg-white p-4`). Titolo + contenuto sotto, senza card.
+- **Sezione "Documenti da caricare" (fornitore)**: `pages/workspace/supplier/operations/Show.vue` → `.supplier-operation-show__section` ora ha solo `margin-top: 32px` (rimossi `padding: 16px`, `border: 2px solid`, `border-radius: 8px`). Titolo + contenuto sotto, senza card.
+- Nessuna modifica a `base.css` / `main.css` / `theming.css`. Valori pari (mt-6=24px, margin-top=32px, font-size titoli invariati).
+
+## 2026-05-11 — Tab Fornitore (admin): solo download documenti, niente upload/elimina
+
+- `pages/operations/partials/SuppliersTab.vue`: rimossi dal blocco `.operation-suppliers__documents` il bottone "Carica documento" + l'`<input type="file">` nascosto + il bottone rosso "Elimina" per riga documento. Sostituito il bottone elimina con un `BbButton` "Scarica" (variant `outline`, icona `download`, `href=doc.url target="_blank"`). Il filename rimane comunque cliccabile come prima. Rimossi anche gli helper non più usati: `onFileChange`, `deleteDocument`, refs `fileInput`/`uploading`/`deletingId`.
+- `app/Http/Controllers/OperationController.php`: eliminati i metodi `uploadSupplierDocument()` e `deleteSupplierDocument()` (erano gli unici entry point admin per i documenti fornitore). Rimosso import ora inutilizzato `UploadOperationSupplierDocumentRequest`.
+- `routes/web.php`: rimosse le route admin `operations.supplier-documents.store` (POST) e `operations.supplier-documents.destroy` (DELETE) — non più referenziate da nessun client.
+- Lato fornitore (`WorkspaceSupplierController` → `operations.documents.store/destroy` + `OperationService::uploadSupplierDocument/deleteSupplierDocument` con `asAdmin: false`) **invariato**: il fornitore continua a poter caricare ed eliminare i documenti durante "Nuovo caso".
+
+## 2026-05-11 — Chat lavorazione: allineamento tab bar al titolo
+
+- `components/chat/OperationChatTabbed.vue`: aggiunta regola scoped con `:deep()` su `.bb-tab__label-boundary .bb-tab__label-container` → `padding-left: var(--bb-dialog-px)` (24px). Le tab "Chat Customer" / "Chat Fornitore" sono ora allineate orizzontalmente al titolo "Chat lavorazione" dell'offcanvas (entrambi a 24px dal bordo sinistro). Prima le tab partivano a 4px (default `--bb-ring-size` del label-container BbTab) mentre il titolo era a 24px (`--bb-dialog-px`). Valore pari (24px), nessuna modifica a `base.css` / `main.css` / `theming.css`.
+
+## 2026-05-11 — Area Fornitore: Dashboard nascosta, landing su Lavorazioni
+
+- `components/layout/workspace-supplier/LayoutSidebar.vue`: rimossa voce "Dashboard" (icona `chart-bar`, prima della voce "Lavorazioni"). Ora "Lavorazioni" è la prima voce di menu.
+- `WorkspaceSupplierController::index()`: ora redirige a `workspace.supplier.operations.index` (era `workspace.supplier.dashboard`). Entrando in `/workspace/supplier` il fornitore arriva direttamente sulla lista lavorazioni.
+- `WorkspaceSupplierController::dashboard()`: trasformato in semplice redirect a `workspace.supplier.operations.index` (rimossa renderizzazione `workspace/supplier/Dashboard` + Gate check `workspace.supplier.dashboard.view`). La route `/workspace/supplier/dashboard` resta registrata per non rompere eventuali bookmark/link.
+- `Auth/InvitationController.php`: dopo l'accettazione dell'invito per `supplier_user`, ora `to_route('workspace.supplier.operations.index')` (era `workspace.supplier.dashboard`).
+- File `pages/workspace/supplier/Dashboard.vue` lasciato in place ma non più referenziato (page nascosta, non eliminata). Enum `WorkspaceAbilityEnum::SUPPLIER_DASHBOARD_VIEW` e mapping in `SupplierWorkspacePermissionMap` lasciati invariati (dormienti).
+
+## 2026-05-11 — Badge produzione (admin + fornitore) + alert completamento fornitore
+
+- `components/productions/ProductionStatusBadge.vue` (admin): `confirmed` da verde (`bg-green-100`) → **giallo** (`!bg-yellow-200 border-yellow-500 !text-yellow-700`). `completed` da emerald (`bg-emerald-200`) → **verde** (`!bg-green-200 border-green-500 !text-green-700`). `canceled` invariato (rosso).
+- `components/operations/SupplierVisibleStatusBadge.vue` (fornitore): `new_case` da giallo → **azzurro** (`!bg-sky-200 border-sky-500 !text-sky-700`); `production_confirmed` da viola → **giallo** (`!bg-yellow-200 border-yellow-500 !text-yellow-700`); `completed` allineato a `!text-green-700` (era `!text-green-600`).
+- `pages/operations/Show.vue`: nuovo banner `.operations-show__supplier-completed-banner` (giallo) visibile in cima al dettaglio (sopra `OperationNotice`) quando `operation.supplier_completed_at` è valorizzato. Dismissibile con bottone "×". Persistenza: `localStorage[op-<id>-supplier-completed-<isoTimestamp>-seen]` settato al mount → alla seconda apertura il banner non riappare. Se il fornitore completa nuovamente la produzione dopo annullamento (nuovo `supplier_completed_at`), la chiave cambia e il banner ritorna. **Stile allineato a `.operation-notice__item--alert`** di `OperationNotice.vue` (border-yellow-300, bg-yellow-50, px-2 py-1.5, icona BbIcon warning + titolo `text-sm font-semibold text-yellow-700`); aggiunto `mb-4` di spazio sotto il banner. Pixel pari (mt-4=16, mb-4=16, py-1.5=6, px-2=8, gap-2/4=8/16, h-6/w-6=24).
+- Backend: `OperationService::getAdminShowData` e `getAgentShowData` ora espongono `supplier_completed_at` come attributo top-level su `operation`, letto via `DB::table('operation_supplier')->where('selected', true)->value('supplier_completed_at')`. Prima era esposto solo lato workspace fornitore.
+- Nessuna modifica a `base.css` / `main.css` / `theming.css`.
+
 ## 2026-05-08 — OverviewSection: pulsante arrow di redirect più piccolo
 
 - `resources/css/admin_view_override.css`: nuova regola su `.overview-section__arrow-btn.bb-button--icon` → forza il bottone a 18×18px e l'icona interna (`.bb-icon` / `.bb-icon svg`) a 12×12px. Padding del button azzerato. Valori pari (design system).

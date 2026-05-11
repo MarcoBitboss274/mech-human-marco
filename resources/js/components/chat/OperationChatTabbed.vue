@@ -73,4 +73,8 @@ const tabs = computed<BbTabItem[]>(() => [
     flex-direction: column;
     height: 100%;
 }
+
+.chat-tabbed :deep(.bb-tab__label-boundary .bb-tab__label-container) {
+    padding-left: var(--bb-dialog-px);
+}
 </style>

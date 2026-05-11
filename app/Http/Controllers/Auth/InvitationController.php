@@ -85,7 +85,7 @@ class InvitationController extends Controller
         Auth::login($user);
 
         if ($pivot['table'] === 'supplier_user') {
-            return to_route('workspace.supplier.dashboard');
+            return to_route('workspace.supplier.operations.index');
         }
 
         return to_route('workspace.dashboard');

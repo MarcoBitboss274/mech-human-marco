@@ -74,6 +74,7 @@ class Operation extends Model implements HasMedia
      * Mapping (in ordine di valutazione):
      *  - DRAFT → null (non visibile)
      *  - supplier_completed_at != null → COMPLETED
+     *  - production_canceled_at != null → PRODUCTION_CANCELED
      *  - PRODUCTION o COMPLETED (lato M&H) → PRODUCTION_CONFIRMED
      *  - REQUESTED / IN_PROGRESS / WAITING_APPROVAL → NEW_CASE
      *
@@ -90,6 +91,10 @@ class Operation extends Model implements HasMedia
 
         if ($this->getRawSupplierCompletedAt() !== null) {
             return SupplierVisibleStatusEnum::COMPLETED->value;
+        }
+
+        if ($this->production_canceled_at !== null) {
+            return SupplierVisibleStatusEnum::PRODUCTION_CANCELED->value;
         }
 
         return match ($this->status) {
