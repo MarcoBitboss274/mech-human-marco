@@ -113,6 +113,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/operations/{operation}/orders/{order}', [OperationController::class, 'removeOrder'])->name('operations.orders.destroy');
         Route::post('/operations/{operation}/productions/confirm', [OperationController::class, 'confirmProduction'])->name('operations.productions.confirm');
         Route::post('/operations/{operation}/productions/cancel', [OperationController::class, 'cancelProduction'])->name('operations.productions.cancel');
+        Route::post('/operations/{operation}/productions/complete', [OperationController::class, 'markProductionCompleted'])->name('operations.productions.complete');
+        Route::post('/operations/{operation}/productions/reopen', [OperationController::class, 'reopenProduction'])->name('operations.productions.reopen');
+        Route::post('/operations/{operation}/case/complete', [OperationController::class, 'markCaseCompleted'])->name('operations.case.complete');
+        Route::post('/operations/{operation}/case/reopen', [OperationController::class, 'reopenCase'])->name('operations.case.reopen');
         Route::post('/operations/{operation}/invoices', [OperationController::class, 'addInvoice'])->name('operations.invoices.store');
         Route::put('/operations/{operation}/invoices/{invoice}', [OperationController::class, 'updateInvoice'])->name('operations.invoices.update');
         Route::patch('/operations/{operation}/invoices/{invoice}/status', [OperationController::class, 'updateInvoiceStatus'])->name('operations.invoices.status');
@@ -222,7 +226,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
                     Route::delete('/team/{user}', [\App\Http\Controllers\WorkspaceSupplierController::class, 'removeTeamMember'])->name('team.destroy');
                     Route::get('/operations', [\App\Http\Controllers\WorkspaceSupplierController::class, 'operationsIndex'])->name('operations.index');
                     Route::get('/operations/{operation}', [\App\Http\Controllers\WorkspaceSupplierController::class, 'operationsShow'])->name('operations.show');
-                    Route::post('/operations/{operation}/complete', [\App\Http\Controllers\WorkspaceSupplierController::class, 'operationsMarkCompleted'])->name('operations.complete');
                     Route::post('/operations/{operation}/documents', [\App\Http\Controllers\WorkspaceSupplierController::class, 'operationsUploadDocument'])->name('operations.documents.store');
                     Route::delete('/operations/{operation}/documents/{media}', [\App\Http\Controllers\WorkspaceSupplierController::class, 'operationsDeleteDocument'])->name('operations.documents.destroy');
                 });

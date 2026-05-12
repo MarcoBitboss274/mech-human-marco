@@ -23,10 +23,8 @@ type Theme = 'error' | 'warning' | 'info';
 
 type Props = {
     operation: Operation & {
-        supplier_visible_status?: string | null;
-        production_canceled_at?: string | null;
+        production_status?: string | null;
         canceled_at?: string | null;
-        supplier_completed_at?: string | null;
     };
 };
 
@@ -40,13 +38,14 @@ type Banner = {
     theme: Theme;
 };
 
-const status = computed(() => props.operation.supplier_visible_status);
 const isCanceled = computed(() => !!props.operation.canceled_at);
-const productionWasCanceled = computed(() => !!props.operation.production_canceled_at);
-const hasActiveRevision = computed(() => !!props.operation.latest_prescription?.active_revision);
+const productionStatus = computed(() => props.operation.production_status);
+const hasActiveRevision = computed(() => {
+    const rev = props.operation.latest_prescription?.active_revision;
+    return !!rev && !!rev.id && !!rev.opened_at && !rev.closed_at;
+});
 
-// Solo alert eccezionali (situazioni a cui il fornitore deve prestare attenzione).
-// Nessun banner di stato base: lo stato è già visibile dal badge nell'header.
+// Solo alert eccezionali. Lo stato base è già rappresentato dai due badge nell'header.
 const alerts = computed<Banner[]>(() => {
     const list: Banner[] = [];
 
@@ -59,11 +58,11 @@ const alerts = computed<Banner[]>(() => {
         });
     }
 
-    if (productionWasCanceled.value && status.value === 'new_case' && !isCanceled.value) {
+    if (productionStatus.value === 'canceled' && !isCanceled.value) {
         list.push({
             key: 'production-canceled',
             title: t('Produzione annullata'),
-            message: t('M&H ha annullato la produzione. Lo stato è tornato a Nuovo caso.'),
+            message: t('M&H ha annullato la produzione di questa lavorazione.'),
             theme: 'warning',
         });
     }
@@ -73,7 +72,7 @@ const alerts = computed<Banner[]>(() => {
             key: 'prescription-in-revision',
             title: t('Prescrizione in revisione'),
             message: t('M&H sta verificando alcuni dati con il customer.'),
-            theme: 'info',
+            theme: 'warning',
         });
     }
 
@@ -97,7 +96,7 @@ const bannerClass = (theme: Theme) => {
     display: flex;
     flex-direction: column;
     gap: 8px;
-    margin: 16px 0;
+    margin: 8px 0;
 }
 
 .supplier-alert {

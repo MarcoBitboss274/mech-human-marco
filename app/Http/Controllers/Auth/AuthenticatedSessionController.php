@@ -38,6 +38,10 @@ class AuthenticatedSessionController extends Controller
         $user->setLastLoginAt();
         $user->setupSessionData();
 
+        if (! $user->isCustomer() && ! $user->isSupplier()) {
+            return redirect()->route('operations.index', ['mode' => 'active']);
+        }
+
         return redirect()->intended(route('dashboard', absolute: false));
     }
 

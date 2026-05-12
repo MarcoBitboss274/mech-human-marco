@@ -1,0 +1,2 @@
+Bisogna modificare l'attuale gestione degli stati di una lavorazione.
+La lavorazione che il fornitore visualizza non ha il suo stato. Ha solo uno stato della produzione. Quindi cancella lo stato lavorazione del fornitore Aperta / Completata. Il fornitore visualizza le lavorazioni che gli sono state assegnate, e di quelle lavorazioni deve solo conoscere lo stato della Produzione. Quindi il fornitore non esegue nessuna azione che interessa lo stato della Lavorazione, ne della produzione. 

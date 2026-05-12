@@ -4,11 +4,6 @@
             <div>
                 <div class="flex flex-wrap items-center gap-4">
                     <h1 class="page__title">{{ t(operation.latest_prescription?.typology ?? '') }}</h1>
-                    <SupplierVisibleStatusBadge
-                        v-if="operation.supplier_visible_status"
-                        :status="operation.supplier_visible_status"
-                        size="sm"
-                    />
                     <div
                         v-if="isCanceled"
                         class="flex w-fit items-center justify-center whitespace-nowrap rounded-md border border-red-500 !bg-red-200 px-3 py-1 text-sm leading-none !text-red-700"
@@ -17,24 +12,25 @@
                     </div>
                 </div>
 
-                <div class="flex items-center gap-2">
+                <div class="flex flex-wrap items-center gap-8">
                     <span class="page__subtitle"
                         >{{ t('Lotto') }}: <span class="font-bold">{{ operation.batch_number ?? '--' }}</span></span
                     >
                     <span class="page__subtitle"
                         >{{ t('Riferimento') }}: <span class="font-bold">{{ operation.latest_prescription?.ref ?? '--' }}</span></span
                     >
+                    <span class="page__subtitle inline-flex items-center gap-2">
+                        {{ t('Stato produzione:') }}
+                        <ProductionStatusBadge
+                            :status="operation.production_status"
+                            :timestamp="productionTimestamp"
+                            size="sm"
+                            verbose
+                        />
+                    </span>
                 </div>
             </div>
             <div class="flex items-center gap-2">
-                <BbButton
-                    v-if="canMarkCompleted"
-                    variant="primary"
-                    :disabled="markingCompleted"
-                    @click="openCompleteDialog"
-                >
-                    {{ markingCompleted ? t('Invio…') : t('Produzione completata') }}
-                </BbButton>
                 <BbButton icon="activity" @click="activityOpen = true">{{ t('Attività') }}</BbButton>
                 <BbButton icon="chat" @click="chatOpen = true">{{ t('Chat') }}</BbButton>
                 <BbButton icon="arrow-left" :title="t('Torna alla lista')" @click="goBack" />
@@ -42,15 +38,6 @@
         </div>
 
         <SupplierOperationAlert :operation="operation" />
-
-        <BbDialog v-model="showCompleteDialog" :title="t('Confermi il completamento?')" size="md">
-            <p>{{ t('Stai segnando la produzione come completata.') }}</p>
-            <p class="mt-2 font-bold">{{ t("L'azione è irreversibile.") }}</p>
-            <div class="mt-4 flex justify-end gap-2">
-                <BbButton variant="ghost" @click="showCompleteDialog = false">{{ t('Annulla') }}</BbButton>
-                <BbButton variant="primary" :disabled="markingCompleted" @click="confirmComplete">{{ t('Conferma') }}</BbButton>
-            </div>
-        </BbDialog>
 
         <ActivitySlider v-model="activityOpen" model-type="supplier_operation" :model-id="operation.id" />
 
@@ -128,14 +115,14 @@
 <script setup lang="ts">
 import ActivitySlider from '@/components/activity/ActivitySlider.vue';
 import ChatSlider from '@/components/chat/ChatSlider.vue';
-import SupplierVisibleStatusBadge from '@/components/operations/SupplierVisibleStatusBadge.vue';
 import PrescriptionDetailsCard from '@/components/prescriptions/PrescriptionDetailsCard.vue';
+import ProductionStatusBadge from '@/components/productions/ProductionStatusBadge.vue';
 import { useMainToast } from '@/composables/useMainToast';
 import WorkspaceSupplierLayout from '@/layouts/WorkspaceSupplierLayout.vue';
 import type { Operation } from '@/types/Operation';
 import type { Prescription } from '@/types/Prescription';
 import { router, usePage } from '@inertiajs/vue3';
-import { BbButton, BbDialog, BbTab, type BbTabItem } from 'bitboss-ui';
+import { BbButton, BbTab, type BbTabItem } from 'bitboss-ui';
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import SupplierOperationAlert from './partials/SupplierOperationAlert.vue';
@@ -158,18 +145,19 @@ type SupplierDocument = {
 };
 
 type ExtendedOperation = Operation & {
-    supplier_visible_status: string | null;
+    production_status: string | null;
+    production_confirmed_at: string | null;
+    production_canceled_at: string | null;
+    production_completed_at: string | null;
     batch_number: string | null;
     assigned_at: string | null;
-    supplier_completed_at: string | null;
     canceled_at: string | null;
-    production_canceled_at: string | null;
     latest_prescription?: {
         ref: string | null;
         typology: string | null;
         send_at: string | null;
         expire_at: string | null;
-        active_revision?: { id: number } | null;
+        active_revision?: { id: number; opened_at?: string | null; closed_at?: string | null } | null;
     } | null;
     prescriptions?: Prescription[];
 };
@@ -188,8 +176,6 @@ const uploading = ref(false);
 const deletingId = ref<number | null>(null);
 const chatOpen = ref(false);
 const activityOpen = ref(false);
-const showCompleteDialog = ref(false);
-const markingCompleted = ref(false);
 
 const tab = ref<string>('case');
 const tabs = computed<BbTabItem[]>(() => [
@@ -202,17 +188,26 @@ const currentUserId = computed<number>(() => inertiaPage.props.auth?.user?.id ??
 
 const isCanceled = computed(() => !!props.operation.canceled_at);
 
-const isEditableState = computed(() => props.operation.supplier_visible_status === 'new_case' && !isCanceled.value);
-
-const canUpload = computed(() => isEditableState.value);
-const canDelete = computed(() => isEditableState.value);
-
-const canMarkCompleted = computed(
-    () =>
-        props.operation.supplier_visible_status === 'production_confirmed' &&
-        !props.operation.supplier_completed_at &&
-        !isCanceled.value,
+// Documenti editabili solo in pre-produzione (production_status null o canceled).
+// Allineato al vincolo backend in OperationService::ensureSupplierDocumentsEditable.
+const productionIsActive = computed(
+    () => props.operation.production_status === 'confirmed' || props.operation.production_status === 'completed',
 );
+const canUpload = computed(() => !productionIsActive.value && !isCanceled.value);
+const canDelete = computed(() => !productionIsActive.value && !isCanceled.value);
+
+const productionTimestamp = computed<string | null>(() => {
+    switch (props.operation.production_status) {
+        case 'confirmed':
+            return props.operation.production_confirmed_at;
+        case 'canceled':
+            return props.operation.production_canceled_at;
+        case 'completed':
+            return props.operation.production_completed_at;
+        default:
+            return null;
+    }
+});
 
 const formatDateTime = (d: string | null | undefined): string =>
     d ? new Date(d).toLocaleString('it-IT', { dateStyle: 'short', timeStyle: 'short' }) : '--';
@@ -266,28 +261,6 @@ const deleteDocument = (doc: SupplierDocument) => {
     );
 };
 
-const openCompleteDialog = () => {
-    if (!canMarkCompleted.value) return;
-    showCompleteDialog.value = true;
-};
-
-const confirmComplete = () => {
-    if (markingCompleted.value) return;
-    markingCompleted.value = true;
-    router.post(
-        route('workspace.supplier.operations.complete', { operation: props.operation.id }),
-        {},
-        {
-            preserveScroll: true,
-            onSuccess: () => {
-                success(t('Produzione segnata come completata.'));
-                showCompleteDialog.value = false;
-            },
-            onError: () => error(t('Lo stato è cambiato. Aggiorna la pagina.')),
-            onFinish: () => (markingCompleted.value = false),
-        },
-    );
-};
 </script>
 
 <style scoped>

@@ -15,12 +15,8 @@ const props = withDefaults(defineProps<Props>(), {
 
 const variantClass = computed(() => {
     switch (props.status) {
-        case 'new_case':
+        case 'open':
             return '!bg-sky-200 border-sky-500 !text-sky-700';
-        case 'production_confirmed':
-            return '!bg-yellow-200 border-yellow-500 !text-yellow-700';
-        case 'production_canceled':
-            return '!bg-red-200 border-red-500 !text-red-700';
         case 'completed':
             return '!bg-green-200 border-green-500 !text-green-700';
         default:
@@ -40,12 +36,8 @@ const classes = computed(() => ({
 
 const text = computed(() => {
     switch (props.status) {
-        case 'new_case':
-            return t('Nuovo caso');
-        case 'production_confirmed':
-            return t('Produzione confermata');
-        case 'production_canceled':
-            return t('Produzione annullata');
+        case 'open':
+            return t('Aperta');
         case 'completed':
             return t('Completata');
         default:

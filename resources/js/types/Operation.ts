@@ -34,9 +34,9 @@ export type Operation = {
     latest_quote_status?: QuoteStatus | null;
     latest_prescription?: Prescription | null;
     batch_number?: string | null;
-    production_canceled_at?: string | null;
     supplier_completed_at?: string | null;
-    supplier_visible_status?: string | null;
+    case_status?: string | null;
+    production_status?: string | null;
 };
 
 export type OperationForm = {

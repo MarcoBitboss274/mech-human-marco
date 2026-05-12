@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\CaseStatusEnum;
 use App\Enums\OperationStatusEnum;
-use App\Enums\SupplierVisibleStatusEnum;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -35,7 +35,6 @@ class Operation extends Model implements HasMedia
         'batch_number',
         'canceled_at',
         'archived_at',
-        'production_canceled_at',
     ];
 
     /**
@@ -46,7 +45,6 @@ class Operation extends Model implements HasMedia
     protected $casts = [
         'canceled_at' => 'datetime',
         'archived_at' => 'datetime',
-        'production_canceled_at' => 'datetime',
     ];
 
     public function registerMediaCollections(): void
@@ -65,46 +63,21 @@ class Operation extends Model implements HasMedia
         'can_be_reopened',
         'can_be_reactivated',
         'can_be_deleted',
-        'supplier_visible_status',
     ];
 
     /**
-     * Stato visibile al fornitore — derivato. Mai persistito.
+     * Stato lavorazione lato Fornitore — derivato dal pivot `operation_supplier`.
      *
-     * Mapping (in ordine di valutazione):
-     *  - DRAFT → null (non visibile)
-     *  - supplier_completed_at != null → COMPLETED
-     *  - production_canceled_at != null → PRODUCTION_CANCELED
-     *  - PRODUCTION o COMPLETED (lato M&H) → PRODUCTION_CONFIRMED
-     *  - REQUESTED / IN_PROGRESS / WAITING_APPROVAL → NEW_CASE
-     *
-     * `canceled_at` è ortogonale: si veicola via badge a parte, non come stato.
-     *
-     * Si appoggia all'attributo `supplier_completed_at` opzionalmente esposto via
-     * `Operation::scopeWithSupplierPivot($supplierId)` (addSelect dal pivot).
+     * Sorgente: `operation_supplier.supplier_completed_at` per il fornitore corrente
+     * (null = Aperta, timestamp = Completata). L'attributo viene esposto via
+     * `Operation::scopeWithSupplierPivot($supplierId)` (addSelect dal pivot) per
+     * evitare N+1.
      */
-    public function getSupplierVisibleStatusAttribute(): ?string
+    public function getCaseStatusAttribute(): string
     {
-        if ($this->status === OperationStatusEnum::DRAFT->value) {
-            return null;
-        }
-
-        if ($this->getRawSupplierCompletedAt() !== null) {
-            return SupplierVisibleStatusEnum::COMPLETED->value;
-        }
-
-        if ($this->production_canceled_at !== null) {
-            return SupplierVisibleStatusEnum::PRODUCTION_CANCELED->value;
-        }
-
-        return match ($this->status) {
-            OperationStatusEnum::PRODUCTION->value,
-            OperationStatusEnum::COMPLETED->value => SupplierVisibleStatusEnum::PRODUCTION_CONFIRMED->value,
-            OperationStatusEnum::REQUESTED->value,
-            OperationStatusEnum::IN_PROGRESS->value,
-            OperationStatusEnum::WAITING_APPROVAL->value => SupplierVisibleStatusEnum::NEW_CASE->value,
-            default => null,
-        };
+        return $this->getRawSupplierCompletedAt() !== null
+            ? CaseStatusEnum::COMPLETED->value
+            : CaseStatusEnum::OPEN->value;
     }
 
     private function getRawSupplierCompletedAt(): mixed

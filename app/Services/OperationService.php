@@ -19,12 +19,12 @@ use App\Models\Quote;
 use App\Models\Supplier;
 use App\Models\User;
 use App\Notifications\Admin\SendPrescriptionForAdmin;
-use App\Notifications\Admin\SupplierProductionCompletedForAdmin;
 use App\Notifications\Supplier\OperationCanceledForSupplierNotification;
 use App\Notifications\Supplier\OperationProductionCanceledForSupplierNotification;
+use App\Notifications\Supplier\OperationProductionCompletedForSupplierNotification;
 use App\Notifications\Supplier\OperationProductionConfirmedForSupplierNotification;
+use App\Notifications\Supplier\OperationProductionReopenedForSupplierNotification;
 use App\Notifications\Supplier\SupplierAssignedToOperationNotification;
-use App\Enums\SupplierVisibleStatusEnum;
 use App\Services\UserService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -766,6 +766,9 @@ class OperationService extends ModelService
                 ->where('selected', true)
                 ->value('supplier_completed_at')
             : null;
+        $operationData['case_status'] = $operationData['supplier_completed_at']
+            ? \App\Enums\CaseStatusEnum::COMPLETED->value
+            : \App\Enums\CaseStatusEnum::OPEN->value;
 
         return [
             'operation' => $operationData,
@@ -954,6 +957,9 @@ class OperationService extends ModelService
             ->where('operation_id', $operation->id)
             ->where('selected', true)
             ->value('supplier_completed_at');
+        $operationData['case_status'] = $operationData['supplier_completed_at']
+            ? \App\Enums\CaseStatusEnum::COMPLETED->value
+            : \App\Enums\CaseStatusEnum::OPEN->value;
 
         return [
             'operation' => $operationData,
@@ -961,52 +967,56 @@ class OperationService extends ModelService
     }
 
     /**
-     * Confirm production for the operation.
+     * Conferma produzione (Admin M&H). Ammesso da Null/Annullata/Completata → Confermata.
+     * Idempotente: se è già `confirmed` non fa nulla.
      */
     public static function confirmProduction(Operation $operation): void
     {
-        $wasAlreadyInProduction = $operation->status === OperationStatusEnum::PRODUCTION->value;
+        $production = $operation->productions()->oldest()->first();
 
-        DB::transaction(function () use ($operation) {
-            $production = $operation->productions()->oldest()->first();
+        if ($production && $production->status === ProductionStatusEnum::CONFIRMED->value) {
+            return;
+        }
 
+        DB::transaction(function () use ($operation, $production) {
             if (! $production) {
                 Production::query()->create([
                     'operation_id' => $operation->id,
                     'status' => ProductionStatusEnum::CONFIRMED->value,
                 ]);
-            } elseif ($production->status !== ProductionStatusEnum::CONFIRMED->value) {
+            } else {
                 $production->update([
                     'status' => ProductionStatusEnum::CONFIRMED->value,
                 ]);
             }
 
-            // Una nuova conferma di produzione "riapre" l'avvio: azzera il marker di annullamento.
-            $operation->update([
-                'production_canceled_at' => null,
-            ]);
-
             static::updateStatus($operation, OperationStatusEnum::PRODUCTION->value, true);
         });
 
-        if (! $wasAlreadyInProduction) {
-            static::logOperationActivity($operation, 'production_confirmed', 'M&H ha confermato la produzione');
+        static::logOperationActivity($operation, 'production_confirmed', 'M&H ha confermato la produzione');
 
-            $supplier = $operation->fresh()->selectedSupplier()->first();
-            if ($supplier) {
-                NotificationService::sendToSupplier($supplier, new OperationProductionConfirmedForSupplierNotification($operation));
-            }
+        $supplier = $operation->fresh()->selectedSupplier()->first();
+        if ($supplier) {
+            NotificationService::sendToSupplier($supplier, new OperationProductionConfirmedForSupplierNotification($operation));
         }
     }
 
     /**
-     * Cancel production for the operation.
+     * Annulla produzione (Admin M&H). Ammesso da Confermata/Completata → Annullata.
+     * NON tocca `supplier_completed_at`: le due dimensioni sono indipendenti.
      */
     public static function cancelProduction(Operation $operation): void
     {
         $production = $operation->productions()->oldest()->first();
 
-        if (! $production || $production->status === ProductionStatusEnum::CANCELED->value) {
+        if (! $production) {
+            return;
+        }
+
+        if (! in_array($production->status, [
+            ProductionStatusEnum::CONFIRMED->value,
+            ProductionStatusEnum::COMPLETED->value,
+        ], true)) {
             return;
         }
 
@@ -1018,50 +1028,66 @@ class OperationService extends ModelService
 
         if ($wasInProduction) {
             $operation->update([
-                'production_canceled_at' => now(),
                 'status' => OperationStatusEnum::WAITING_APPROVAL->value,
             ]);
+        }
 
-            static::resetSupplierCompletedForCurrentSupplier($operation);
+        static::logOperationActivity($operation, 'production_canceled', 'M&H ha annullato la produzione');
 
-            static::logOperationActivity($operation, 'production_canceled', 'M&H ha annullato la produzione');
-
-            $supplier = $operation->selectedSupplier()->first();
-            if ($supplier) {
-                NotificationService::sendToSupplier($supplier, new OperationProductionCanceledForSupplierNotification($operation));
-            }
+        $supplier = $operation->selectedSupplier()->first();
+        if ($supplier) {
+            NotificationService::sendToSupplier($supplier, new OperationProductionCanceledForSupplierNotification($operation));
         }
     }
 
     /**
-     * Reset `supplier_completed_at` su pivot del fornitore corrente, se valorizzato.
-     * Effetto collaterale dell'annullamento produzione lato M&H. Logga l'evento di reset.
+     * Segna produzione come Completata (Admin M&H). Ammesso solo da Confermata → Completata.
      */
-    private static function resetSupplierCompletedForCurrentSupplier(Operation $operation): void
+    public static function markProductionCompleted(Operation $operation): void
     {
-        $row = DB::table('operation_supplier')
-            ->where('operation_id', $operation->id)
-            ->where('selected', true)
-            ->whereNotNull('supplier_completed_at')
-            ->first();
+        $production = $operation->productions()->oldest()->first();
 
-        if (! $row) {
-            return;
+        if (! $production || $production->status !== ProductionStatusEnum::CONFIRMED->value) {
+            throw ValidationException::withMessages([
+                'production' => 'La produzione può essere segnata come completata solo se è in stato Confermata.',
+            ]);
         }
 
-        DB::table('operation_supplier')
-            ->where('id', $row->id)
-            ->update([
-                'supplier_completed_at' => null,
-                'updated_at' => now(),
-            ]);
+        $production->update([
+            'status' => ProductionStatusEnum::COMPLETED->value,
+        ]);
 
-        static::logOperationActivity(
-            $operation,
-            'supplier_completed_reset_for_production_cancel',
-            'Il completato è stato resettato perché M&H ha annullato la produzione',
-            ['supplier_id' => $row->supplier_id],
-        );
+        static::logOperationActivity($operation, 'production_completed', 'M&H ha segnato la produzione come completata');
+
+        $supplier = $operation->selectedSupplier()->first();
+        if ($supplier) {
+            NotificationService::sendToSupplier($supplier, new OperationProductionCompletedForSupplierNotification($operation));
+        }
+    }
+
+    /**
+     * Riapre produzione (Admin M&H). Ammesso solo da Completata → Confermata.
+     */
+    public static function reopenProduction(Operation $operation): void
+    {
+        $production = $operation->productions()->oldest()->first();
+
+        if (! $production || $production->status !== ProductionStatusEnum::COMPLETED->value) {
+            throw ValidationException::withMessages([
+                'production' => 'La produzione può essere riaperta solo se è in stato Completata.',
+            ]);
+        }
+
+        $production->update([
+            'status' => ProductionStatusEnum::CONFIRMED->value,
+        ]);
+
+        static::logOperationActivity($operation, 'production_reopened', 'M&H ha riaperto la produzione');
+
+        $supplier = $operation->selectedSupplier()->first();
+        if ($supplier) {
+            NotificationService::sendToSupplier($supplier, new OperationProductionReopenedForSupplierNotification($operation));
+        }
     }
 
     /**
@@ -1307,63 +1333,78 @@ class OperationService extends ModelService
     }
 
     /**
-     * Click "Produzione completata" dal fornitore: valorizza il pivot, logga, notifica admin M&H.
-     * Idempotente: se già completato lancia ValidationException.
+     * Admin M&H segna la lavorazione del fornitore selezionato come Completata.
+     * Idempotente: se già completata lancia ValidationException. Non tocca `Production.status`.
      */
-    public static function markSupplierProductionCompleted(
-        Operation $operation,
-        Supplier $supplier,
-        User $causer,
-    ): void {
+    public static function markCaseCompletedByAdmin(Operation $operation, User $causer): void
+    {
+        $row = static::resolveSelectedSupplierRow($operation);
+
+        if ($row->supplier_completed_at !== null) {
+            throw ValidationException::withMessages([
+                'case_status' => 'Lavorazione già completata.',
+            ]);
+        }
+
+        DB::table('operation_supplier')
+            ->where('id', $row->id)
+            ->update([
+                'supplier_completed_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+        static::logOperationActivity(
+            $operation,
+            'case_completed',
+            'M&H ha segnato la lavorazione come completata',
+            ['supplier_id' => $row->supplier_id],
+            $causer,
+        );
+    }
+
+    /**
+     * Admin M&H riapre una lavorazione del fornitore selezionato precedentemente completata.
+     */
+    public static function reopenCaseByAdmin(Operation $operation, User $causer): void
+    {
+        $row = static::resolveSelectedSupplierRow($operation);
+
+        if ($row->supplier_completed_at === null) {
+            throw ValidationException::withMessages([
+                'case_status' => 'La lavorazione non è completata.',
+            ]);
+        }
+
+        DB::table('operation_supplier')
+            ->where('id', $row->id)
+            ->update([
+                'supplier_completed_at' => null,
+                'updated_at' => now(),
+            ]);
+
+        static::logOperationActivity(
+            $operation,
+            'case_reopened',
+            'M&H ha riaperto la lavorazione',
+            ['supplier_id' => $row->supplier_id],
+            $causer,
+        );
+    }
+
+    private static function resolveSelectedSupplierRow(Operation $operation): object
+    {
         $row = DB::table('operation_supplier')
             ->where('operation_id', $operation->id)
-            ->where('supplier_id', $supplier->id)
             ->where('selected', true)
             ->first();
 
         if (! $row) {
             throw ValidationException::withMessages([
-                'supplier' => 'Questa lavorazione non è assegnata al tuo fornitore.',
+                'supplier' => 'Nessun fornitore selezionato per questa lavorazione.',
             ]);
         }
 
-        if ($row->supplier_completed_at !== null) {
-            throw ValidationException::withMessages([
-                'supplier_completed_at' => 'Lavorazione già completata.',
-            ]);
-        }
-
-        if ($operation->canceled_at !== null || $operation->status !== OperationStatusEnum::PRODUCTION->value) {
-            throw ValidationException::withMessages([
-                'status' => 'Lo stato della lavorazione è cambiato. Aggiorna la pagina.',
-            ]);
-        }
-
-        DB::transaction(function () use ($operation, $row) {
-            DB::table('operation_supplier')
-                ->where('id', $row->id)
-                ->update([
-                    'supplier_completed_at' => now(),
-                    'updated_at' => now(),
-                ]);
-
-            $production = $operation->productions()->oldest()->first();
-            if ($production && $production->status !== ProductionStatusEnum::COMPLETED->value) {
-                $production->update([
-                    'status' => ProductionStatusEnum::COMPLETED->value,
-                ]);
-            }
-        });
-
-        static::logOperationActivity(
-            $operation,
-            'supplier_marked_completed',
-            trim(($causer->name ?? '') . ' ' . ($causer->surname ?? '')) . ' ha segnato la produzione come completata',
-            ['supplier_id' => $supplier->id],
-            $causer,
-        );
-
-        NotificationService::sendToAdmins(new SupplierProductionCompletedForAdmin($operation, $supplier));
+        return $row;
     }
 
     /**

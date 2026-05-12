@@ -28,11 +28,11 @@
                 />
                 <BbSelect
                     class="w-full sm:w-1/3 lg:w-1/6"
-                    v-model="statusModel"
+                    v-model="productionStatusModel"
                     item-text="label"
                     item-value="value"
-                    :items="supplierStatusOptions"
-                    :label="t('Stato')"
+                    :items="productionStatusOptions"
+                    :label="t('Stato produzione')"
                     clearable
                 />
                 <BbSelect
@@ -58,11 +58,24 @@
             <BbTable :columns="columns" item-value="id" :items="operations.data ?? []" :loading="loading" actions>
                 <template #no-data>{{ t('Non ti è ancora stata assegnata nessuna lavorazione.') }}</template>
                 <template #typology="{ item }">
-                    <PrescriptionTypologyBadge :typology="item.latest_prescription?.typology" size="xs" />
+                    <div class="flex items-center gap-1">
+                        <PrescriptionTypologyBadge :typology="item.latest_prescription?.typology" size="xs" />
+                        <BbTooltip v-if="item.latest_prescription?.active_revision">
+                            <template #activator="{ props: tooltipProps }">
+                                <span
+                                    v-bind="tooltipProps"
+                                    class="text-base leading-none"
+                                    role="img"
+                                    :aria-label="t('Prescrizione in revisione')"
+                                >🔄</span>
+                            </template>
+                            {{ t('Prescrizione in revisione') }}
+                        </BbTooltip>
+                    </div>
                 </template>
-                <template #supplier_visible_status="{ item }">
+                <template #production_status="{ item }">
                     <span class="inline-flex flex-wrap items-center gap-1">
-                        <SupplierVisibleStatusBadge :status="item.supplier_visible_status" size="xs" />
+                        <ProductionStatusBadge :status="item.production_status" size="xs" verbose />
                         <span
                             v-if="item.canceled_at"
                             class="rounded border border-red-500 bg-red-200 px-2 py-0.5 text-xs font-medium text-red-700"
@@ -95,14 +108,14 @@
 
 <script setup lang="ts">
 import XPagination from '@/components/common/XPagination.vue';
-import SupplierVisibleStatusBadge from '@/components/operations/SupplierVisibleStatusBadge.vue';
 import PrescriptionTypologyBadge from '@/components/prescriptions/PrescriptionTypologyBadge.vue';
+import ProductionStatusBadge from '@/components/productions/ProductionStatusBadge.vue';
 import { useIndexPage } from '@/composables/useIndexPage';
 import WorkspaceSupplierLayout from '@/layouts/WorkspaceSupplierLayout.vue';
 import type { Operation } from '@/types/Operation';
 import type { Pagination } from '@/types/Pagination';
 import { router, usePage } from '@inertiajs/vue3';
-import { BbButton, BbSelect, BbTable, type BbTableColumn, BbTextInput } from 'bitboss-ui';
+import { BbButton, BbSelect, BbTable, type BbTableColumn, BbTextInput, BbTooltip } from 'bitboss-ui';
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -113,7 +126,7 @@ defineOptions({
 });
 
 type SupplierOperation = Operation & {
-    supplier_visible_status: string | null;
+    production_status: string | null;
     supplier_documents_count?: number;
     assigned_at?: string | null;
 };
@@ -125,7 +138,7 @@ type Props = {
         query: string | null;
         ref: string | null;
         batch_number: string | null;
-        supplier_visible_status: string | null;
+        production_status: string | null;
         canceled_state: string | null;
         documents_state: string | null;
     };
@@ -144,7 +157,7 @@ const filtersDefault = {
     query: (queryParam('query') as string | undefined) ?? null,
     ref: (queryParam('ref') as string | undefined) ?? null,
     batch_number: (queryParam('batch_number') as string | undefined) ?? null,
-    supplier_visible_status: (queryParam('supplier_visible_status') as string | undefined) ?? null,
+    production_status: (queryParam('production_status') as string | undefined) ?? null,
     canceled_state: (queryParam('canceled_state') as string | undefined) ?? null,
     documents_state: (queryParam('documents_state') as string | undefined) ?? null,
 };
@@ -162,13 +175,14 @@ const stringModel = (key: keyof typeof filtersDefault) =>
 const queryModel = stringModel('query');
 const refModel = stringModel('ref');
 const batchModel = stringModel('batch_number');
-const statusModel = stringModel('supplier_visible_status');
+const productionStatusModel = stringModel('production_status');
 const canceledModel = stringModel('canceled_state');
 const documentsModel = stringModel('documents_state');
 
-const supplierStatusOptions = [
-    { value: 'new_case', label: t('Nuovo caso') },
-    { value: 'production_confirmed', label: t('Produzione confermata') },
+const productionStatusOptions = [
+    { value: 'null', label: t('Nessuna') },
+    { value: 'confirmed', label: t('Confermata') },
+    { value: 'canceled', label: t('Annullata') },
     { value: 'completed', label: t('Completata') },
 ];
 
@@ -191,7 +205,7 @@ const columns: BbTableColumn[] = [
     },
     { key: 'batch_number', label: t('Lotto'), formatter: (d) => d ?? '--' },
     { key: 'latest_prescription.ref', label: t('Riferimento'), formatter: (d) => d ?? '--' },
-    { key: 'supplier_visible_status', label: t('Stato') },
+    { key: 'production_status', label: t('Stato produzione') },
     { key: 'supplier_documents_count', label: t('Documenti caricati'), formatter: (d) => String(d ?? 0) },
     {
         key: 'latest_prescription.expire_at',

@@ -4,7 +4,8 @@
 
 - `components/layout/LayoutSidebar.vue`: rimossa voce "Dashboard" (icona `chart-bar`, prima voce di menu). Ora la sidebar admin parte direttamente da "Utenti".
 - `app/Http/Controllers/HomeController.php`: il metodo `dashboard()` per utenti non-customer/non-supplier (admin, superadmin, agent) ora redirige a `to_route('operations.index', ['mode' => 'active'])` invece di renderizzare `Dashboard`. Customer continua su `workspace.index`, supplier su `workspace.supplier.index`. Rimosso import inutilizzato `Inertia\Inertia`.
-- Effetti: entrando in `/` o `/dashboard` (o tramite `home`) gli utenti M&H atterrano direttamente su `/operations?mode=active` (tab "Attive" della pagina Lavorazioni).
+- `app/Http/Controllers/Auth/AuthenticatedSessionController.php` (post-login `store()`): per utenti M&H (non-customer/non-supplier) bypass dell'`intended()` e redirect diretto a `route('operations.index', ['mode' => 'active'])`. Customer/supplier mantengono `redirect()->intended(route('dashboard'))` (poi HomeController instrada). Garantisce che l'admin atterri SEMPRE sulla tab "Attive" anche se la sessione era scaduta su un'altra pagina M&H.
+- Effetti: entrando in `/`, `/dashboard`, o dopo il login, gli utenti M&H atterrano direttamente su `/operations?mode=active` (tab "Attive" della pagina Lavorazioni).
 - File `resources/js/pages/Dashboard.vue` lasciato in place ma non più referenziato (page nascosta, non eliminata). La route `/dashboard` resta registrata (HomeController la usa come redirect target da `home`).
 
 ## 2026-05-11 — Nuovo stato "Produzione annullata" lato fornitore + flat section documenti

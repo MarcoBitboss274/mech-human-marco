@@ -26,20 +26,26 @@ const emit = defineEmits<{
 const productions = computed<Production[]>(() => props.operation.productions ?? []);
 const production = computed<Production | null>(() => productions.value[0] ?? null);
 
-const hasConfirmedProduction = computed(() => production.value?.status === 'confirmed' || production.value?.status === 'completed');
+const productionStatus = computed<string | null>(() => production.value?.status ?? null);
+const canManage = computed(() => can('operations.production.manage'));
+
+const showConfirm = computed(() => canManage.value && productionStatus.value !== 'confirmed' && productionStatus.value !== 'completed');
+const showCancel = computed(() => canManage.value && (productionStatus.value === 'confirmed' || productionStatus.value === 'completed'));
+const showComplete = computed(() => canManage.value && productionStatus.value === 'confirmed');
+const showReopen = computed(() => canManage.value && productionStatus.value === 'completed');
+
 const working = ref(false);
 
-const confirmProduction = () => {
+const post = (routeName: string, successMsg: string) => {
     if (working.value) return;
     working.value = true;
-
     router.post(
-        route('operations.productions.confirm', { operation: props.operation.id }),
+        route(routeName, { operation: props.operation.id }),
         {},
         {
             preserveScroll: true,
             onSuccess: () => {
-                success(t('Produzione confermata con successo'));
+                success(successMsg);
                 emit('production:updated');
             },
             onError: () => error(t('Si è verificato un errore')),
@@ -48,24 +54,10 @@ const confirmProduction = () => {
     );
 };
 
-const cancelProduction = () => {
-    if (working.value) return;
-    working.value = true;
-
-    router.post(
-        route('operations.productions.cancel', { operation: props.operation.id }),
-        {},
-        {
-            preserveScroll: true,
-            onSuccess: () => {
-                success(t('Produzione annullata con successo'));
-                emit('production:updated');
-            },
-            onError: () => error(t('Si è verificato un errore')),
-            onFinish: () => (working.value = false),
-        },
-    );
-};
+const confirmProduction = () => post('operations.productions.confirm', t('Produzione confermata con successo'));
+const cancelProduction = () => post('operations.productions.cancel', t('Produzione annullata con successo'));
+const markCompleted = () => post('operations.productions.complete', t('Produzione segnata come completata'));
+const reopenProduction = () => post('operations.productions.reopen', t('Produzione riaperta'));
 </script>
 
 <template>
@@ -73,26 +65,49 @@ const cancelProduction = () => {
         <div class="operation-production__header">
             <h2 class="operation-production__title">{{ t('Produzione') }}</h2>
 
-            <BbButton
-                v-if="can('operations.production.manage') && !hasConfirmedProduction"
-                append:icon="play"
-                size="xs"
-                :disabled="working"
-                @click="confirmProduction"
-            >
-                {{ t('Conferma produzione') }}
-            </BbButton>
+            <div class="flex flex-wrap items-center gap-2">
+                <BbButton
+                    v-if="showConfirm"
+                    append:icon="play"
+                    size="xs"
+                    :disabled="working"
+                    @click="confirmProduction"
+                >
+                    {{ productionStatus === 'canceled' ? t('Riconferma produzione') : t('Conferma produzione') }}
+                </BbButton>
 
-            <BbButton
-                v-else-if="can('operations.production.manage') && hasConfirmedProduction"
-                variant="danger"
-                append:icon="trash"
-                size="xs"
-                :disabled="working"
-                @click="cancelProduction"
-            >
-                {{ t('Annulla produzione') }}
-            </BbButton>
+                <BbButton
+                    v-if="showComplete"
+                    variant="primary"
+                    append:icon="check"
+                    size="xs"
+                    :disabled="working"
+                    @click="markCompleted"
+                >
+                    {{ t('Segna completata') }}
+                </BbButton>
+
+                <BbButton
+                    v-if="showReopen"
+                    append:icon="refresh"
+                    size="xs"
+                    :disabled="working"
+                    @click="reopenProduction"
+                >
+                    {{ t('Riapri produzione') }}
+                </BbButton>
+
+                <BbButton
+                    v-if="showCancel"
+                    variant="danger"
+                    append:icon="trash"
+                    size="xs"
+                    :disabled="working"
+                    @click="cancelProduction"
+                >
+                    {{ t('Annulla produzione') }}
+                </BbButton>
+            </div>
         </div>
 
         <div v-if="!production" class="operation-production__empty">
@@ -155,4 +170,3 @@ const cancelProduction = () => {
     @apply text-gray-900;
 }
 </style>
-

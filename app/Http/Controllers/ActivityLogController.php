@@ -21,9 +21,9 @@ class ActivityLogController extends Controller
         'supplier_document_removed',
         'production_confirmed',
         'production_canceled',
+        'production_completed',
+        'production_reopened',
         'operation_canceled',
-        'supplier_marked_completed',
-        'supplier_completed_reset_for_production_cancel',
     ];
 
     /**

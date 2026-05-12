@@ -151,11 +151,8 @@
                 >
                     <template #no-data>{{ t('Nessuna lavorazione trovata') }}</template>
                     <template #typology="{ item }">
-                        <PrescriptionTypologyBadge :typology="item.latest_prescription?.typology" size="xs" />
-                    </template>
-                    <template #status="{ item }">
                         <div class="flex items-center gap-1">
-                            <OperationStatusBadge :status="item.status" size="xs" />
+                            <PrescriptionTypologyBadge :typology="item.latest_prescription?.typology" size="xs" />
                             <BbTooltip v-if="item.latest_prescription?.active_revision">
                                 <template #activator="{ props: tooltipProps }">
                                     <span
@@ -168,6 +165,9 @@
                                 {{ t('Prescrizione in revisione') }}
                             </BbTooltip>
                         </div>
+                    </template>
+                    <template #status="{ item }">
+                        <OperationStatusBadge :status="item.status" size="xs" />
                     </template>
                     <template #latest_quote_status="{ item }">
                         <OperationQuoteStatusBadge v-if="item.latest_quote_status" :status="item.latest_quote_status" size="xs" />

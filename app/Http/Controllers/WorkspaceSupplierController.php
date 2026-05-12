@@ -168,17 +168,24 @@ class WorkspaceSupplierController extends Controller
                 OperationStatusEnum::COMPLETED->value,
             ])
             ->with([
-                'latestPrescription:id,operation_id,ref,typology,send_at,expire_at',
+                'latestPrescription' => fn ($q) => $q
+                    ->select(['id', 'operation_id', 'ref', 'typology', 'send_at', 'expire_at'])
+                    ->with('activeRevision:id,prescription_id,opened_at,closed_at'),
                 'building:id,name',
             ])
             ->withCount(['media as supplier_documents_count' => fn ($q) => $q->where('collection_name', 'supplier_documents')])
-            ->withSupplierPivot($supplier->id)
             ->addSelect([
                 'assigned_at' => DB::table('operation_supplier')
                     ->select('selected_at')
                     ->whereColumn('operation_supplier.operation_id', 'operations.id')
                     ->where('operation_supplier.supplier_id', $supplier->id)
                     ->where('operation_supplier.selected', true)
+                    ->limit(1),
+                'production_status' => DB::table('productions')
+                    ->select('status')
+                    ->whereColumn('productions.operation_id', 'operations.id')
+                    ->whereNull('productions.deleted_at')
+                    ->oldest('id')
                     ->limit(1),
             ]);
 
@@ -200,9 +207,9 @@ class WorkspaceSupplierController extends Controller
             $query->where('batch_number', 'like', "%{$batch}%");
         }
 
-        $supplierStatus = $request->input('supplier_visible_status');
-        if (is_string($supplierStatus) && $supplierStatus !== '') {
-            $this->applySupplierVisibleStatusFilter($query, $supplierStatus, $supplier->id);
+        $productionStatus = $request->input('production_status');
+        if (is_string($productionStatus) && $productionStatus !== '') {
+            $this->applyProductionStatusFilter($query, $productionStatus);
         }
 
         $canceledState = $request->input('canceled_state');
@@ -236,7 +243,7 @@ class WorkspaceSupplierController extends Controller
                 'query' => $search,
                 'ref' => $ref,
                 'batch_number' => $batch,
-                'supplier_visible_status' => $supplierStatus,
+                'production_status' => $productionStatus,
                 'canceled_state' => $canceledState,
                 'documents_state' => $documentsState,
             ],
@@ -244,53 +251,48 @@ class WorkspaceSupplierController extends Controller
     }
 
     /**
-     * Filtro per i 3 stati base visibili al fornitore. `Annullata` è un flag ortogonale,
-     * gestito a parte tramite il filtro `canceled_state`.
+     * Filtro stato produzione. `null` = nessun record Production attivo;
+     * altrimenti match diretto su `productions.status` del record più vecchio
+     * (allineato alla convenzione `productions()->oldest()->first()`).
      */
-    private function applySupplierVisibleStatusFilter(Builder $query, string $status, int $supplierId): void
+    private function applyProductionStatusFilter(Builder $query, string $status): void
     {
-        $newCaseStatuses = [
-            OperationStatusEnum::REQUESTED->value,
-            OperationStatusEnum::IN_PROGRESS->value,
-            OperationStatusEnum::WAITING_APPROVAL->value,
-        ];
+        if ($status === 'null') {
+            $query->whereNotExists(fn ($sub) => $sub
+                ->from('productions')
+                ->whereColumn('productions.operation_id', 'operations.id')
+                ->whereNull('productions.deleted_at'));
 
-        $productionConfirmedStatuses = [
-            OperationStatusEnum::PRODUCTION->value,
-            OperationStatusEnum::COMPLETED->value,
-        ];
+            return;
+        }
 
-        $pivotCompletedQuery = fn () => DB::table('operation_supplier')
-            ->whereColumn('operation_supplier.operation_id', 'operations.id')
-            ->where('operation_supplier.supplier_id', $supplierId)
-            ->where('operation_supplier.selected', true)
-            ->whereNotNull('operation_supplier.supplier_completed_at');
+        if (! in_array($status, ['confirmed', 'canceled', 'completed'], true)) {
+            return;
+        }
 
-        match ($status) {
-            'new_case' => $query
-                ->whereIn('operations.status', $newCaseStatuses)
-                ->whereNotExists($pivotCompletedQuery()),
-            'production_confirmed' => $query
-                ->whereIn('operations.status', $productionConfirmedStatuses)
-                ->whereNotExists($pivotCompletedQuery()),
-            'completed' => $query->whereExists($pivotCompletedQuery()),
-            default => null,
-        };
+        $query->whereRaw(
+            '(select `status` from `productions` where `productions`.`operation_id` = `operations`.`id` and `productions`.`deleted_at` is null order by `id` asc limit 1) = ?',
+            [$status],
+        );
     }
 
     public function operationsShow(Operation $operation)
     {
         Gate::authorize('supplierWorkspaceAbility', 'workspace.supplier.operations.view');
 
-        $supplier = $this->ensureOperationBelongsToCurrentSupplier($operation);
+        $this->ensureOperationBelongsToCurrentSupplier($operation);
 
-        // Esponi `supplier_completed_at` dal pivot per il calcolo dello stato visibile lato Vue.
-        $supplierCompletedAt = DB::table('operation_supplier')
+        // Esponi lo stato della produzione (Null/confirmed/canceled/completed) — la dimensione che
+        // l'Admin tocca esplicitamente. Per coerenza con `productions()->oldest()->first()`.
+        $productionRow = DB::table('productions')
+            ->whereNull('deleted_at')
             ->where('operation_id', $operation->id)
-            ->where('supplier_id', $supplier->id)
-            ->where('selected', true)
-            ->value('supplier_completed_at');
-        $operation->setAttribute('supplier_completed_at', $supplierCompletedAt);
+            ->orderBy('id')
+            ->first(['status', 'confirmed_at', 'canceled_at', 'completed_at']);
+        $operation->setAttribute('production_status', $productionRow?->status);
+        $operation->setAttribute('production_confirmed_at', $productionRow?->confirmed_at);
+        $operation->setAttribute('production_canceled_at', $productionRow?->canceled_at);
+        $operation->setAttribute('production_completed_at', $productionRow?->completed_at);
 
         $operation->load([
             'latestPrescription:id,operation_id,ref,typology,send_at,expire_at',
@@ -335,17 +337,6 @@ class WorkspaceSupplierController extends Controller
         $this->ensureOperationBelongsToCurrentSupplier($operation);
 
         OperationService::deleteSupplierDocument($operation, $media, asAdmin: false);
-
-        return back();
-    }
-
-    public function operationsMarkCompleted(Operation $operation)
-    {
-        Gate::authorize('supplierWorkspaceAbility', 'workspace.supplier.operations.complete');
-
-        $supplier = $this->ensureOperationBelongsToCurrentSupplier($operation);
-
-        OperationService::markSupplierProductionCompleted($operation, $supplier, UserService::currentUser());
 
         return back();
     }

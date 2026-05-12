@@ -502,6 +502,54 @@ class OperationController extends Controller
     }
 
     /**
+     * Mark production as completed (Admin M&H). Allowed only from Confermata.
+     */
+    public function markProductionCompleted(Operation $operation)
+    {
+        Gate::authorize('manageProduction', $operation);
+
+        OperationService::markProductionCompleted($operation);
+
+        return to_route('operations.show', ['operation' => $operation->id]);
+    }
+
+    /**
+     * Reopen production (Admin M&H). Allowed only from Completata → Confermata.
+     */
+    public function reopenProduction(Operation $operation)
+    {
+        Gate::authorize('manageProduction', $operation);
+
+        OperationService::reopenProduction($operation);
+
+        return to_route('operations.show', ['operation' => $operation->id]);
+    }
+
+    /**
+     * Admin M&H marks the supplier case as Completata.
+     */
+    public function markCaseCompleted(Operation $operation, Request $request)
+    {
+        Gate::authorize('manageProduction', $operation);
+
+        OperationService::markCaseCompletedByAdmin($operation, $request->user());
+
+        return to_route('operations.show', ['operation' => $operation->id]);
+    }
+
+    /**
+     * Admin M&H reopens a completed supplier case.
+     */
+    public function reopenCase(Operation $operation, Request $request)
+    {
+        Gate::authorize('manageProduction', $operation);
+
+        OperationService::reopenCaseByAdmin($operation, $request->user());
+
+        return to_route('operations.show', ['operation' => $operation->id]);
+    }
+
+    /**
      * Add an invoice to the specified operation.
      */
     public function addInvoice(AddOperationInvoiceRequest $request, Operation $operation)

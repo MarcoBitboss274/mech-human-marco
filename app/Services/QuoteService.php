@@ -99,7 +99,7 @@ class QuoteService extends ModelService
             static::accept($quote);
             // Per le tipologie ad accettazione automatica del preventivo, il preventivo
             // inviato implica anche la conferma della produzione: crea/aggiorna Production,
-            // notifica il fornitore, log activity, reset di production_canceled_at.
+            // notifica il fornitore, log activity.
             OperationService::confirmProduction($quote->operation);
         } else {
             OperationService::updateStatus($quote->operation, OperationStatusEnum::WAITING_APPROVAL->value);
